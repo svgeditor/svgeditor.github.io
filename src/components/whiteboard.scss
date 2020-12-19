@@ -1,0 +1,10 @@
+.whiteboard-container {
+  height: 100vh;
+  width: 100vw;
+
+  & textarea {
+    padding: 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.6rem;
+  }
+}

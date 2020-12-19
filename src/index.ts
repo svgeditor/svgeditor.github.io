@@ -2,6 +2,6 @@ import './index.scss';
 
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import Hello from './hello';
+import Whiteboard from './components/whiteboard';
 
-ReactDom.render(React.createElement(Hello), document.querySelector('body'));
+ReactDom.render(React.createElement(Whiteboard), document.querySelector('body'));
