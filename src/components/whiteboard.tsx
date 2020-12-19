@@ -19,10 +19,10 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   }
 
   componentDidMount() {
-    this.container.addEventListener('dblclick', this.addTextBox.bind(this));
+    this.container.addEventListener('mousedown', this.handleMouseDownEvent.bind(this));
   }
 
-  private addTextBox(event: MouseEvent) {
+  private handleMouseDownEvent(event) {
     this.container.append(createBlockElement(event));
   }
 }
