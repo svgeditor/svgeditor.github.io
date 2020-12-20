@@ -1,22 +1,12 @@
-.whiteboard-container {
+body {
   height: 100vh;
-  width: 100vw;
+}
 
-  & .resizable {
-    & .resize-guide {
-      width: 12px;
-      height: 12px;
-      border-radius: 100rem;
-      background-color: #66bbfd;
-      border: 2px solid white;
-      opacity: 0;
-      transition: var(--transition);
-      transition-property: opacity;
-      transition-duration: 350ms;
-    }
-
-    &:hover .resize-guide {
-      opacity: 1;
-    }
-  }
+.whiteboard-container {
+  position: relative;
+  height: 90vh;
+  width: 90vh;
+  margin: 5vh auto 5vh;
+  box-shadow: 0px 0px 2px 1px #d1d1d1;
+  overflow: hidden;
 }
