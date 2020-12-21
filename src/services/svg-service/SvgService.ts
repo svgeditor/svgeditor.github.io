@@ -1,4 +1,5 @@
-import { Rect, SVG, Svg } from '@svgdotjs/svg.js';
+import { Shape, SVG, Svg } from '@svgdotjs/svg.js';
+import { MOVEABLE_CLASS_NAME, SELECTABLE_CLASS_NAME } from '../common/constants';
 import { IMoveService } from '../move-service/IMoveService';
 import { MoveServiceFactory } from '../move-service/MoveServiceFactory';
 import { IRectangleElementService } from '../rectangle-element-service/IRectangleElementService';
@@ -19,35 +20,21 @@ export class SvgService implements ISvgService {
   }
 
   handleMouseDownEvent(svg: Svg, event: MouseEvent): void {
-    this.selectService.unselectElements(svg);
     const eventTarget = event.target as HTMLElement;
-    const eventTargetTagName = eventTarget.tagName;
-    switch (eventTargetTagName.toLowerCase()) {
-      case 'svg': {
-        this.rectangleElementService.create(svg, event);
-        break;
-      }
-      case 'rect': {
-        this.moveService.moveElement(event, SVG(eventTarget) as Rect);
-        break;
-      }
-      default: {
-        console.debug('unknown tag: ' + eventTargetTagName);
-      }
+    if (eventTarget instanceof SVGSVGElement) {
+      return this.rectangleElementService.create(svg, event);
+    }
+    if (eventTarget.classList.contains(MOVEABLE_CLASS_NAME)) {
+      return this.moveService.moveElement(event, SVG(eventTarget) as Shape);
     }
   }
 
   handleClickEvent(svg: Svg, event: MouseEvent): void {
     const eventTarget = event.target as HTMLElement;
-    const eventTargetTagName = eventTarget.tagName;
-    switch (eventTargetTagName.toLowerCase()) {
-      case 'rect': {
-        this.selectService.selectElement(svg, SVG(eventTarget) as Rect);
-        break;
-      }
-      default: {
-        this.selectService.unselectElements(svg);
-      }
+    if (eventTarget.classList.contains(SELECTABLE_CLASS_NAME)) {
+      return this.selectService.selectElement(svg, SVG(eventTarget) as Shape);
+    } else {
+      this.selectService.unselectElements(svg);
     }
   }
 

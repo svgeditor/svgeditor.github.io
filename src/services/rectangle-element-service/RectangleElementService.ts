@@ -1,4 +1,5 @@
 import { G, Rect, Svg } from '@svgdotjs/svg.js';
+import { MOVEABLE_CLASS_NAME, RESIZABLE_CLASS_NAME, SELECTABLE_CLASS_NAME } from '../common/constants';
 import { IRectangleElementService } from './IRectangleElementService';
 
 interface Position {
@@ -23,6 +24,9 @@ export class RectangleElementService implements IRectangleElementService {
     this.rectInitialPosition = { x: event.offsetX, y: event.offsetY };
     this.rectContainer.add(this.rectElement);
     this.rectElement
+      .addClass(RESIZABLE_CLASS_NAME)
+      .addClass(MOVEABLE_CLASS_NAME)
+      .addClass(SELECTABLE_CLASS_NAME)
       .move(event.offsetX, event.offsetY)
       .size(0, 0)
       .fill('white')
@@ -34,18 +38,6 @@ export class RectangleElementService implements IRectangleElementService {
   getStyles(): string {
     return `
       /* <![CDATA[ */
-      .resize-guide {
-        fill: #369bfa;
-        stroke: white;
-        stroke-width: 2;
-        opacity: 0;
-        transition: all 0.15s ease-in-out;
-        transition-property: opacity;
-        transition-duration: 350ms;
-      }
-      .resizable:hover .resize-guide {
-        opacity: 1;
-      }
       /* ]]> */
     `;
   }
