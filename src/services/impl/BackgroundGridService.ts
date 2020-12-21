@@ -1,4 +1,4 @@
-import { IBackgroundGridService } from './IBackgroundGridService';
+import { IBackgroundGridService } from '../api/IBackgroundGridService';
 
 export class BackgroundGridService implements IBackgroundGridService {
   add(element: HTMLElement): void {

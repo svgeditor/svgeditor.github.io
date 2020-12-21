@@ -1,11 +1,10 @@
 import { G, Shape } from '@svgdotjs/svg.js';
-import { Position } from '../common/Position';
-import { IMoveService } from './IMoveService';
+import { Position } from '../api/Position';
+import { IMoveService } from '../api/IMoveService';
 
 export class MoveService implements IMoveService {
   private mousePosition: Position;
   private shape: Shape;
-  private moved: boolean;
 
   constructor() {
     this.move = this.move.bind(this);
@@ -13,7 +12,6 @@ export class MoveService implements IMoveService {
   }
 
   moveElement(event: MouseEvent, shape: Shape): void {
-    this.moved = false;
     this.mousePosition = { x: event.clientX, y: event.clientY };
     this.shape = <G>shape.parent();
     document.addEventListener('mousemove', this.move);
@@ -21,7 +19,6 @@ export class MoveService implements IMoveService {
   }
 
   private move(event: MouseEvent): void {
-    this.moved = true;
     event.preventDefault();
     let previousMousePosition = { ...this.mousePosition };
     this.mousePosition = { x: event.clientX, y: event.clientY };

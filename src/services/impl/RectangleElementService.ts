@@ -1,6 +1,6 @@
 import { G, Rect, Svg } from '@svgdotjs/svg.js';
-import { MOVEABLE_CLASS_NAME, RESIZABLE_CLASS_NAME, SELECTABLE_CLASS_NAME } from '../common/constants';
-import { IRectangleElementService } from './IRectangleElementService';
+import { MOVEABLE_CLASS_NAME, RESIZABLE_CLASS_NAME, SELECTABLE_CLASS_NAME } from './_constants';
+import { IRectangleElementService } from '../api/IRectangleElementService';
 
 interface Position {
   x: number;

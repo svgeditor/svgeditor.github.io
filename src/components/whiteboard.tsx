@@ -1,10 +1,10 @@
 import './whiteboard.scss';
 import * as React from 'react';
-import { IBackgroundGridService } from '../services/background-grid-service/IBackgroundGridService';
+import { IBackgroundGridService } from '../services/api/IBackgroundGridService';
 import { SVG } from '@svgdotjs/svg.js';
-import { ISvgService } from '../services/svg-service/ISvgService';
-import { BackgroundGridServiceFactory } from '../services/background-grid-service/BackgroundGridServiceFactory';
-import { SvgServiceFactory } from '../services/svg-service/SvgServiceFactory';
+import { ISvgService } from '../services/api/ISvgService';
+import { SvgService } from '../services/impl/SvgService';
+import { BackgroundGridService } from '../services/impl/BackgroundGridService';
 
 export interface IWhiteboardProps {
   svgService?: ISvgService;
@@ -21,8 +21,8 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   constructor(props: IWhiteboardProps) {
     super(props);
     this.state = {};
-    this.svgService = this.props.svgService ? this.props.svgService : SvgServiceFactory.create();
-    this.backgroundGridService = this.props.backgroundGridService ? this.props.backgroundGridService : BackgroundGridServiceFactory.create();
+    this.svgService = this.props.svgService ? this.props.svgService : new SvgService();
+    this.backgroundGridService = this.props.backgroundGridService ? this.props.backgroundGridService : new BackgroundGridService();
   }
 
   public render() {

@@ -1,12 +1,12 @@
 import { Shape, SVG, Svg } from '@svgdotjs/svg.js';
-import { MOVEABLE_CLASS_NAME, SELECTABLE_CLASS_NAME } from '../common/constants';
-import { IMoveService } from '../move-service/IMoveService';
-import { MoveServiceFactory } from '../move-service/MoveServiceFactory';
-import { IRectangleElementService } from '../rectangle-element-service/IRectangleElementService';
-import { RectangleElementServiceFactory } from '../rectangle-element-service/RectangleElementServiceFactory';
-import { ISelectService } from '../select-service/ISelectService';
-import { SelectServiceFactory } from '../select-service/SelectServiceFactory';
-import { ISvgService } from './ISvgService';
+import { MOVEABLE_CLASS_NAME, SELECTABLE_CLASS_NAME } from './_constants';
+import { IMoveService } from '../api/IMoveService';
+import { IRectangleElementService } from '../api/IRectangleElementService';
+import { ISelectService } from '../api/ISelectService';
+import { ISvgService } from '../api/ISvgService';
+import { MoveService } from './MoveService';
+import { SelectService } from './SelectService';
+import { RectangleElementService } from './RectangleElementService';
 
 export class SvgService implements ISvgService {
   private moveService: IMoveService;
@@ -14,9 +14,9 @@ export class SvgService implements ISvgService {
   private rectangleElementService: IRectangleElementService;
 
   constructor(moveService?: IMoveService, selectService?: ISelectService, rectangleElementService?: IRectangleElementService) {
-    this.moveService = moveService ? moveService : MoveServiceFactory.create();
-    this.selectService = selectService ? selectService : SelectServiceFactory.create();
-    this.rectangleElementService = rectangleElementService ? rectangleElementService : RectangleElementServiceFactory.create();
+    this.moveService = moveService ? moveService : new MoveService();
+    this.selectService = selectService ? selectService : new SelectService();
+    this.rectangleElementService = rectangleElementService ? rectangleElementService : new RectangleElementService();
   }
 
   handleMouseDownEvent(svg: Svg, event: MouseEvent): void {

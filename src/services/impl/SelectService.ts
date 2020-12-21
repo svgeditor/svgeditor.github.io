@@ -1,6 +1,6 @@
 import { Shape, Svg } from '@svgdotjs/svg.js';
-import { SELECTABLE_BORDER_CLASS_NAME, SHAPE_DATA } from '../common/constants';
-import { ISelectService } from './ISelectService';
+import { SELECTABLE_BORDER_CLASS_NAME, SHAPE_DATA } from './_constants';
+import { ISelectService } from '../api/ISelectService';
 
 export class SelectService implements ISelectService {
   private group = null;

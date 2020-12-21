@@ -1,4 +1,4 @@
-import { IRandomIdService } from './IRandomIdService';
+import { IRandomIdService } from '../api/IRandomIdService';
 
 export class RandomIdService implements IRandomIdService {
   generate(): string {
