@@ -1,11 +1,5 @@
 import { Shape, Svg } from '@svgdotjs/svg.js';
-import {
-  MOVE_IN_PROGRESS_CLASS_NAME,
-  RESIZE_GUIDE_CLASS_NAME,
-  SELECTABLE_BORDER_CLASS_NAME,
-  SELECTABLE_BORDER_GROUP_CLASS_NAME,
-  SHAPE_DATA,
-} from './_constants';
+import { MOVE_IN_PROGRESS_CLASS_NAME, RESIZE_GUIDE_CLASS_NAME, SELECTABLE_BORDER_CLASS_NAME, SELECTABLE_BORDER_GROUP_CLASS_NAME } from './_constants';
 import { ISelectService } from '../api/ISelectService';
 
 export class SelectService implements ISelectService {
@@ -65,14 +59,31 @@ export class SelectService implements ISelectService {
       .move(shape.x(), shape.y())
       .size(shape.width(), shape.height())
       .fill('transparent')
-      .stroke({ color: '#348CF7', dasharray: '5,5', width: 2 })
-      .data(SHAPE_DATA, shape.id());
+      .stroke({ color: '#348CF7', dasharray: '5,5', width: 2 });
   }
 
   private createResizeGuideNW(svg: Svg, shape: Shape): Shape {
     const circle = this.createResizeGuide(svg, shape.x(), shape.y());
     circle.addClass(RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
+    circle.on('mousedown', () => {
+      const shapeInitialX = shape.x() + shape.width();
+      const shapeInitialY = shape.y() + shape.height();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const x = Math.min(event.offsetX, shapeInitialX);
+        const y = Math.min(event.offsetY, shapeInitialY);
+        const width = Math.abs(event.offsetX - shapeInitialX);
+        const height = Math.abs(event.offsetY - shapeInitialY);
+        shape.move(x, y).size(width, height);
+      };
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
     return circle;
   }
 
@@ -80,6 +91,21 @@ export class SelectService implements ISelectService {
     const circle = this.createResizeGuide(svg, shape.x() + shape.width() / 2, shape.y());
     circle.addClass(RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
+    circle.on('mousedown', () => {
+      const shapeInitialY = shape.y() + shape.height();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const y = Math.min(event.offsetY, shapeInitialY);
+        const height = Math.abs(event.offsetY - shapeInitialY);
+        shape.y(y).height(height);
+      };
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
     return circle;
   }
 
@@ -87,6 +113,24 @@ export class SelectService implements ISelectService {
     const circle = this.createResizeGuide(svg, shape.x() + shape.width(), shape.y());
     circle.addClass(RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
+    circle.on('mousedown', () => {
+      const shapeInitialX = shape.x();
+      const shapeInitialY = shape.y() + shape.height();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const x = Math.min(event.offsetX, shapeInitialX);
+        const y = Math.min(event.offsetY, shapeInitialY);
+        const width = Math.abs(event.offsetX - shapeInitialX);
+        const height = Math.abs(event.offsetY - shapeInitialY);
+        shape.move(x, y).size(width, height);
+      };
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
     return circle;
   }
 
@@ -94,6 +138,21 @@ export class SelectService implements ISelectService {
     const circle = this.createResizeGuide(svg, shape.x() + shape.width(), shape.y() + shape.height() / 2);
     circle.addClass(RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
+    circle.on('mousedown', () => {
+      const shapeInitialX = shape.x();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const x = Math.min(event.offsetX, shapeInitialX);
+        const width = Math.abs(event.offsetX - shapeInitialX);
+        shape.x(x).width(width);
+      };
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
     return circle;
   }
 
@@ -101,6 +160,24 @@ export class SelectService implements ISelectService {
     const circle = this.createResizeGuide(svg, shape.x() + shape.width(), shape.y() + shape.height());
     circle.addClass(RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
+    circle.on('mousedown', () => {
+      const shapeInitialX = shape.x();
+      const shapeInitialY = shape.y();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const x = Math.min(event.offsetX, shapeInitialX);
+        const y = Math.min(event.offsetY, shapeInitialY);
+        const width = Math.abs(event.offsetX - shapeInitialX);
+        const height = Math.abs(event.offsetY - shapeInitialY);
+        shape.move(x, y).size(width, height);
+      };
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
     return circle;
   }
 
@@ -108,6 +185,21 @@ export class SelectService implements ISelectService {
     const circle = this.createResizeGuide(svg, shape.x() + shape.width() / 2, shape.y() + shape.height());
     circle.addClass(RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
+    circle.on('mousedown', () => {
+      const shapeInitialY = shape.y();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const y = Math.min(event.offsetY, shapeInitialY);
+        const height = Math.abs(event.offsetY - shapeInitialY);
+        shape.y(y).height(height);
+      };
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
     return circle;
   }
 
@@ -115,6 +207,24 @@ export class SelectService implements ISelectService {
     const circle = this.createResizeGuide(svg, shape.x(), shape.y() + shape.height());
     circle.addClass(RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
+    circle.on('mousedown', () => {
+      const shapeInitialX = shape.x() + shape.width();
+      const shapeInitialY = shape.y();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const x = Math.min(event.offsetX, shapeInitialX);
+        const y = Math.min(event.offsetY, shapeInitialY);
+        const width = Math.abs(event.offsetX - shapeInitialX);
+        const height = Math.abs(event.offsetY - shapeInitialY);
+        shape.move(x, y).size(width, height);
+      };
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
     return circle;
   }
 
@@ -122,6 +232,21 @@ export class SelectService implements ISelectService {
     const circle = this.createResizeGuide(svg, shape.x(), shape.y() + shape.height() / 2);
     circle.addClass(RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
+    circle.on('mousedown', () => {
+      const shapeInitialX = shape.x() + shape.width();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const x = Math.min(event.offsetX, shapeInitialX);
+        const width = Math.abs(event.offsetX - shapeInitialX);
+        shape.x(x).width(width);
+      };
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
     return circle;
   }
 
