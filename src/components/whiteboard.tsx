@@ -34,7 +34,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     window.addEventListener('resize', () => this.backgroundGridService.reset(this.svgContainer));
     const svgRoot = SVG().addTo(this.svgContainer).size('100%', '100%');
     svgRoot.element('style').words(this.svgService.getStyles());
-    this.svgContainer.addEventListener('mousedown', (event) => this.svgService.handleMouseDownEvent(svgRoot, event));
-    this.svgContainer.addEventListener('click', (event) => this.svgService.handleClickEvent(svgRoot, event));
+    this.svgContainer.addEventListener('mousedown', (event) => this.svgService.handleMouseDownEvent(event, svgRoot));
+    this.svgContainer.addEventListener('click', (event) => this.svgService.handleClickEvent(event, svgRoot));
   }
 }

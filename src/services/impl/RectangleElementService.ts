@@ -18,7 +18,7 @@ export class RectangleElementService implements IRectangleElementService {
   }
 
   // prettier-ignore
-  create(svg: Svg, event: MouseEvent): void {
+  create(event: MouseEvent, svg: Svg): void {
     this.rectContainer = svg.group();
     this.rectElement = svg.rect();
     this.rectInitialPosition = { x: event.offsetX, y: event.offsetY };

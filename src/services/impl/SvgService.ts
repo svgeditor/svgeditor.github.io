@@ -19,17 +19,18 @@ export class SvgService implements ISvgService {
     this.rectangleElementService = rectangleElementService ? rectangleElementService : new RectangleElementService();
   }
 
-  handleMouseDownEvent(svg: Svg, event: MouseEvent): void {
+  handleMouseDownEvent(event: MouseEvent, svg: Svg): void {
     const eventTarget = event.target as HTMLElement;
     if (eventTarget instanceof SVGSVGElement) {
-      return this.rectangleElementService.create(svg, event);
+      return this.rectangleElementService.create(event, svg);
     }
     if (eventTarget.classList.contains(MOVEABLE_CLASS_NAME)) {
-      return this.moveService.moveElement(event, SVG(eventTarget) as Shape);
+      this.selectService.selectElement(svg, SVG(eventTarget) as Shape);
+      return this.moveService.moveElement(event, svg, SVG(eventTarget) as Shape);
     }
   }
 
-  handleClickEvent(svg: Svg, event: MouseEvent): void {
+  handleClickEvent(event: MouseEvent, svg: Svg): void {
     const eventTarget = event.target as HTMLElement;
     if (eventTarget.classList.contains(SELECTABLE_CLASS_NAME)) {
       return this.selectService.selectElement(svg, SVG(eventTarget) as Shape);

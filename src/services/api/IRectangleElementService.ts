@@ -1,6 +1,6 @@
-import { Rect, Svg } from '@svgdotjs/svg.js';
+import { Svg } from '@svgdotjs/svg.js';
 
 export interface IRectangleElementService {
-  create(svg: Svg, event: MouseEvent): void;
+  create(event: MouseEvent, svg: Svg): void;
   getStyles(): string;
 }

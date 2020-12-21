@@ -1,17 +1,22 @@
-import { G, Shape } from '@svgdotjs/svg.js';
+import { G, Shape, Svg } from '@svgdotjs/svg.js';
 import { Position } from '../api/Position';
 import { IMoveService } from '../api/IMoveService';
+import { MOVE_IN_PROGRESS_CLASS_NAME } from './_constants';
 
 export class MoveService implements IMoveService {
   private mousePosition: Position;
+  private svg: Svg;
   private shape: Shape;
+  private moved: boolean;
 
   constructor() {
     this.move = this.move.bind(this);
     this.endMove = this.endMove.bind(this);
   }
 
-  moveElement(event: MouseEvent, shape: Shape): void {
+  moveElement(event: MouseEvent, svg: Svg, shape: Shape): void {
+    this.moved = false;
+    this.svg = svg;
     this.mousePosition = { x: event.clientX, y: event.clientY };
     this.shape = <G>shape.parent();
     document.addEventListener('mousemove', this.move);
@@ -19,6 +24,8 @@ export class MoveService implements IMoveService {
   }
 
   private move(event: MouseEvent): void {
+    if (!this.moved) this.svg.addClass(MOVE_IN_PROGRESS_CLASS_NAME);
+    this.moved = true;
     event.preventDefault();
     let previousMousePosition = { ...this.mousePosition };
     this.mousePosition = { x: event.clientX, y: event.clientY };
@@ -28,6 +35,7 @@ export class MoveService implements IMoveService {
   }
 
   private endMove(event: MouseEvent): void {
+    this.svg.removeClass(MOVE_IN_PROGRESS_CLASS_NAME);
     document.removeEventListener('mousemove', this.move);
     document.removeEventListener('mouseup', this.endMove);
   }
