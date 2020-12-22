@@ -1,93 +1,138 @@
-import { Shape, Svg } from '@svgdotjs/svg.js';
-import {
-  MOVE_IN_PROGRESS_CLASS_NAME,
-  RESIZE_GUIDE_CLASS_NAME,
-  RESIZE_IN_PROGRESS_CLASS_NAME,
-  SELECTABLE_BORDER_CLASS_NAME,
-  SELECTABLE_BORDER_GROUP_CLASS_NAME,
-  SELECTION_COLOR,
-} from './_constants';
-import { ISelectService } from '../api/ISelectService';
+import { G, Rect, Shape, Svg } from '@svgdotjs/svg.js';
+import * as constants from './_constants';
+import { ISvgElementService } from '../api/ISvgElementService';
+import { AppStateService } from './AppStateService';
+import { SvgElementService } from './BaseSvgElementService';
 
-export class SelectService implements ISelectService {
-  private group = null;
-  // prettier-ignore
-  selectElement(svg: Svg, shape: Shape): void {
-    this.unselectElements(svg);
-    this.setGroup(svg);
-    this.group.add(this.createBorder(svg, shape));
-    this.group.add(this.createResizeGuideNW(svg, shape));
-    this.group.add(this.createResizeGuideN(svg, shape));
-    this.group.add(this.createResizeGuideNE(svg, shape));
-    this.group.add(this.createResizeGuideE(svg, shape));
-    this.group.add(this.createResizeGuideSE(svg, shape));
-    this.group.add(this.createResizeGuideS(svg, shape));
-    this.group.add(this.createResizeGuideSW(svg, shape));
-    this.group.add(this.createResizeGuideW(svg, shape));
-    this.group.front();
+interface Position {
+  x: number;
+  y: number;
+}
+
+export class RectSvgElementService extends SvgElementService implements ISvgElementService {
+  private container: G;
+  private element: Rect;
+  private initialPosition: Position;
+
+  constructor(appStateService = AppStateService.getInstance()) {
+    super(appStateService);
+    this.resize = this.resize.bind(this);
+    this.endResize = this.endResize.bind(this);
   }
 
-  unselectElements(svg: Svg): void {
-    this.setGroup(svg);
-    this.group.each(function () {
-      this.remove();
-    });
+  // prettier-ignore
+  createOnMouseDown(event: MouseEvent): void {
+    const svg = this.appStateService.getSvg();
+    this.container = svg.group().addClass(constants.SELECTABLE_GROUP_CLASS_NAME);
+    this.element = svg.rect();
+    this.initialPosition = { x: event.offsetX, y: event.offsetY };
+    this.container.add(this.element);
+    this.element
+      .addClass(constants.SHAPE_CLASS_NAME)
+      .move(event.offsetX, event.offsetY)
+      .size(0, 0)
+      .fill('white')
+      .stroke({color: '#707070', width: 1});
+    document.addEventListener('mousemove', this.resize);
+    document.addEventListener('mouseup', this.endResize);
+  }
+
+  // prettier-ignore
+  select(shape: Shape): void {
+    this.unselectAll();
+    const svg = this.appStateService.getSvg();
+    const group = this.getGroup();
+    group.add(this.createBorder(svg, shape));
+    group.add(this.createResizeGuideNW(svg, shape));
+    group.add(this.createResizeGuideN(svg, shape));
+    group.add(this.createResizeGuideNE(svg, shape));
+    group.add(this.createResizeGuideE(svg, shape));
+    group.add(this.createResizeGuideSE(svg, shape));
+    group.add(this.createResizeGuideS(svg, shape));
+    group.add(this.createResizeGuideSW(svg, shape));
+    group.add(this.createResizeGuideW(svg, shape));
+    group.front();
   }
 
   getStyles(): string {
     return `
       /* <![CDATA[ */
-        .${SELECTABLE_BORDER_GROUP_CLASS_NAME} .${SELECTABLE_BORDER_CLASS_NAME} {
+        .${constants.ON_HOVER_HELPER_CLASS_NAME} {
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.15s ease-in-out;
+        }
+        .${constants.SELECTABLE_GROUP_CLASS_NAME}:hover .${constants.ON_HOVER_HELPER_CLASS_NAME} {
+          opacity: 1;
+        }
+
+        .${constants.SELECTABLE_BORDER_GROUP_CLASS_NAME} .${constants.SELECTABLE_BORDER_CLASS_NAME} {
           pointer-events: none;
         }
 
-        .${MOVE_IN_PROGRESS_CLASS_NAME} .${RESIZE_GUIDE_CLASS_NAME},
-        .${RESIZE_IN_PROGRESS_CLASS_NAME} .${RESIZE_GUIDE_CLASS_NAME} {
+        .${constants.MOVE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_GUIDE_CLASS_NAME},
+        .${constants.RESIZE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_GUIDE_CLASS_NAME} {
           opacity: 0;
         }
 
-        .${MOVE_IN_PROGRESS_CLASS_NAME} .${SELECTABLE_BORDER_CLASS_NAME},
-        .${RESIZE_IN_PROGRESS_CLASS_NAME} .${SELECTABLE_BORDER_CLASS_NAME} {
+        .${constants.MOVE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTABLE_BORDER_CLASS_NAME},
+        .${constants.RESIZE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTABLE_BORDER_CLASS_NAME} {
           opacity: 0.8;
           stroke-dasharray: 5,5;
         }
 
-        .${RESIZE_GUIDE_CLASS_NAME} {
+        .${constants.RESIZE_GUIDE_CLASS_NAME} {
           transition: fill 0.15s ease-in-out;
         }
 
-        .${RESIZE_GUIDE_CLASS_NAME}:hover {
-          fill: ${SELECTION_COLOR}
+        .${constants.RESIZE_GUIDE_CLASS_NAME}:hover {
+          fill: ${constants.SELECTION_COLOR}
         }
-
       /* ]]> */
     `;
   }
 
-  private setGroup(svg: Svg): void {
-    if (!this.group) {
-      this.group = svg.findOne(`g.${SELECTABLE_BORDER_GROUP_CLASS_NAME}`);
-      if (!this.group) this.group = svg.group().addClass(`${SELECTABLE_BORDER_GROUP_CLASS_NAME}`);
+  private resize(event: MouseEvent): void {
+    event.preventDefault();
+    const x = Math.min(event.offsetX, this.initialPosition.x);
+    const y = Math.min(event.offsetY, this.initialPosition.y);
+    const width = Math.abs(event.offsetX - this.initialPosition.x);
+    const height = Math.abs(event.offsetY - this.initialPosition.y);
+    this.element.move(x, y).size(width, height);
+  }
+
+  // prettier-ignore
+  private endResize(event: MouseEvent) {
+    if (this.element.width() == 0 || this.element.height() == 0) {
+      this.container.remove();
+    } else {
+      this.container.add(this.element.clone()
+        .addClass(constants.ON_HOVER_HELPER_CLASS_NAME)
+        .fill('transparent')
+        .stroke({ color: constants.SELECTION_COLOR, width: 1 }));
+      setTimeout(() => this.select(this.container), 0);
     }
+    document.removeEventListener('mousemove', this.resize);
+    document.removeEventListener('mouseup', this.endResize);
   }
 
   private createBorder(svg: Svg, shape: Shape): Shape {
     return svg
       .rect()
-      .addClass(SELECTABLE_BORDER_CLASS_NAME)
+      .addClass(constants.SELECTABLE_BORDER_CLASS_NAME)
       .move(shape.x(), shape.y())
       .size(shape.width(), shape.height())
       .fill('transparent')
-      .stroke({ color: SELECTION_COLOR, width: 1 });
+      .stroke({ color: constants.SELECTION_COLOR, width: 1 });
   }
 
   private createResizeGuideNW(svg: Svg, shape: Shape): Shape {
     const circle = this.createResizeGuide(svg, shape.x(), shape.y());
-    circle.addClass(RESIZE_GUIDE_CLASS_NAME);
+    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
       const shapeInitialX = shape.x() + shape.width();
       const shapeInitialY = shape.y() + shape.height();
       const handleMouseMove = (event) => {
@@ -101,8 +146,8 @@ export class SelectService implements ISelectService {
         });
       };
       const handleMouseUp = () => {
-        _this.selectElement(svg, shape);
-        svg.removeClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+        _this.select(shape);
+        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -114,11 +159,11 @@ export class SelectService implements ISelectService {
 
   private createResizeGuideN(svg: Svg, shape: Shape): Shape {
     const circle = this.createResizeGuide(svg, shape.x() + shape.width() / 2, shape.y());
-    circle.addClass(RESIZE_GUIDE_CLASS_NAME);
+    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
       const shapeInitialY = shape.y() + shape.height();
       const handleMouseMove = (event) => {
         event.preventDefault();
@@ -129,8 +174,8 @@ export class SelectService implements ISelectService {
         });
       };
       const handleMouseUp = () => {
-        _this.selectElement(svg, shape);
-        svg.removeClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+        _this.select(shape);
+        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -142,11 +187,11 @@ export class SelectService implements ISelectService {
 
   private createResizeGuideNE(svg: Svg, shape: Shape): Shape {
     const circle = this.createResizeGuide(svg, shape.x() + shape.width(), shape.y());
-    circle.addClass(RESIZE_GUIDE_CLASS_NAME);
+    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
       const shapeInitialX = shape.x();
       const shapeInitialY = shape.y() + shape.height();
       const handleMouseMove = (event) => {
@@ -160,8 +205,8 @@ export class SelectService implements ISelectService {
         });
       };
       const handleMouseUp = () => {
-        _this.selectElement(svg, shape);
-        svg.removeClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+        _this.select(shape);
+        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -173,11 +218,11 @@ export class SelectService implements ISelectService {
 
   private createResizeGuideE(svg: Svg, shape: Shape): Shape {
     const circle = this.createResizeGuide(svg, shape.x() + shape.width(), shape.y() + shape.height() / 2);
-    circle.addClass(RESIZE_GUIDE_CLASS_NAME);
+    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
       const shapeInitialX = shape.x();
       const handleMouseMove = (event) => {
         event.preventDefault();
@@ -188,8 +233,8 @@ export class SelectService implements ISelectService {
         });
       };
       const handleMouseUp = () => {
-        _this.selectElement(svg, shape);
-        svg.removeClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+        _this.select(shape);
+        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -201,11 +246,11 @@ export class SelectService implements ISelectService {
 
   private createResizeGuideSE(svg: Svg, shape: Shape): Shape {
     const circle = this.createResizeGuide(svg, shape.x() + shape.width(), shape.y() + shape.height());
-    circle.addClass(RESIZE_GUIDE_CLASS_NAME);
+    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
       const shapeInitialX = shape.x();
       const shapeInitialY = shape.y();
       const handleMouseMove = (event) => {
@@ -219,8 +264,8 @@ export class SelectService implements ISelectService {
         });
       };
       const handleMouseUp = () => {
-        _this.selectElement(svg, shape);
-        svg.removeClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+        _this.select(shape);
+        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -232,11 +277,11 @@ export class SelectService implements ISelectService {
 
   private createResizeGuideS(svg: Svg, shape: Shape): Shape {
     const circle = this.createResizeGuide(svg, shape.x() + shape.width() / 2, shape.y() + shape.height());
-    circle.addClass(RESIZE_GUIDE_CLASS_NAME);
+    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
       const shapeInitialY = shape.y();
       const handleMouseMove = (event) => {
         event.preventDefault();
@@ -247,8 +292,8 @@ export class SelectService implements ISelectService {
         });
       };
       const handleMouseUp = () => {
-        _this.selectElement(svg, shape);
-        svg.removeClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+        _this.select(shape);
+        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -260,11 +305,11 @@ export class SelectService implements ISelectService {
 
   private createResizeGuideSW(svg: Svg, shape: Shape): Shape {
     const circle = this.createResizeGuide(svg, shape.x(), shape.y() + shape.height());
-    circle.addClass(RESIZE_GUIDE_CLASS_NAME);
+    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
       const shapeInitialX = shape.x() + shape.width();
       const shapeInitialY = shape.y();
       const handleMouseMove = (event) => {
@@ -278,8 +323,8 @@ export class SelectService implements ISelectService {
         });
       };
       const handleMouseUp = () => {
-        _this.selectElement(svg, shape);
-        svg.removeClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+        _this.select(shape);
+        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -291,11 +336,11 @@ export class SelectService implements ISelectService {
 
   private createResizeGuideW(svg: Svg, shape: Shape): Shape {
     const circle = this.createResizeGuide(svg, shape.x(), shape.y() + shape.height() / 2);
-    circle.addClass(RESIZE_GUIDE_CLASS_NAME);
+    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
       const shapeInitialX = shape.x() + shape.width();
       const handleMouseMove = (event) => {
         event.preventDefault();
@@ -306,8 +351,8 @@ export class SelectService implements ISelectService {
         });
       };
       const handleMouseUp = () => {
-        _this.selectElement(svg, shape);
-        svg.removeClass(RESIZE_IN_PROGRESS_CLASS_NAME);
+        _this.select(shape);
+        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -323,6 +368,6 @@ export class SelectService implements ISelectService {
       .circle(8)
       .cx(x).cy(y)
       .fill('white')
-      .stroke({ color: SELECTION_COLOR, width: 1 });
+      .stroke({ color: constants.SELECTION_COLOR, width: 1 });
   }
 }

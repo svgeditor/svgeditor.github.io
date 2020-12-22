@@ -1,9 +1,11 @@
-import { AppState } from '../api/AppState';
+import { Svg } from '@svgdotjs/svg.js';
+import { AppState } from '../../models/AppState';
 import { IAppStateService } from '../api/IAppStateService';
 
 export class AppStateService implements IAppStateService {
   private static instance: IAppStateService = null;
   private appState: AppState = null;
+  private svg: Svg;
 
   static getInstance(): IAppStateService {
     if (AppStateService.instance === null) {
@@ -13,6 +15,13 @@ export class AppStateService implements IAppStateService {
   }
 
   protected constructor() {}
+
+  setSvg(svg: Svg): void {
+    this.svg = svg;
+  }
+  getSvg(): Svg {
+    return this.svg;
+  }
 
   getAppState(): AppState {
     if (!this.appState) {

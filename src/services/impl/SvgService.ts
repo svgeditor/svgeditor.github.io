@@ -1,48 +1,60 @@
-import { G, Shape, SVG, Svg } from '@svgdotjs/svg.js';
-import { MOVEABLE_CLASS_NAME, SELECTABLE_CLASS_NAME } from './_constants';
-import { IMoveService } from '../api/IMoveService';
-import { IRectangleElementService } from '../api/IRectangleElementService';
-import { ISelectService } from '../api/ISelectService';
+import { G, Shape, SVG } from '@svgdotjs/svg.js';
+import { SHAPE_CLASS_NAME } from './_constants';
+import { ISvgElementService } from '../api/ISvgElementService';
 import { ISvgService } from '../api/ISvgService';
-import { MoveService } from './MoveService';
-import { SelectService } from './SelectService';
-import { RectangleElementService } from './RectangleElementService';
+import { RectSvgElementService } from './RectSvgElementService';
 
 export class SvgService implements ISvgService {
-  private moveService: IMoveService;
-  private selectService: ISelectService;
-  private rectangleElementService: IRectangleElementService;
+  private rectService: ISvgElementService;
 
-  constructor(moveService?: IMoveService, selectService?: ISelectService, rectangleElementService?: IRectangleElementService) {
-    this.moveService = moveService ? moveService : new MoveService();
-    this.selectService = selectService ? selectService : new SelectService();
-    this.rectangleElementService = rectangleElementService ? rectangleElementService : new RectangleElementService();
+  constructor(rectService?: ISvgElementService) {
+    this.rectService = rectService ? rectService : new RectSvgElementService();
   }
 
-  handleMouseDownEvent(event: MouseEvent, svg: Svg): void {
-    const eventTarget = event.target as HTMLElement;
-    if (eventTarget instanceof SVGSVGElement) {
-      return this.rectangleElementService.create(event, svg);
+  handleMouseDownEvent(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target instanceof SVGSVGElement) {
+      return this.getSvgElementService().createOnMouseDown(event);
     }
-    if (eventTarget.classList.contains(MOVEABLE_CLASS_NAME)) {
-      this.selectService.selectElement(svg, SVG(eventTarget).parent() as G);
-      return this.moveService.moveElement(event, svg, SVG(eventTarget) as Shape);
+    if (target.classList.contains(SHAPE_CLASS_NAME)) {
+      return this.getSvgElementServiceByEventTarget(target).move(event, this.toShape(target));
     }
   }
 
-  handleClickEvent(event: MouseEvent, svg: Svg): void {
-    const eventTarget = event.target as HTMLElement;
-    if (eventTarget.classList.contains(SELECTABLE_CLASS_NAME)) {
-      return this.selectService.selectElement(svg, SVG(eventTarget).parent() as G);
+  handleClickEvent(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains(SHAPE_CLASS_NAME)) {
+      return this.getSvgElementServiceByEventTarget(target).select(this.toShape(target));
     } else {
-      this.selectService.unselectElements(svg);
+      this.rectService.unselectAll();
     }
   }
 
   getStyles(): string {
     return `
-      ${this.rectangleElementService.getStyles()}
-      ${this.selectService.getStyles()}
+      ${this.rectService.getStyles()}
     `;
+  }
+
+  private getSvgElementService(): ISvgElementService {
+    return this.rectService;
+  }
+
+  private getSvgElementServiceByEventTarget(target: HTMLElement): ISvgElementService {
+    const shapeName = target.tagName.toUpperCase();
+    switch (shapeName) {
+      case 'RECT':
+        return this.rectService;
+      default:
+        throw Error('Unsupported shape: ' + shapeName);
+    }
+  }
+
+  private toShape(eventTarget): Shape {
+    let res = SVG(eventTarget) as Shape;
+    while (res.parent() instanceof G) {
+      res = res.parent() as G;
+    }
+    return res as G;
   }
 }

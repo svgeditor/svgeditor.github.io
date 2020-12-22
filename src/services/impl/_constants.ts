@@ -1,6 +1,4 @@
-export const MOVEABLE_CLASS_NAME = 'moveable';
-export const RESIZABLE_CLASS_NAME = 'resizable';
-export const SELECTABLE_CLASS_NAME = 'selectable';
+export const SHAPE_CLASS_NAME = 'shape';
 export const SELECTABLE_GROUP_CLASS_NAME = 'selectable-group';
 export const SELECTABLE_BORDER_CLASS_NAME = 'selected-element-border';
 export const SELECTABLE_BORDER_GROUP_CLASS_NAME = 'selectable-border-group-class-name';
