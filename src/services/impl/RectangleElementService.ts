@@ -1,5 +1,12 @@
 import { G, Rect, Svg } from '@svgdotjs/svg.js';
-import { MOVEABLE_CLASS_NAME, RESIZABLE_CLASS_NAME, SELECTABLE_CLASS_NAME } from './_constants';
+import {
+  MOVEABLE_CLASS_NAME,
+  ON_HOVER_HELPER_CLASS_NAME,
+  RESIZABLE_CLASS_NAME,
+  SELECTABLE_CLASS_NAME,
+  SELECTABLE_GROUP_CLASS_NAME,
+  SELECTION_COLOR,
+} from './_constants';
 import { IRectangleElementService } from '../api/IRectangleElementService';
 
 interface Position {
@@ -8,9 +15,9 @@ interface Position {
 }
 
 export class RectangleElementService implements IRectangleElementService {
-  private rectContainer: G;
-  private rectElement: Rect;
-  private rectInitialPosition: Position;
+  private container: G;
+  private element: Rect;
+  private initialPosition: Position;
 
   constructor() {
     this.resize = this.resize.bind(this);
@@ -19,18 +26,18 @@ export class RectangleElementService implements IRectangleElementService {
 
   // prettier-ignore
   create(event: MouseEvent, svg: Svg): void {
-    this.rectContainer = svg.group();
-    this.rectElement = svg.rect();
-    this.rectInitialPosition = { x: event.offsetX, y: event.offsetY };
-    this.rectContainer.add(this.rectElement);
-    this.rectElement
+    this.container = svg.group().addClass(SELECTABLE_GROUP_CLASS_NAME);
+    this.element = svg.rect();
+    this.initialPosition = { x: event.offsetX, y: event.offsetY };
+    this.container.add(this.element);
+    this.element
       .addClass(RESIZABLE_CLASS_NAME)
       .addClass(MOVEABLE_CLASS_NAME)
       .addClass(SELECTABLE_CLASS_NAME)
       .move(event.offsetX, event.offsetY)
       .size(0, 0)
       .fill('white')
-      .stroke({color: '#222', width: 1});
+      .stroke({color: '#707070', width: 1});
     document.addEventListener('mousemove', this.resize);
     document.addEventListener('mouseup', this.endResize);
   }
@@ -38,23 +45,36 @@ export class RectangleElementService implements IRectangleElementService {
   getStyles(): string {
     return `
       /* <![CDATA[ */
+        .${ON_HOVER_HELPER_CLASS_NAME} {
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.15s ease-in-out;
+        }
+        .${SELECTABLE_GROUP_CLASS_NAME}:hover .${ON_HOVER_HELPER_CLASS_NAME} {
+          opacity: 1;
+        }
       /* ]]> */
     `;
   }
 
   private resize(event: MouseEvent): void {
     event.preventDefault();
-    const x = Math.min(event.offsetX, this.rectInitialPosition.x);
-    const y = Math.min(event.offsetY, this.rectInitialPosition.y);
-    const width = Math.abs(event.offsetX - this.rectInitialPosition.x);
-    const height = Math.abs(event.offsetY - this.rectInitialPosition.y);
-    this.rectElement.move(x, y).size(width, height);
+    const x = Math.min(event.offsetX, this.initialPosition.x);
+    const y = Math.min(event.offsetY, this.initialPosition.y);
+    const width = Math.abs(event.offsetX - this.initialPosition.x);
+    const height = Math.abs(event.offsetY - this.initialPosition.y);
+    this.element.move(x, y).size(width, height);
   }
 
+  // prettier-ignore
   private endResize() {
-    if (this.rectElement.width() == 0 || this.rectElement.height() == 0) {
-      this.rectContainer.remove();
+    if (this.element.width() == 0 || this.element.height() == 0) {
+      this.container.remove();
     }
+    this.container.add(this.element.clone()
+      .addClass(ON_HOVER_HELPER_CLASS_NAME)
+      .fill('transparent')
+      .stroke({ color: SELECTION_COLOR, width: 1 }));
     document.removeEventListener('mousemove', this.resize);
     document.removeEventListener('mouseup', this.endResize);
   }

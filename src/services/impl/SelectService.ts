@@ -5,6 +5,7 @@ import {
   RESIZE_IN_PROGRESS_CLASS_NAME,
   SELECTABLE_BORDER_CLASS_NAME,
   SELECTABLE_BORDER_GROUP_CLASS_NAME,
+  SELECTION_COLOR,
 } from './_constants';
 import { ISelectService } from '../api/ISelectService';
 
@@ -48,6 +49,15 @@ export class SelectService implements ISelectService {
         .${MOVE_IN_PROGRESS_CLASS_NAME} .${SELECTABLE_BORDER_CLASS_NAME},
         .${RESIZE_IN_PROGRESS_CLASS_NAME} .${SELECTABLE_BORDER_CLASS_NAME} {
           opacity: 0.8;
+          stroke-dasharray: 5,5;
+        }
+
+        .${RESIZE_GUIDE_CLASS_NAME} {
+          transition: fill 0.15s ease-in-out;
+        }
+
+        .${RESIZE_GUIDE_CLASS_NAME}:hover {
+          fill: ${SELECTION_COLOR}
         }
 
       /* ]]> */
@@ -68,7 +78,7 @@ export class SelectService implements ISelectService {
       .move(shape.x(), shape.y())
       .size(shape.width(), shape.height())
       .fill('transparent')
-      .stroke({ color: '#348CF7', dasharray: '5,5', width: 1 });
+      .stroke({ color: SELECTION_COLOR, width: 1 });
   }
 
   private createResizeGuideNW(svg: Svg, shape: Shape): Shape {
@@ -86,7 +96,9 @@ export class SelectService implements ISelectService {
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.move(x, y).size(width, height);
+        shape.each(function () {
+          this.move(x, y).size(width, height);
+        });
       };
       const handleMouseUp = () => {
         _this.selectElement(svg, shape);
@@ -112,7 +124,9 @@ export class SelectService implements ISelectService {
         event.preventDefault();
         const y = Math.min(event.offsetY, shapeInitialY);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.y(y).height(height);
+        shape.each(function () {
+          this.y(y).height(height);
+        });
       };
       const handleMouseUp = () => {
         _this.selectElement(svg, shape);
@@ -141,7 +155,9 @@ export class SelectService implements ISelectService {
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.move(x, y).size(width, height);
+        shape.each(function () {
+          this.move(x, y).size(width, height);
+        });
       };
       const handleMouseUp = () => {
         _this.selectElement(svg, shape);
@@ -167,7 +183,9 @@ export class SelectService implements ISelectService {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const width = Math.abs(event.offsetX - shapeInitialX);
-        shape.x(x).width(width);
+        shape.each(function () {
+          this.x(x).width(width);
+        });
       };
       const handleMouseUp = () => {
         _this.selectElement(svg, shape);
@@ -196,7 +214,9 @@ export class SelectService implements ISelectService {
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.move(x, y).size(width, height);
+        shape.each(function () {
+          this.move(x, y).size(width, height);
+        });
       };
       const handleMouseUp = () => {
         _this.selectElement(svg, shape);
@@ -222,7 +242,9 @@ export class SelectService implements ISelectService {
         event.preventDefault();
         const y = Math.min(event.offsetY, shapeInitialY);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.y(y).height(height);
+        shape.each(function () {
+          this.y(y).height(height);
+        });
       };
       const handleMouseUp = () => {
         _this.selectElement(svg, shape);
@@ -251,7 +273,9 @@ export class SelectService implements ISelectService {
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.move(x, y).size(width, height);
+        shape.each(function () {
+          this.move(x, y).size(width, height);
+        });
       };
       const handleMouseUp = () => {
         _this.selectElement(svg, shape);
@@ -277,7 +301,9 @@ export class SelectService implements ISelectService {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const width = Math.abs(event.offsetX - shapeInitialX);
-        shape.x(x).width(width);
+        shape.each(function () {
+          this.x(x).width(width);
+        });
       };
       const handleMouseUp = () => {
         _this.selectElement(svg, shape);
@@ -294,9 +320,9 @@ export class SelectService implements ISelectService {
   // prettier-ignore
   private createResizeGuide(svg: Svg, x: number, y: number): Shape {
     return svg
-      .circle(10)
+      .circle(8)
       .cx(x).cy(y)
-      .fill('#348CF7')
-      .stroke({ color: 'white', width: 1.5 });
+      .fill('white')
+      .stroke({ color: SELECTION_COLOR, width: 1 });
   }
 }

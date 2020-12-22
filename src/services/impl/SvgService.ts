@@ -1,4 +1,4 @@
-import { Shape, SVG, Svg } from '@svgdotjs/svg.js';
+import { G, Shape, SVG, Svg } from '@svgdotjs/svg.js';
 import { MOVEABLE_CLASS_NAME, SELECTABLE_CLASS_NAME } from './_constants';
 import { IMoveService } from '../api/IMoveService';
 import { IRectangleElementService } from '../api/IRectangleElementService';
@@ -25,7 +25,7 @@ export class SvgService implements ISvgService {
       return this.rectangleElementService.create(event, svg);
     }
     if (eventTarget.classList.contains(MOVEABLE_CLASS_NAME)) {
-      this.selectService.selectElement(svg, SVG(eventTarget) as Shape);
+      this.selectService.selectElement(svg, SVG(eventTarget).parent() as G);
       return this.moveService.moveElement(event, svg, SVG(eventTarget) as Shape);
     }
   }
@@ -33,7 +33,7 @@ export class SvgService implements ISvgService {
   handleClickEvent(event: MouseEvent, svg: Svg): void {
     const eventTarget = event.target as HTMLElement;
     if (eventTarget.classList.contains(SELECTABLE_CLASS_NAME)) {
-      return this.selectService.selectElement(svg, SVG(eventTarget) as Shape);
+      return this.selectService.selectElement(svg, SVG(eventTarget).parent() as G);
     } else {
       this.selectService.unselectElements(svg);
     }
