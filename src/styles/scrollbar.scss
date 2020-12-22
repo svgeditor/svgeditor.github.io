@@ -1,0 +1,26 @@
+:root {
+  --scrollbar-background-color: var(--color-scale-gray-5);
+  --scrollbar-thumb-background-color: var(--color-scale-gray-4);
+}
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+  background-color: var(--scrollbar-background-color);
+}
+
+::-webkit-scrollbar-corner {
+  background-color: var(--scrollbar-background-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-background-color);
+  background-clip: padding-box;
+  border: solid transparent;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background-clip: padding-box;
+  border: solid transparent;
+  border-width: 1px;
+}

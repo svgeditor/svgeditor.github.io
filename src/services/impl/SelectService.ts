@@ -47,7 +47,7 @@ export class SelectService implements ISelectService {
 
         .${MOVE_IN_PROGRESS_CLASS_NAME} .${SELECTABLE_BORDER_CLASS_NAME},
         .${RESIZE_IN_PROGRESS_CLASS_NAME} .${SELECTABLE_BORDER_CLASS_NAME} {
-          opacity: 0.75;
+          opacity: 0.8;
         }
 
       /* ]]> */
@@ -68,7 +68,7 @@ export class SelectService implements ISelectService {
       .move(shape.x(), shape.y())
       .size(shape.width(), shape.height())
       .fill('transparent')
-      .stroke({ color: '#348CF7', dasharray: '5,5', width: 2 });
+      .stroke({ color: '#348CF7', dasharray: '5,5', width: 1 });
   }
 
   private createResizeGuideNW(svg: Svg, shape: Shape): Shape {

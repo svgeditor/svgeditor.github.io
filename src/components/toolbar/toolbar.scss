@@ -1,0 +1,8 @@
+:root {
+  --toolbar-container-background-color: var(--color-scale-gray-5);
+  --toolbar-container-border-color: var(--color-scale-gray-4);
+}
+.toolbar-container {
+  background-color: var(--toolbar-container-background-color);
+  border-right: 3px solid var(--toolbar-container-border-color);
+}
