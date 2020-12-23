@@ -3,6 +3,6 @@ export class ZoomPercentage {
   current: number = 100;
 
   static zoom(value: number, zoomPercentage: ZoomPercentage): number {
-    return Math.floor((value * zoomPercentage.current) / zoomPercentage.previous);
+    return (value * zoomPercentage.current) / zoomPercentage.previous;
   }
 }

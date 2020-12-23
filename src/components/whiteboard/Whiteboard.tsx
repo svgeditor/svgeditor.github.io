@@ -15,7 +15,7 @@ export interface IWhiteboardState {}
 
 const MAX_ZOOM_PERCENTAGE = 800;
 const MIN_ZOOM_PERCENTAGE = 25;
-const ZOOM_PERCENTAGE_STEP = 5;
+const ZOOM_PERCENTAGE_STEP = 15;
 const SVG_MARGIN = 25;
 const DELETE_KEY_CODE = 46;
 
@@ -99,6 +99,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
       console.log(
         `widthChange: ${widthChange}. heightChange: ${heightChange}. scrollLeft: ${this.container.scrollLeft}, scrollTop: ${this.container.scrollTop}`
       );
+      this.container.scrollTo(this.container.scrollLeft + widthChange / 4, this.container.scrollTop + heightChange / 4);
     }
   }
 
