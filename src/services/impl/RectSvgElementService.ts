@@ -3,6 +3,7 @@ import * as constants from './_constants';
 import { ISvgElementService } from '../api/ISvgElementService';
 import { AppStateService } from './AppStateService';
 import { SvgElementService } from './BaseSvgElementService';
+import { ZoomPercentage } from '../../models/ZoomPercentage';
 
 interface Position {
   x: number;
@@ -16,8 +17,16 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
 
   constructor(appStateService = AppStateService.getInstance()) {
     super(appStateService);
-    this.resize = this.resize.bind(this);
-    this.endResize = this.endResize.bind(this);
+    this.createOnMouseDownInProgress = this.createOnMouseDownInProgress.bind(this);
+    this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
+  }
+
+  resize(shape: Shape, zoomPercentage = this.appStateService.getZoomPercentage()): void {
+    const newX = ZoomPercentage.zoom(shape.x(), zoomPercentage);
+    const newY = ZoomPercentage.zoom(shape.y(), zoomPercentage);
+    const newW = ZoomPercentage.zoom(shape.width(), zoomPercentage);
+    const newH = ZoomPercentage.zoom(shape.height(), zoomPercentage);
+    shape.move(newX, newY).size(newW, newH);
   }
 
   // prettier-ignore
@@ -33,8 +42,8 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
       .size(0, 0)
       .fill('white')
       .stroke({color: '#707070', width: 1});
-    document.addEventListener('mousemove', this.resize);
-    document.addEventListener('mouseup', this.endResize);
+    document.addEventListener('mousemove', this.createOnMouseDownInProgress);
+    document.addEventListener('mouseup', this.endCreateOnMouseDown);
   }
 
   // prettier-ignore
@@ -92,7 +101,7 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
     `;
   }
 
-  private resize(event: MouseEvent): void {
+  private createOnMouseDownInProgress(event: MouseEvent): void {
     event.preventDefault();
     const x = Math.min(event.offsetX, this.initialPosition.x);
     const y = Math.min(event.offsetY, this.initialPosition.y);
@@ -102,7 +111,7 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
   }
 
   // prettier-ignore
-  private endResize(event: MouseEvent) {
+  private endCreateOnMouseDown(event: MouseEvent) {
     if (this.element.width() == 0 || this.element.height() == 0) {
       this.container.remove();
     } else {
@@ -112,8 +121,8 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
         .stroke({ color: constants.SELECTION_COLOR, width: 1 }));
       setTimeout(() => this.select(this.container), 0);
     }
-    document.removeEventListener('mousemove', this.resize);
-    document.removeEventListener('mouseup', this.endResize);
+    document.removeEventListener('mousemove', this.createOnMouseDownInProgress);
+    document.removeEventListener('mouseup', this.endCreateOnMouseDown);
   }
 
   private createBorder(svg: Svg, shape: Shape): Shape {

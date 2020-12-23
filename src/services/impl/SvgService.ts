@@ -1,15 +1,13 @@
-import { G, Shape, SVG } from '@svgdotjs/svg.js';
+import { G, Rect, Shape, SVG } from '@svgdotjs/svg.js';
 import { SHAPE_CLASS_NAME } from './_constants';
 import { ISvgElementService } from '../api/ISvgElementService';
 import { ISvgService } from '../api/ISvgService';
 import { RectSvgElementService } from './RectSvgElementService';
+import { ZoomPercentage } from '../../models/ZoomPercentage';
+import { AppStateService } from './AppStateService';
 
 export class SvgService implements ISvgService {
-  private rectService: ISvgElementService;
-
-  constructor(rectService?: ISvgElementService) {
-    this.rectService = rectService ? rectService : new RectSvgElementService();
-  }
+  constructor(private appStateService = AppStateService.getInstance(), private rectService = new RectSvgElementService()) {}
 
   handleMouseDownEvent(event: MouseEvent): void {
     const target = event.target as HTMLElement;
@@ -34,6 +32,11 @@ export class SvgService implements ISvgService {
     return `
       ${this.rectService.getStyles()}
     `;
+  }
+
+  resize(svg = this.appStateService.getSvg(), zoomPercentage: ZoomPercentage = this.appStateService.getZoomPercentage()): void {
+    this.rectService.unselectAll();
+    svg.find('rect').forEach((rect) => this.rectService.resize(rect));
   }
 
   private getSvgElementService(): ISvgElementService {

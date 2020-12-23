@@ -3,11 +3,14 @@ import { MOVE_IN_PROGRESS_CLASS_NAME, SELECTABLE_BORDER_GROUP_CLASS_NAME } from 
 import { ISvgElementService } from '../api/ISvgElementService';
 import { IAppStateService } from '../api/IAppStateService';
 import { Position } from '../../models/Position';
+import { ZoomPercentage } from '../../models/ZoomPercentage';
 
 export abstract class SvgElementService implements ISvgElementService {
   abstract createOnMouseDown(event: MouseEvent): void;
   abstract getStyles(): string;
   abstract select(shape: Shape): void;
+  abstract resize(shape: Shape): void;
+  abstract resize(shape: Shape, zoomPercentage: ZoomPercentage): void;
 
   private group = null;
   private mousePosition: Position;
