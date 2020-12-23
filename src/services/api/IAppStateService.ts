@@ -1,4 +1,4 @@
-import { Svg } from '@svgdotjs/svg.js';
+import { G, Svg } from '@svgdotjs/svg.js';
 import { AppState } from '../../models/AppState';
 import { ZoomPercentage } from '../../models/ZoomPercentage';
 
@@ -15,4 +15,5 @@ export interface IAppStateService {
   getSvgWidth(takingIntoAccountZoomPercentage: boolean): number;
   getSvgHeight(): number;
   getSvgHeight(takingIntoAccountZoomPercentage: boolean): number;
+  getSelectedShapesGroup(): G;
 }

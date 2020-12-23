@@ -7,4 +7,5 @@ export interface ISvgService {
   getStyles(): string;
   resize(): void;
   resize(svg: Svg, zoomPercentage: ZoomPercentage): void;
+  unselectAll(): void;
 }

@@ -4,6 +4,7 @@ import { ISvgElementService } from '../api/ISvgElementService';
 import { AppStateService } from './AppStateService';
 import { SvgElementService } from './BaseSvgElementService';
 import { ZoomPercentage } from '../../models/ZoomPercentage';
+import { ISvgService } from '../api/ISvgService';
 
 interface Position {
   x: number;
@@ -15,7 +16,7 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
   private element: Rect;
   private initialPosition: Position;
 
-  constructor(appStateService = AppStateService.getInstance()) {
+  constructor(private svgService: ISvgService, appStateService = AppStateService.getInstance()) {
     super(appStateService);
     this.createOnMouseDownInProgress = this.createOnMouseDownInProgress.bind(this);
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
@@ -32,7 +33,7 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
   // prettier-ignore
   createOnMouseDown(event: MouseEvent): void {
     const svg = this.appStateService.getSvg();
-    this.container = svg.group().addClass(constants.SELECTABLE_GROUP_CLASS_NAME);
+    this.container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
     this.element = svg.rect();
     this.initialPosition = { x: event.offsetX, y: event.offsetY };
     this.container.add(this.element);
@@ -48,9 +49,10 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
 
   // prettier-ignore
   select(shape: Shape): void {
-    this.unselectAll();
+    this.svgService.unselectAll();
+    shape.addClass(constants.SELECTED_SHAPE_CLASS_NAME);
     const svg = this.appStateService.getSvg();
-    const group = this.getGroup();
+    const group = this.appStateService.getSelectedShapesGroup();
     group.add(this.createBorder(svg, shape));
     group.add(this.createResizeGuideNW(svg, shape));
     group.add(this.createResizeGuideN(svg, shape));
@@ -66,16 +68,16 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
   getStyles(): string {
     return `
       /* <![CDATA[ */
-        .${constants.ON_HOVER_HELPER_CLASS_NAME} {
+        .${constants.ON_HOVER_CLASS_NAME} {
           pointer-events: none;
           opacity: 0;
           transition: opacity 0.15s ease-in-out;
         }
-        .${constants.SELECTABLE_GROUP_CLASS_NAME}:hover .${constants.ON_HOVER_HELPER_CLASS_NAME} {
+        .${constants.SHAPE_GROUP_CLASS_NAME}:hover .${constants.ON_HOVER_CLASS_NAME} {
           opacity: 1;
         }
 
-        .${constants.SELECTABLE_BORDER_GROUP_CLASS_NAME} .${constants.SELECTABLE_BORDER_CLASS_NAME} {
+        .${constants.SELECTION_GROUP_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
           pointer-events: none;
         }
 
@@ -84,8 +86,8 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
           opacity: 0;
         }
 
-        .${constants.MOVE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTABLE_BORDER_CLASS_NAME},
-        .${constants.RESIZE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTABLE_BORDER_CLASS_NAME} {
+        .${constants.MOVE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME},
+        .${constants.RESIZE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
           opacity: 0.8;
           stroke-dasharray: 5,5;
         }
@@ -116,7 +118,7 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
       this.container.remove();
     } else {
       this.container.add(this.element.clone()
-        .addClass(constants.ON_HOVER_HELPER_CLASS_NAME)
+        .addClass(constants.ON_HOVER_CLASS_NAME)
         .fill('transparent')
         .stroke({ color: constants.SELECTION_COLOR, width: 1 }));
       setTimeout(() => this.select(this.container), 0);
@@ -128,7 +130,7 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
   private createBorder(svg: Svg, shape: Shape): Shape {
     return svg
       .rect()
-      .addClass(constants.SELECTABLE_BORDER_CLASS_NAME)
+      .addClass(constants.SELECTED_SHAPE_BORDER_CLASS_NAME)
       .move(shape.x(), shape.y())
       .size(shape.width(), shape.height())
       .fill('transparent')

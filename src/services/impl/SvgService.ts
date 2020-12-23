@@ -1,5 +1,5 @@
-import { G, Rect, Shape, SVG } from '@svgdotjs/svg.js';
-import { SHAPE_CLASS_NAME } from './_constants';
+import { G, Shape, SVG } from '@svgdotjs/svg.js';
+import { SELECTED_SHAPE_CLASS_NAME, SHAPE_CLASS_NAME } from './_constants';
 import { ISvgElementService } from '../api/ISvgElementService';
 import { ISvgService } from '../api/ISvgService';
 import { RectSvgElementService } from './RectSvgElementService';
@@ -7,7 +7,10 @@ import { ZoomPercentage } from '../../models/ZoomPercentage';
 import { AppStateService } from './AppStateService';
 
 export class SvgService implements ISvgService {
-  constructor(private appStateService = AppStateService.getInstance(), private rectService = new RectSvgElementService()) {}
+  private rectService: ISvgElementService;
+  constructor(private appStateService = AppStateService.getInstance(), rectService?: ISvgElementService) {
+    this.rectService = rectService ? rectService : new RectSvgElementService(this);
+  }
 
   handleMouseDownEvent(event: MouseEvent): void {
     const target = event.target as HTMLElement;
@@ -24,7 +27,7 @@ export class SvgService implements ISvgService {
     if (target.classList.contains(SHAPE_CLASS_NAME)) {
       return this.getSvgElementServiceByEventTarget(target).select(this.toShape(target));
     } else {
-      this.rectService.unselectAll();
+      this.unselectAll();
     }
   }
 
@@ -35,8 +38,18 @@ export class SvgService implements ISvgService {
   }
 
   resize(svg = this.appStateService.getSvg(), zoomPercentage: ZoomPercentage = this.appStateService.getZoomPercentage()): void {
-    this.rectService.unselectAll();
+    this.unselectAll();
     svg.find('rect').forEach((rect) => this.rectService.resize(rect));
+  }
+
+  unselectAll(): void {
+    this.appStateService
+      .getSvg()
+      .find(`.${SELECTED_SHAPE_CLASS_NAME}`)
+      .forEach((shape) => shape.removeClass(`${SELECTED_SHAPE_CLASS_NAME}`));
+    this.appStateService.getSelectedShapesGroup().each(function () {
+      this.remove();
+    });
   }
 
   private getSvgElementService(): ISvgElementService {

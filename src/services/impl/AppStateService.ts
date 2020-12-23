@@ -1,12 +1,14 @@
-import { Svg } from '@svgdotjs/svg.js';
+import { G, Svg } from '@svgdotjs/svg.js';
 import { AppState } from '../../models/AppState';
 import { ZoomPercentage } from '../../models/ZoomPercentage';
 import { IAppStateService } from '../api/IAppStateService';
+import { SELECTION_GROUP_CLASS_NAME } from './_constants';
 
 export class AppStateService implements IAppStateService {
   private static instance: IAppStateService = null;
   private appState: AppState = new AppState();
   private svg: Svg;
+  private selectedShapeGroup: G;
 
   static getInstance(): IAppStateService {
     if (AppStateService.instance === null) {
@@ -59,5 +61,13 @@ export class AppStateService implements IAppStateService {
 
   saveAppState(newAppState: AppState): void {
     this.appState = newAppState;
+  }
+
+  getSelectedShapesGroup(): G {
+    if (this.selectedShapeGroup) return this.selectedShapeGroup;
+    const svg = this.getSvg();
+    this.selectedShapeGroup = svg.findOne(`g.${SELECTION_GROUP_CLASS_NAME}`) as G;
+    if (!this.selectedShapeGroup) this.selectedShapeGroup = svg.group().addClass(`${SELECTION_GROUP_CLASS_NAME}`);
+    return this.selectedShapeGroup;
   }
 }
