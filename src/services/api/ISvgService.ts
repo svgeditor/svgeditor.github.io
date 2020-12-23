@@ -8,4 +8,5 @@ export interface ISvgService {
   resize(): void;
   resize(svg: Svg, zoomPercentage: ZoomPercentage): void;
   unselectAll(): void;
+  deleteSelectedShapes(): void;
 }

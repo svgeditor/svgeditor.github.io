@@ -13,10 +13,11 @@ export interface IWhiteboardProps {
 
 export interface IWhiteboardState {}
 
-export const MAX_ZOOM_PERCENTAGE = 800;
-export const MIN_ZOOM_PERCENTAGE = 25;
-export const ZOOM_PERCENTAGE_STEP = 5;
-export const SVG_MARGIN = 25;
+const MAX_ZOOM_PERCENTAGE = 800;
+const MIN_ZOOM_PERCENTAGE = 25;
+const ZOOM_PERCENTAGE_STEP = 5;
+const SVG_MARGIN = 25;
+const DELETE_KEY_CODE = 46;
 
 export default class Whiteboard extends React.Component<IWhiteboardProps, IWhiteboardState> {
   private container: HTMLElement;
@@ -50,6 +51,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     this.svgContainer.addEventListener('click', (event) => this.svgService.handleClickEvent(event));
     this.container.addEventListener('wheel', this.handleMouseWheelEvent.bind(this));
     this.container.addEventListener('click', (event) => console.log(event.clientX));
+    document.addEventListener('keydown', this.handleKeyPressEvent.bind(this));
   }
 
   private initSvg(): void {
@@ -74,6 +76,12 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     this.svgContainer.style.height = `${svgHeight}px`;
     this.svgBackground.style.width = `${containerRect.width * 2 + svgWidth - 2 * SVG_MARGIN}px`;
     this.svgBackground.style.height = `${containerRect.height * 2 + svgHeight - 2 * SVG_MARGIN}px`;
+  }
+
+  private handleKeyPressEvent(event) {
+    if (event.keyCode == DELETE_KEY_CODE) {
+      this.svgService.deleteSelectedShapes();
+    }
   }
 
   private handleMouseWheelEvent(event: WheelEvent): void {

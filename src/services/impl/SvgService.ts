@@ -52,6 +52,16 @@ export class SvgService implements ISvgService {
     });
   }
 
+  deleteSelectedShapes(): void {
+    this.appStateService
+      .getSvg()
+      .find(`.${SELECTED_SHAPE_CLASS_NAME}`)
+      .forEach((shape) => shape.remove());
+    this.appStateService.getSelectedShapesGroup().each(function () {
+      this.remove();
+    });
+  }
+
   private getSvgElementService(): ISvgElementService {
     return this.rectService;
   }
