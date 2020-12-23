@@ -15,12 +15,12 @@ export interface IWhiteboardState {}
 
 const MAX_ZOOM_PERCENTAGE = 800;
 const MIN_ZOOM_PERCENTAGE = 25;
-const ZOOM_PERCENTAGE_STEP = 15;
+const ZOOM_PERCENTAGE_STEP = 10;
 const SVG_MARGIN = 25;
 const DELETE_KEY_CODE = 46;
 
 export default class Whiteboard extends React.Component<IWhiteboardProps, IWhiteboardState> {
-  private container: HTMLElement;
+  private whiteboardContainer: HTMLElement;
   private svgBackground: HTMLElement;
   private svgContainer: HTMLElement;
   private svgService: ISvgService;
@@ -35,7 +35,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
 
   public render() {
     return (
-      <div ref={(ref) => (this.container = ref)} className='whiteboard-container'>
+      <div ref={(ref) => (this.whiteboardContainer = ref)} className='whiteboard-container'>
         <div ref={(ref) => (this.svgBackground = ref)} className='svg-background'>
           <div ref={(ref) => (this.svgContainer = ref)} className='svg-container'></div>
         </div>
@@ -49,9 +49,12 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     window.addEventListener('resize', this.resizeContainers.bind(this));
     this.svgContainer.addEventListener('mousedown', (event) => this.svgService.handleMouseDownEvent(event));
     this.svgContainer.addEventListener('click', (event) => this.svgService.handleClickEvent(event));
-    this.container.addEventListener('wheel', this.handleMouseWheelEvent.bind(this));
-    this.container.addEventListener('click', (event) => console.log(event.clientX));
+    this.whiteboardContainer.addEventListener('wheel', this.handleMouseWheelEvent.bind(this));
     document.addEventListener('keydown', this.handleKeyPressEvent.bind(this));
+    this.svgBackground.addEventListener('click', (event) => {
+      const svgBackgroundRect = this.svgBackground.getBoundingClientRect();
+      console.log(event.clientX - svgBackgroundRect.x);
+    });
   }
 
   private initSvg(): void {
@@ -62,14 +65,14 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
 
   private InitContainersDimensions(): void {
     this.resizeContainers();
-    const containerRect = this.container.getBoundingClientRect();
+    const containerRect = this.whiteboardContainer.getBoundingClientRect();
     this.svgContainer.style.left = `${containerRect.width - SVG_MARGIN}px`;
     this.svgContainer.style.top = `${containerRect.height - SVG_MARGIN}px`;
-    this.container.scrollTo(containerRect.width - SVG_MARGIN, containerRect.height - SVG_MARGIN);
+    this.whiteboardContainer.scrollTo(containerRect.width - SVG_MARGIN, containerRect.height - SVG_MARGIN);
   }
 
   private resizeContainers(): void {
-    const containerRect = this.container.getBoundingClientRect();
+    const containerRect = this.whiteboardContainer.getBoundingClientRect();
     const svgWidth = this.appStateService.getSvgWidth();
     const svgHeight = this.appStateService.getSvgHeight();
     this.svgContainer.style.width = `${svgWidth}px`;
@@ -87,33 +90,54 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   private handleMouseWheelEvent(event: WheelEvent): void {
     if (event.ctrlKey) {
       event.preventDefault();
-      const svgBackgroundRectBeforeResize = this.svgBackground.getBoundingClientRect();
+      const whiteboardContainerRect = this.whiteboardContainer.getBoundingClientRect();
+      const mousePositionRelatedToWhiteboardContainer = {
+        x: event.clientX - whiteboardContainerRect.x,
+        y: event.clientY - whiteboardContainerRect.y,
+      };
+      const svgBackgroundRectBeforeZoom = this.svgBackground.getBoundingClientRect();
+      const mousePositionRelatedToSvgBackgroundContainerBeforeZoom = {
+        x: event.clientX - svgBackgroundRectBeforeZoom.x,
+        y: event.clientY - svgBackgroundRectBeforeZoom.y,
+      };
+      let zoomResult;
       if (event.deltaY < 0) {
-        this.zoomIn();
+        zoomResult = this.zoomIn();
       } else {
-        this.zoomOut();
+        zoomResult = this.zoomOut();
       }
-      const svgBackgroundRectAfterResize = this.svgBackground.getBoundingClientRect();
-      const widthChange = svgBackgroundRectAfterResize.width - svgBackgroundRectBeforeResize.width;
-      const heightChange = svgBackgroundRectAfterResize.height - svgBackgroundRectBeforeResize.height;
-      console.log(
-        `widthChange: ${widthChange}. heightChange: ${heightChange}. scrollLeft: ${this.container.scrollLeft}, scrollTop: ${this.container.scrollTop}`
-      );
-      this.container.scrollTo(this.container.scrollLeft + widthChange / 4, this.container.scrollTop + heightChange / 4);
+      if (zoomResult) {
+        const svgBackgroundRectAfterZoom = this.svgBackground.getBoundingClientRect();
+        const svgBackgroundRectWidthChange = svgBackgroundRectAfterZoom.width - svgBackgroundRectBeforeZoom.width;
+        const svgBackgroundRectHeightChange = svgBackgroundRectAfterZoom.height - svgBackgroundRectBeforeZoom.height;
+        const svgBackgroundRectWidthChangeRelatedToMousePosition =
+          (svgBackgroundRectWidthChange * mousePositionRelatedToWhiteboardContainer.x) / whiteboardContainerRect.width;
+        const svgBackgroundRectHeightChangeRelatedToMousePosition =
+          (svgBackgroundRectHeightChange * mousePositionRelatedToWhiteboardContainer.y) / whiteboardContainerRect.height;
+        const expectedMousePositionRelatedToSvgBackgroundContainerAfterZoom = {
+          x: mousePositionRelatedToSvgBackgroundContainerBeforeZoom.x + svgBackgroundRectWidthChangeRelatedToMousePosition,
+          y: mousePositionRelatedToSvgBackgroundContainerBeforeZoom.y + svgBackgroundRectHeightChangeRelatedToMousePosition,
+        };
+        const scrollX = expectedMousePositionRelatedToSvgBackgroundContainerAfterZoom.x - mousePositionRelatedToWhiteboardContainer.x;
+        const scrollY = expectedMousePositionRelatedToSvgBackgroundContainerAfterZoom.y - mousePositionRelatedToWhiteboardContainer.y;
+        this.whiteboardContainer.scrollTo(scrollX, scrollY);
+      }
     }
   }
 
-  private zoomIn() {
-    if (this.appStateService.getCurrentZoomPercentage() >= MAX_ZOOM_PERCENTAGE) return;
+  private zoomIn(): boolean {
+    if (this.appStateService.getCurrentZoomPercentage() >= MAX_ZOOM_PERCENTAGE) return false;
     this.appStateService.increaseZoomPercentageBy(ZOOM_PERCENTAGE_STEP);
     this.resizeContainers();
     this.svgService.resize();
+    return true;
   }
 
-  private zoomOut() {
-    if (this.appStateService.getCurrentZoomPercentage() <= MIN_ZOOM_PERCENTAGE) return;
+  private zoomOut(): boolean {
+    if (this.appStateService.getCurrentZoomPercentage() <= MIN_ZOOM_PERCENTAGE) return false;
     this.appStateService.reduceZoomPercentageBy(ZOOM_PERCENTAGE_STEP);
     this.resizeContainers();
     this.svgService.resize();
+    return true;
   }
 }
