@@ -58,7 +58,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     document.addEventListener('keydown', this.handleKeyPressEvent.bind(this));
     this.svgBackground.addEventListener('click', (event) => {
       const svgBackgroundRect = this.svgBackground.getBoundingClientRect();
-      console.log(event.clientX - svgBackgroundRect.x);
+      console.log(event.clientY - svgBackgroundRect.y);
     });
   }
 
@@ -100,6 +100,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
         x: event.clientX - whiteboardContainerRect.x,
         y: event.clientY - whiteboardContainerRect.y,
       };
+      const svgRectBeforeZoom = this.svgContainer.getBoundingClientRect();
       const svgBackgroundRectBeforeZoom = this.svgBackground.getBoundingClientRect();
       const mousePositionRelatedToSvgBackgroundContainerBeforeZoom = {
         x: event.clientX - svgBackgroundRectBeforeZoom.x,
@@ -112,16 +113,18 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
         zoomResult = this.zoomOut();
       }
       if (zoomResult) {
-        const svgBackgroundRectAfterZoom = this.svgBackground.getBoundingClientRect();
-        const svgBackgroundRectWidthChange = svgBackgroundRectAfterZoom.width - svgBackgroundRectBeforeZoom.width;
-        const svgBackgroundRectHeightChange = svgBackgroundRectAfterZoom.height - svgBackgroundRectBeforeZoom.height;
-        const svgBackgroundRectWidthChangeRelatedToMousePosition =
-          (svgBackgroundRectWidthChange * mousePositionRelatedToWhiteboardContainer.x) / whiteboardContainerRect.width;
-        const svgBackgroundRectHeightChangeRelatedToMousePosition =
-          (svgBackgroundRectHeightChange * mousePositionRelatedToWhiteboardContainer.y) / whiteboardContainerRect.height;
+        const svgRectAfterZoom = this.svgContainer.getBoundingClientRect();
+        const totalSvgRectWidthChange = svgRectAfterZoom.width - svgRectBeforeZoom.width;
+        const totalSvgRectHeightChange = svgRectAfterZoom.height - svgRectBeforeZoom.height;
+        const svgRectWidthChangeToMousePosition =
+          (totalSvgRectWidthChange * (mousePositionRelatedToSvgBackgroundContainerBeforeZoom.x - whiteboardContainerRect.width)) /
+          svgRectBeforeZoom.width;
+        const svgRectHeightChangeToMousePosition =
+          (totalSvgRectHeightChange * (mousePositionRelatedToSvgBackgroundContainerBeforeZoom.y - whiteboardContainerRect.height)) /
+          svgRectBeforeZoom.height;
         const expectedMousePositionRelatedToSvgBackgroundContainerAfterZoom = {
-          x: mousePositionRelatedToSvgBackgroundContainerBeforeZoom.x + svgBackgroundRectWidthChangeRelatedToMousePosition,
-          y: mousePositionRelatedToSvgBackgroundContainerBeforeZoom.y + svgBackgroundRectHeightChangeRelatedToMousePosition,
+          x: mousePositionRelatedToSvgBackgroundContainerBeforeZoom.x + svgRectWidthChangeToMousePosition,
+          y: mousePositionRelatedToSvgBackgroundContainerBeforeZoom.y + svgRectHeightChangeToMousePosition,
         };
         const scrollX = expectedMousePositionRelatedToSvgBackgroundContainerAfterZoom.x - mousePositionRelatedToWhiteboardContainer.x;
         const scrollY = expectedMousePositionRelatedToSvgBackgroundContainerAfterZoom.y - mousePositionRelatedToWhiteboardContainer.y;
