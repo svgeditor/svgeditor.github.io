@@ -11,10 +11,11 @@ export class BackgroundGridService implements IBackgroundGridService {
       div.style.position = 'absolute';
       div.style.width = '100%';
       div.style.height = index % 5 == 0 ? '2px' : '1px';
-      div.style.zIndex = '-100';
       div.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
       div.style.top = `${index * 10}px`;
       div.style.left = '0';
+      div.style.zIndex = '0';
+      div.style.pointerEvents = 'none';
       element.appendChild(div);
     }
 
@@ -25,10 +26,10 @@ export class BackgroundGridService implements IBackgroundGridService {
       div.style.position = 'absolute';
       div.style.width = index % 5 == 0 ? '2px' : '1px';
       div.style.height = '100%';
-      div.style.zIndex = '-100';
       div.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
       div.style.top = '0';
       div.style.left = `${index * 10}px`;
+      div.style.pointerEvents = 'none';
       element.appendChild(div);
     }
   }
