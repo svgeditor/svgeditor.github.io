@@ -5,6 +5,6 @@ export class AppState {
   zoomPercentage = new ZoomPercentage();
   svgDimensions: Dimensions = {
     width: 850,
-    height: 400,
+    height: 1100,
   };
 }

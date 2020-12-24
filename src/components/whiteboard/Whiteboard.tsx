@@ -68,7 +68,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     const containerRect = this.whiteboardContainer.getBoundingClientRect();
     this.svgContainer.style.left = `${containerRect.width - SVG_MARGIN}px`;
     this.svgContainer.style.top = `${containerRect.height - SVG_MARGIN}px`;
-    this.whiteboardContainer.scrollTo(containerRect.width - SVG_MARGIN, containerRect.height - SVG_MARGIN);
+    this.whiteboardContainer.scrollTo(containerRect.width - SVG_MARGIN * 2, containerRect.height - SVG_MARGIN * 2);
   }
 
   private resizeContainers(): void {
