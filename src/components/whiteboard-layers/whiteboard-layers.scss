@@ -1,9 +1,0 @@
-:root {
-  --whiteboard-layers-container-background-color: var(--color-scale-gray-5);
-  --whiteboard-layers-container-border-color: var(--color-scale-gray-4);
-}
-
-.whiteboard-layers-container {
-  background-color: var(--whiteboard-layers-container-background-color);
-  border-right: 3px solid var(--whiteboard-layers-container-border-color);
-}

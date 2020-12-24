@@ -1,16 +1,15 @@
 import { G, Shape } from '@svgdotjs/svg.js';
-import { MOVE_IN_PROGRESS_CLASS_NAME, SELECTION_GROUP_CLASS_NAME } from './_constants';
-import { ISvgElementService } from '../api/ISvgElementService';
+import { MOVE_IN_PROGRESS_CLASS_NAME } from './_constants';
+import { IShapeService } from '../api/IShapeService';
 import { IAppStateService } from '../api/IAppStateService';
 import { Position } from '../../models/Position';
-import { ZoomPercentage } from '../../models/ZoomPercentage';
+import { ZoomLevel } from '../../models/ZoomLevel';
 
-export abstract class SvgElementService implements ISvgElementService {
+export abstract class BaseShapeService implements IShapeService {
   abstract createOnMouseDown(event: MouseEvent): void;
   abstract getStyles(): string;
   abstract select(shape: Shape): void;
-  abstract resize(shape: Shape): void;
-  abstract resize(shape: Shape, zoomPercentage: ZoomPercentage): void;
+  abstract resize(shape: Shape, zoomLevel: ZoomLevel): void;
 
   private mousePosition: Position;
   private shapeToMove: Shape;
@@ -31,7 +30,7 @@ export abstract class SvgElementService implements ISvgElementService {
   }
 
   private moveInProgress(event: MouseEvent): void {
-    if (!this.moveInProgressFlag) this.appStateService.getSvg().addClass(MOVE_IN_PROGRESS_CLASS_NAME);
+    if (!this.moveInProgressFlag) this.appStateService.getSvgRootElement().addClass(MOVE_IN_PROGRESS_CLASS_NAME);
     this.moveInProgressFlag = true;
     event.preventDefault();
     let previousMousePosition = { ...this.mousePosition };
@@ -42,7 +41,7 @@ export abstract class SvgElementService implements ISvgElementService {
   }
 
   private endMove(): void {
-    this.appStateService.getSvg().removeClass(MOVE_IN_PROGRESS_CLASS_NAME);
+    this.appStateService.getSvgRootElement().removeClass(MOVE_IN_PROGRESS_CLASS_NAME);
     document.removeEventListener('mousemove', this.moveInProgress);
     document.removeEventListener('mouseup', this.endMove);
   }

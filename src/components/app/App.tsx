@@ -3,7 +3,7 @@ import * as React from 'react';
 import Toolbar from '../toolbar/Toolbar';
 import Whiteboard from '../whiteboard/Whiteboard';
 import WhiteboardSettings from '../whiteboard-settings/WhiteboardSettings';
-import WhiteboardLayers from '../whiteboard-layers/WhiteboardLayers';
+import WhiteboardShapes from '../whiteboard-shapes/WhiteboardShapes';
 import Navbar from '../navbar/Navbar';
 import WhiteboardHorizontalRuler from '../whiteboard-rulers/WhiteboardHorizantalRuler';
 import WhiteboardVerticalRuler from '../whiteboard-rulers/WhiteboardVerticalRuler';
@@ -25,11 +25,11 @@ export default class App extends React.Component<IAppProps, IAppState> {
       <div className='app-container'>
         <Navbar></Navbar>
         <Toolbar></Toolbar>
+        <WhiteboardShapes></WhiteboardShapes>
         <Whiteboard></Whiteboard>
         <WhiteboardHorizontalRuler></WhiteboardHorizontalRuler>
         <WhiteboardVerticalRuler></WhiteboardVerticalRuler>
         <WhiteboardRulersCorner></WhiteboardRulersCorner>
-        <WhiteboardLayers></WhiteboardLayers>
         <WhiteboardSettings></WhiteboardSettings>
       </div>
     );

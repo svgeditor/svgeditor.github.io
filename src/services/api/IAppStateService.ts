@@ -1,19 +1,13 @@
 import { G, Svg } from '@svgdotjs/svg.js';
 import { AppState } from '../../models/AppState';
-import { ZoomPercentage } from '../../models/ZoomPercentage';
+import { ZoomLevel } from '../../models/ZoomLevel';
 
 export interface IAppStateService {
   getAppState(): AppState;
   saveAppState(newAppState: AppState): void;
-  setSvg(svg: Svg): void;
-  getSvg(): Svg;
-  getZoomPercentage(): ZoomPercentage;
-  getCurrentZoomPercentage(): number;
-  reduceZoomPercentageBy(value: number): void;
-  increaseZoomPercentageBy(value: number): void;
-  getSvgWidth(): number;
-  getSvgWidth(takingIntoAccountZoomPercentage: boolean): number;
-  getSvgHeight(): number;
-  getSvgHeight(takingIntoAccountZoomPercentage: boolean): number;
+  setSvgRootElement(svg: Svg): void;
+  getSvgRootElement(): Svg;
+  getWhiteboardWidth(): number;
+  getWhiteboardHeight(): number;
   getSelectedShapesGroup(): G;
 }

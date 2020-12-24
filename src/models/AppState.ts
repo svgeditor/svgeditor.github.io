@@ -1,10 +1,8 @@
 import { Dimensions } from './Dimensions';
-import { ZoomPercentage } from './ZoomPercentage';
 
 export class AppState {
-  zoomPercentage = new ZoomPercentage();
   svgDimensions: Dimensions = {
-    width: 850,
-    height: 1100,
+    width: 800,
+    height: 1000,
   };
 }

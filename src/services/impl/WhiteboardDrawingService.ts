@@ -1,15 +1,15 @@
 import { G, Shape, SVG } from '@svgdotjs/svg.js';
 import { SELECTED_SHAPE_CLASS_NAME, SHAPE_CLASS_NAME } from './_constants';
-import { ISvgElementService } from '../api/ISvgElementService';
-import { ISvgService } from '../api/ISvgService';
-import { RectSvgElementService } from './RectSvgElementService';
-import { ZoomPercentage } from '../../models/ZoomPercentage';
+import { IShapeService } from '../api/IShapeService';
+import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
+import { RectShapeService } from './RectShapeService';
+import { ZoomLevel } from '../../models/ZoomLevel';
 import { AppStateService } from './AppStateService';
 
-export class SvgService implements ISvgService {
-  private rectService: ISvgElementService;
-  constructor(private appStateService = AppStateService.getInstance(), rectService?: ISvgElementService) {
-    this.rectService = rectService ? rectService : new RectSvgElementService(this);
+export class WhiteboardDrawingService implements IWhiteboardDrawingService {
+  private rectService: IShapeService;
+  constructor(private appStateService = AppStateService.getInstance(), rectService?: IShapeService) {
+    this.rectService = rectService ? rectService : new RectShapeService(this);
   }
 
   handleMouseDownEvent(event: MouseEvent): void {
@@ -37,14 +37,14 @@ export class SvgService implements ISvgService {
     `;
   }
 
-  resize(svg = this.appStateService.getSvg(), zoomPercentage: ZoomPercentage = this.appStateService.getZoomPercentage()): void {
+  resize(zoomLevel: ZoomLevel, svg = this.appStateService.getSvgRootElement()): void {
     this.unselectAll();
-    svg.find('rect').forEach((rect) => this.rectService.resize(rect));
+    svg.find('rect').forEach((rect) => this.rectService.resize(rect, zoomLevel));
   }
 
   unselectAll(): void {
     this.appStateService
-      .getSvg()
+      .getSvgRootElement()
       .find(`.${SELECTED_SHAPE_CLASS_NAME}`)
       .forEach((shape) => shape.removeClass(`${SELECTED_SHAPE_CLASS_NAME}`));
     this.appStateService.getSelectedShapesGroup().each(function () {
@@ -54,7 +54,7 @@ export class SvgService implements ISvgService {
 
   deleteSelectedShapes(): void {
     this.appStateService
-      .getSvg()
+      .getSvgRootElement()
       .find(`.${SELECTED_SHAPE_CLASS_NAME}`)
       .forEach((shape) => shape.remove());
     this.appStateService.getSelectedShapesGroup().each(function () {
@@ -62,11 +62,11 @@ export class SvgService implements ISvgService {
     });
   }
 
-  private getSvgElementService(): ISvgElementService {
+  private getSvgElementService(): IShapeService {
     return this.rectService;
   }
 
-  private getSvgElementServiceByEventTarget(target: HTMLElement): ISvgElementService {
+  private getSvgElementServiceByEventTarget(target: HTMLElement): IShapeService {
     const shapeName = target.tagName.toUpperCase();
     switch (shapeName) {
       case 'RECT':

@@ -1,6 +1,5 @@
 import { G, Svg } from '@svgdotjs/svg.js';
 import { AppState } from '../../models/AppState';
-import { ZoomPercentage } from '../../models/ZoomPercentage';
 import { IAppStateService } from '../api/IAppStateService';
 import { SELECTION_GROUP_CLASS_NAME } from './_constants';
 
@@ -19,39 +18,19 @@ export class AppStateService implements IAppStateService {
 
   protected constructor() {}
 
-  getSvgWidth(takingIntoAccountZoomPercentage: boolean = true): number {
-    if (!takingIntoAccountZoomPercentage) return this.appState.svgDimensions.width;
-    return ZoomPercentage.zoom(this.appState.svgDimensions.width, { current: this.getCurrentZoomPercentage(), previous: 100 });
+  getWhiteboardWidth(): number {
+    return this.appState.svgDimensions.width;
   }
 
-  getSvgHeight(takingIntoAccountZoomPercentage: boolean = true): number {
-    if (!takingIntoAccountZoomPercentage) return this.appState.svgDimensions.height;
-    return (this.appState.svgDimensions.height * this.getCurrentZoomPercentage()) / 100;
+  getWhiteboardHeight(): number {
+    return this.appState.svgDimensions.height;
   }
 
-  getZoomPercentage(): ZoomPercentage {
-    return this.appState.zoomPercentage;
-  }
-
-  getCurrentZoomPercentage(): number {
-    return this.appState.zoomPercentage.current;
-  }
-
-  reduceZoomPercentageBy(value: number): void {
-    this.appState.zoomPercentage.previous = this.appState.zoomPercentage.current;
-    this.appState.zoomPercentage.current -= value;
-  }
-
-  increaseZoomPercentageBy(value: number): void {
-    this.appState.zoomPercentage.previous = this.appState.zoomPercentage.current;
-    this.appState.zoomPercentage.current += value;
-  }
-
-  setSvg(svg: Svg): void {
+  setSvgRootElement(svg: Svg): void {
     this.svg = svg;
   }
 
-  getSvg(): Svg {
+  getSvgRootElement(): Svg {
     return this.svg;
   }
 
@@ -65,7 +44,7 @@ export class AppStateService implements IAppStateService {
 
   getSelectedShapesGroup(): G {
     if (this.selectedShapeGroup) return this.selectedShapeGroup;
-    const svg = this.getSvg();
+    const svg = this.getSvgRootElement();
     this.selectedShapeGroup = svg.findOne(`g.${SELECTION_GROUP_CLASS_NAME}`) as G;
     if (!this.selectedShapeGroup) this.selectedShapeGroup = svg.group().addClass(`${SELECTION_GROUP_CLASS_NAME}`);
     return this.selectedShapeGroup;

@@ -1,38 +1,38 @@
 import { G, Rect, Shape, Svg } from '@svgdotjs/svg.js';
 import * as constants from './_constants';
-import { ISvgElementService } from '../api/ISvgElementService';
+import { IShapeService } from '../api/IShapeService';
 import { AppStateService } from './AppStateService';
-import { SvgElementService } from './BaseSvgElementService';
-import { ZoomPercentage } from '../../models/ZoomPercentage';
-import { ISvgService } from '../api/ISvgService';
+import { BaseShapeService } from './BaseShapeService';
+import { ZoomLevel } from '../../models/ZoomLevel';
+import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
 
 interface Position {
   x: number;
   y: number;
 }
 
-export class RectSvgElementService extends SvgElementService implements ISvgElementService {
+export class RectShapeService extends BaseShapeService implements IShapeService {
   private container: G;
   private element: Rect;
   private initialPosition: Position;
 
-  constructor(private svgService: ISvgService, appStateService = AppStateService.getInstance()) {
+  constructor(private svgService: IWhiteboardDrawingService, appStateService = AppStateService.getInstance()) {
     super(appStateService);
     this.createOnMouseDownInProgress = this.createOnMouseDownInProgress.bind(this);
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
-  resize(shape: Shape, zoomPercentage = this.appStateService.getZoomPercentage()): void {
-    const newX = ZoomPercentage.zoom(shape.x(), zoomPercentage);
-    const newY = ZoomPercentage.zoom(shape.y(), zoomPercentage);
-    const newW = ZoomPercentage.zoom(shape.width(), zoomPercentage);
-    const newH = ZoomPercentage.zoom(shape.height(), zoomPercentage);
+  resize(shape: Shape, zoomLevel: ZoomLevel): void {
+    const newX = zoomLevel.getZoomedValueFromPreviousValue(shape.x());
+    const newY = zoomLevel.getZoomedValueFromPreviousValue(shape.y());
+    const newW = zoomLevel.getZoomedValueFromPreviousValue(shape.width());
+    const newH = zoomLevel.getZoomedValueFromPreviousValue(shape.height());
     shape.move(newX, newY).size(newW, newH);
   }
 
   // prettier-ignore
   createOnMouseDown(event: MouseEvent): void {
-    const svg = this.appStateService.getSvg();
+    const svg = this.appStateService.getSvgRootElement();
     this.container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
     this.element = svg.rect();
     this.initialPosition = { x: event.offsetX, y: event.offsetY };
@@ -51,7 +51,7 @@ export class RectSvgElementService extends SvgElementService implements ISvgElem
   select(shape: Shape): void {
     this.svgService.unselectAll();
     shape.addClass(constants.SELECTED_SHAPE_CLASS_NAME);
-    const svg = this.appStateService.getSvg();
+    const svg = this.appStateService.getSvgRootElement();
     const group = this.appStateService.getSelectedShapesGroup();
     group.add(this.createBorder(svg, shape));
     group.add(this.createResizeGuideNW(svg, shape));

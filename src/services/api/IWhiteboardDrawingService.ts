@@ -1,12 +1,12 @@
 import { Svg } from '@svgdotjs/svg.js';
-import { ZoomPercentage } from '../../models/ZoomPercentage';
+import { ZoomLevel } from '../../models/ZoomLevel';
 
-export interface ISvgService {
+export interface IWhiteboardDrawingService {
   handleMouseDownEvent(event: MouseEvent): void;
   handleClickEvent(event: MouseEvent): void;
   getStyles(): string;
-  resize(): void;
-  resize(svg: Svg, zoomPercentage: ZoomPercentage): void;
+  resize(zoomPercentage: ZoomLevel): void;
+  resize(zoomPercentage: ZoomLevel, svg: Svg): void;
   unselectAll(): void;
   deleteSelectedShapes(): void;
 }
