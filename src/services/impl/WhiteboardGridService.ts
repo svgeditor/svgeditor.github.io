@@ -1,15 +1,26 @@
 import { WhiteboardLayers } from '../../models/WhiteboardLayers';
+import { ZoomLevel } from '../../models/ZoomLevel';
 import { IWhiteboardGridService } from '../api/IWhiteboardGridService';
+
+const GRID_SIZE_INITIAL_VALUE = 10;
 
 export class WhiteboardGridService implements IWhiteboardGridService {
   init(whiteboardLayers: WhiteboardLayers): void {
-    const gridBackgroundCssValue = `url(data:image/svg+xml;base64,${this.getGridBase64()})`;
+    this.updateWhiteboardBackground(whiteboardLayers, this.getGridBase64(GRID_SIZE_INITIAL_VALUE));
+  }
+
+  resize(whiteboardLayers: WhiteboardLayers, zoomLevel: ZoomLevel): void {
+    const gridSize = zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE_INITIAL_VALUE);
+    this.updateWhiteboardBackground(whiteboardLayers, this.getGridBase64(gridSize));
+  }
+
+  private updateWhiteboardBackground(whiteboardLayers: WhiteboardLayers, gridBase64: string) {
+    const gridBackgroundCssValue = `url(data:image/svg+xml;base64,${gridBase64})`;
     whiteboardLayers.whiteboard.style.backgroundImage = gridBackgroundCssValue;
     whiteboardLayers.whiteboard.style.backgroundColor = 'white';
   }
 
-  private getGridBase64() {
-    const gridSize = 10;
+  private getGridBase64(gridSize: number) {
     return btoa(/* html */ `
       <svg width="100%" height="100%"
         xmlns="http://www.w3.org/2000/svg">

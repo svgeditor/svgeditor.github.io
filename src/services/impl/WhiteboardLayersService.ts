@@ -72,6 +72,7 @@ export class WhiteboardLayersService implements IWhiteboardLayersService {
     layers.whiteboard.style.height = `${whiteboardHeight}px`;
     layers.whiteboardBackground.style.width = `${whiteboardWindowBoundingRect.width * 2 + whiteboardWidth - 2 * WHITEBOARD_MARGIN}px`;
     layers.whiteboardBackground.style.height = `${whiteboardWindowBoundingRect.height * 2 + whiteboardHeight - 2 * WHITEBOARD_MARGIN}px`;
+    this.whiteboardGridService.resize(layers, zoomLevel);
   }
 
   continueScrollNorthWest(scrollInfo: ScrollInfo): void {
