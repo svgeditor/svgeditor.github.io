@@ -5,6 +5,8 @@ import { ZoomLevel } from '../../models/ZoomLevel';
 
 export interface IWhiteboardLayersService {
   init(layers: WhiteboardLayers): void;
+  zoomIn(event: WheelEvent): void;
+  zoomOut(event: WheelEvent): void;
   getMousePositionRelatedToWhiteboardContainer(event: MouseEvent): Position;
   getWhiteboardZoomScroll(event: MouseEvent, zoomPercentage: number): ScrollInfo;
   resize(zoomLevel: ZoomLevel): void;

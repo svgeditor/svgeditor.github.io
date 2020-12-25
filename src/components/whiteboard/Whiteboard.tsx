@@ -10,15 +10,12 @@ import { WhiteboardGridService } from '../../services/impl/WhiteboardGridService
 import { WhiteboardLayers } from '../../models/WhiteboardLayers';
 import { IWhiteboardLayersService } from '../../services/api/IWhiteboardLayersService';
 import { WhiteboardLayersService } from '../../services/impl/WhiteboardLayersService';
-import { IWhiteboardZoomService } from '../../services/api/IWhiteboardZoomService';
-import { WhiteboardZoomService } from '../../services/impl/WhiteboardZoomService';
 
 export interface IWhiteboardProps {
   appStateService?: IAppStateService;
   backgroundGridService?: IWhiteboardGridService;
   whiteboardDrawingService?: IWhiteboardDrawingService;
   whiteboardLayersService?: IWhiteboardLayersService;
-  whiteboardZoomService?: IWhiteboardZoomService;
 }
 
 export interface IWhiteboardState {}
@@ -32,7 +29,6 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   private whiteboardLayers: WhiteboardLayers;
   private whiteboardLayersService: IWhiteboardLayersService;
   private whiteboardDrawingService: IWhiteboardDrawingService;
-  private whiteboardZoomService: IWhiteboardZoomService;
   private appStateService: IAppStateService;
   private backgroundGridService: IWhiteboardGridService;
 
@@ -41,9 +37,6 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     this.state = {};
     this.whiteboardLayersService = this.props.whiteboardLayersService ? this.props.whiteboardLayersService : new WhiteboardLayersService();
     this.whiteboardDrawingService = this.props.whiteboardDrawingService ? this.props.whiteboardDrawingService : new WhiteboardDrawingService();
-    this.whiteboardZoomService = this.props.whiteboardZoomService
-      ? this.props.whiteboardZoomService
-      : new WhiteboardZoomService(this.whiteboardLayersService);
     this.appStateService = this.props.appStateService ? this.props.appStateService : AppStateService.getInstance();
     this.backgroundGridService = this.backgroundGridService ? this.props.backgroundGridService : new WhiteboardGridService();
   }
@@ -83,7 +76,11 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   private handleMouseWheelEvent(event: WheelEvent): void {
     if (event.ctrlKey) {
       event.preventDefault();
-      this.whiteboardZoomService.handleZoomEvent(event);
+      if (event.deltaY < 0) {
+        this.whiteboardLayersService.zoomIn(event);
+      } else {
+        this.whiteboardLayersService.zoomOut(event);
+      }
     }
   }
 }

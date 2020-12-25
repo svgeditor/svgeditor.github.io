@@ -1,6 +1,5 @@
 import { G, Svg } from '@svgdotjs/svg.js';
 import { AppState } from '../../models/AppState';
-import { ZoomLevel } from '../../models/ZoomLevel';
 
 export interface IAppStateService {
   getAppState(): AppState;

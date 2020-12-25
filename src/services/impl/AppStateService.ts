@@ -19,11 +19,11 @@ export class AppStateService implements IAppStateService {
   protected constructor() {}
 
   getWhiteboardWidth(): number {
-    return this.appState.svgDimensions.width;
+    return this.appState.whiteboardDimensions.width;
   }
 
   getWhiteboardHeight(): number {
-    return this.appState.svgDimensions.height;
+    return this.appState.whiteboardDimensions.height;
   }
 
   setSvgRootElement(svg: Svg): void {

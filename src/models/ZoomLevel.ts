@@ -1,6 +1,6 @@
-export const ZOOM_PERCENTAGE_STEP = 15;
-export const MAX_ZOOM_PERCENTAGE = 600;
-export const MIN_ZOOM_PERCENTAGE = 100;
+export const ZOOM_PERCENTAGE_STEP = 10;
+export const MAX_ZOOM_PERCENTAGE = 1000;
+export const MIN_ZOOM_PERCENTAGE = 25;
 
 export class ZoomLevel {
   previousPercentageZoom: number = 100;
