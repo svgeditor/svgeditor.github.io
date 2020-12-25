@@ -3,7 +3,6 @@ import * as constants from './_constants';
 import { IShapeService } from '../api/IShapeService';
 import { AppStateService } from './AppStateService';
 import { BaseShapeService } from './BaseShapeService';
-import { ZoomLevel } from '../../models/ZoomLevel';
 import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
 
 interface Position {
@@ -22,17 +21,20 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
-  resize(shape: Shape, zoomLevel: ZoomLevel): void {
+  resize(shape: Shape): void {
+    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     const newX = zoomLevel.getZoomedValueFromPreviousValue(shape.x());
     const newY = zoomLevel.getZoomedValueFromPreviousValue(shape.y());
     const newW = zoomLevel.getZoomedValueFromPreviousValue(shape.width());
     const newH = zoomLevel.getZoomedValueFromPreviousValue(shape.height());
-    shape.move(newX, newY).size(newW, newH);
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.attr('stroke-width'));
+    shape.move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
   }
 
   // prettier-ignore
   createOnMouseDown(event: MouseEvent): void {
     const svg = this.appStateService.getSvgRootElement();
+    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     this.container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
     this.element = svg.rect();
     this.initialPosition = { x: event.offsetX, y: event.offsetY };
@@ -42,7 +44,7 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
       .move(event.offsetX, event.offsetY)
       .size(0, 0)
       .fill('white')
-      .stroke({color: '#707070', width: 1});
+      .stroke({color: '#707070', width: zoomLevel.getZoomedValueFromInitialValue(1)});
     document.addEventListener('mousemove', this.createOnMouseDownInProgress);
     document.addEventListener('mouseup', this.endCreateOnMouseDown);
   }

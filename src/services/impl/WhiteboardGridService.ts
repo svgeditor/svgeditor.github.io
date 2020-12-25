@@ -1,15 +1,19 @@
 import { WhiteboardLayers } from '../../models/WhiteboardLayers';
-import { ZoomLevel } from '../../models/ZoomLevel';
+import { IAppStateService } from '../api/IAppStateService';
 import { IWhiteboardGridService } from '../api/IWhiteboardGridService';
+import { AppStateService } from './AppStateService';
 
 const GRID_SIZE_INITIAL_VALUE = 10;
 
 export class WhiteboardGridService implements IWhiteboardGridService {
+  constructor(private appStateService: IAppStateService = AppStateService.getInstance()) {}
+
   init(whiteboardLayers: WhiteboardLayers): void {
     this.updateWhiteboardBackground(whiteboardLayers, this.getGridBase64(GRID_SIZE_INITIAL_VALUE));
   }
 
-  resize(whiteboardLayers: WhiteboardLayers, zoomLevel: ZoomLevel): void {
+  resize(whiteboardLayers: WhiteboardLayers): void {
+    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     const gridSize = zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE_INITIAL_VALUE);
     this.updateWhiteboardBackground(whiteboardLayers, this.getGridBase64(gridSize));
   }

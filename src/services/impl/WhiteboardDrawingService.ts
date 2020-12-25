@@ -37,9 +37,10 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     `;
   }
 
-  resize(zoomLevel: ZoomLevel, svg = this.appStateService.getSvgRootElement()): void {
+  resize(): void {
+    const svg = this.appStateService.getSvgRootElement();
     this.unselectAll();
-    svg.find('rect').forEach((rect) => this.rectService.resize(rect, zoomLevel));
+    svg.find('rect').forEach((rect) => this.rectService.resize(rect));
   }
 
   unselectAll(): void {

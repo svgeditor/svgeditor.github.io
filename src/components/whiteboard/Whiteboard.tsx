@@ -10,6 +10,8 @@ import { WhiteboardGridService } from '../../services/impl/WhiteboardGridService
 import { WhiteboardLayers } from '../../models/WhiteboardLayers';
 import { IWhiteboardLayersService } from '../../services/api/IWhiteboardLayersService';
 import { WhiteboardLayersService } from '../../services/impl/WhiteboardLayersService';
+import WhiteboardHorizontalRuler from '../whiteboard-rulers/WhiteboardHorizantalRuler';
+import WhiteboardVerticalRuler from '../whiteboard-rulers/WhiteboardVerticalRuler';
 
 export interface IWhiteboardProps {
   appStateService?: IAppStateService;
@@ -51,10 +53,14 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
             <div className='whiteboard-rulers-corner'></div>
           </div>
           <div className='whiteboard-rulers-container'>
-            <div ref={(ref) => (this.whiteboardHorizontalRuler = ref)} className='whiteboard-horizontal-ruler'></div>
+            <div ref={(ref) => (this.whiteboardHorizontalRuler = ref)} className='whiteboard-horizontal-ruler'>
+              <WhiteboardHorizontalRuler></WhiteboardHorizontalRuler>
+            </div>
           </div>
           <div className='whiteboard-rulers-container'>
-            <div ref={(ref) => (this.whiteboardVerticalRuler = ref)} className='whiteboard-vertical-ruler'></div>
+            <div ref={(ref) => (this.whiteboardVerticalRuler = ref)} className='whiteboard-vertical-ruler'>
+              <WhiteboardVerticalRuler></WhiteboardVerticalRuler>
+            </div>
           </div>
           <div ref={(ref) => (this.whiteboard = ref)} className='whiteboard-container'></div>
         </div>

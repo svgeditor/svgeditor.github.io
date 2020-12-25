@@ -1,15 +1,14 @@
-import { G, Shape } from '@svgdotjs/svg.js';
+import { Shape } from '@svgdotjs/svg.js';
 import { MOVE_IN_PROGRESS_CLASS_NAME } from './_constants';
 import { IShapeService } from '../api/IShapeService';
 import { IAppStateService } from '../api/IAppStateService';
 import { Position } from '../../models/Position';
-import { ZoomLevel } from '../../models/ZoomLevel';
 
 export abstract class BaseShapeService implements IShapeService {
   abstract createOnMouseDown(event: MouseEvent): void;
   abstract getStyles(): string;
   abstract select(shape: Shape): void;
-  abstract resize(shape: Shape, zoomLevel: ZoomLevel): void;
+  abstract resize(shape: Shape): void;
 
   private mousePosition: Position;
   private shapeToMove: Shape;
