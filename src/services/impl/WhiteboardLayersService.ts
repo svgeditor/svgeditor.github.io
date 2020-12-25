@@ -10,6 +10,7 @@ import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { WhiteboardGridService } from './WhiteboardGridService';
 
 const WHITEBOARD_MARGIN = 25;
+const WHITEBOARD_RULER_WIDTH = 15;
 
 export class WhiteboardLayersService implements IWhiteboardLayersService {
   private static whiteboardLayers: WhiteboardLayers = null;
@@ -31,6 +32,8 @@ export class WhiteboardLayersService implements IWhiteboardLayersService {
     layers.whiteboard.style.top = `${whiteboardWindowBoundingRect.height - WHITEBOARD_MARGIN}px`;
     layers.whiteboardBackground.style.width = `${whiteboardWindowBoundingRect.width * 2 + whiteboardWidth - 2 * WHITEBOARD_MARGIN}px`;
     layers.whiteboardBackground.style.height = `${whiteboardWindowBoundingRect.height * 2 + whiteboardHeight - 2 * WHITEBOARD_MARGIN}px`;
+    layers.whiteboardVerticalRuler.style.height = `${whiteboardWindowBoundingRect.height - WHITEBOARD_RULER_WIDTH}px`;
+    layers.whiteboardHorizontalRuler.style.width = `${whiteboardWindowBoundingRect.width - WHITEBOARD_RULER_WIDTH}px`;
     const whiteboardBackgroundBoundingRect = layers.whiteboardBackground.getBoundingClientRect();
     const scrollX =
       whiteboardWidth < whiteboardWindowBoundingRect.width

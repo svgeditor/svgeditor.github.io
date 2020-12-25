@@ -26,6 +26,8 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   private whiteboard: HTMLElement;
   private whiteboardWindow: HTMLElement;
   private whiteboardBackground: HTMLElement;
+  private whiteboardVerticalRuler: HTMLElement;
+  private whiteboardHorizontalRuler: HTMLElement;
   private whiteboardLayers: WhiteboardLayers;
   private whiteboardLayersService: IWhiteboardLayersService;
   private whiteboardDrawingService: IWhiteboardDrawingService;
@@ -45,6 +47,15 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     return (
       <div ref={(ref) => (this.whiteboardWindow = ref)} className='whiteboard-window-container'>
         <div ref={(ref) => (this.whiteboardBackground = ref)} className='whiteboard-background-container'>
+          <div className='whiteboard-rulers-container'>
+            <div className='whiteboard-rulers-corner'></div>
+          </div>
+          <div className='whiteboard-rulers-container'>
+            <div ref={(ref) => (this.whiteboardHorizontalRuler = ref)} className='whiteboard-horizontal-ruler'></div>
+          </div>
+          <div className='whiteboard-rulers-container'>
+            <div ref={(ref) => (this.whiteboardVerticalRuler = ref)} className='whiteboard-vertical-ruler'></div>
+          </div>
           <div ref={(ref) => (this.whiteboard = ref)} className='whiteboard-container'></div>
         </div>
       </div>
@@ -52,7 +63,13 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   }
 
   componentDidMount() {
-    this.whiteboardLayers = new WhiteboardLayers(this.whiteboard, this.whiteboardWindow, this.whiteboardBackground);
+    this.whiteboardLayers = new WhiteboardLayers(
+      this.whiteboard,
+      this.whiteboardWindow,
+      this.whiteboardBackground,
+      this.whiteboardVerticalRuler,
+      this.whiteboardHorizontalRuler
+    );
     this.whiteboardLayersService.init(this.whiteboardLayers);
     this.initSvgRootElement();
     this.whiteboard.addEventListener('mousedown', (event) => this.whiteboardDrawingService.handleMouseDownEvent(event));
