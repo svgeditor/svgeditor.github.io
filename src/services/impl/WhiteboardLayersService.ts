@@ -53,8 +53,8 @@ export class WhiteboardLayersService implements IWhiteboardLayersService {
 
   getWhiteboardZoomScroll(event: WheelEvent, zoomPercentage: number): ScrollInfo {
     const mousePositionRelatedToWhiteboardContainer = this.getMousePositionRelatedToWhiteboardContainer(event);
-    const scrollX = (mousePositionRelatedToWhiteboardContainer.x * ZOOM_PERCENTAGE_STEP) / zoomPercentage;
-    const scrollY = (mousePositionRelatedToWhiteboardContainer.y * ZOOM_PERCENTAGE_STEP) / zoomPercentage;
+    const scrollX = Math.floor((mousePositionRelatedToWhiteboardContainer.x * ZOOM_PERCENTAGE_STEP) / zoomPercentage);
+    const scrollY = Math.floor((mousePositionRelatedToWhiteboardContainer.y * ZOOM_PERCENTAGE_STEP) / zoomPercentage);
     return {
       scrollX,
       scrollY,
