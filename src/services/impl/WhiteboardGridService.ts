@@ -2,25 +2,24 @@ import { WhiteboardLayers } from '../../models/WhiteboardLayers';
 import { IAppStateService } from '../api/IAppStateService';
 import { IWhiteboardGridService } from '../api/IWhiteboardGridService';
 import { AppStateService } from './AppStateService';
-
-const GRID_SIZE_INITIAL_VALUE = 10;
+import { GRID_SIZE } from './_constants';
 
 export class WhiteboardGridService implements IWhiteboardGridService {
   constructor(private appStateService: IAppStateService = AppStateService.getInstance()) {}
 
   init(whiteboardLayers: WhiteboardLayers): void {
-    this.updateWhiteboardBackground(whiteboardLayers, this.getGridBase64(GRID_SIZE_INITIAL_VALUE));
-  }
-
-  resize(whiteboardLayers: WhiteboardLayers): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const gridSize = zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE_INITIAL_VALUE);
+    const gridSize = zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE);
     this.updateWhiteboardBackground(whiteboardLayers, this.getGridBase64(gridSize));
   }
 
+  resize(whiteboardLayers: WhiteboardLayers): void {
+    this.init(whiteboardLayers);
+  }
+
   private updateWhiteboardBackground(whiteboardLayers: WhiteboardLayers, gridBase64: string) {
-    const gridBackgroundCssValue = `url(data:image/svg+xml;base64,${gridBase64})`;
-    whiteboardLayers.whiteboard.style.backgroundImage = gridBackgroundCssValue;
+    const backgroundImageCssValue = `url(data:image/svg+xml;base64,${gridBase64})`;
+    whiteboardLayers.whiteboard.style.backgroundImage = backgroundImageCssValue;
     whiteboardLayers.whiteboard.style.backgroundColor = 'white';
   }
 

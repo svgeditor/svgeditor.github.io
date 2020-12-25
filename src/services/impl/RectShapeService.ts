@@ -34,7 +34,6 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
   // prettier-ignore
   createOnMouseDown(event: MouseEvent): void {
     const svg = this.appStateService.getSvgRootElement();
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     this.container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
     this.element = svg.rect();
     this.initialPosition = { x: event.offsetX, y: event.offsetY };
@@ -44,7 +43,7 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
       .move(event.offsetX, event.offsetY)
       .size(0, 0)
       .fill('white')
-      .stroke({color: '#707070', width: zoomLevel.getZoomedValueFromInitialValue(1)});
+      .stroke({color: '#707070', width: this.getZoomedValue()});
     document.addEventListener('mousemove', this.createOnMouseDownInProgress);
     document.addEventListener('mouseup', this.endCreateOnMouseDown);
   }
@@ -378,9 +377,14 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
   // prettier-ignore
   private createResizeGuide(svg: Svg, x: number, y: number): Shape {
     return svg
-      .circle(8)
+      .circle(this.getZoomedValue(8))
       .cx(x).cy(y)
       .fill('white')
-      .stroke({ color: constants.SELECTION_COLOR, width: 1 });
+      .stroke({ color: constants.SELECTION_COLOR, width: this.getZoomedValue() });
+  }
+
+  private getZoomedValue(initialValue = 1): number {
+    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    return zoomLevel.getZoomedValueFromInitialValue(initialValue);
   }
 }

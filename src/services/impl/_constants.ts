@@ -8,3 +8,7 @@ export const MOVE_IN_PROGRESS_CLASS_NAME = 'move-in-progress-class-name';
 export const RESIZE_IN_PROGRESS_CLASS_NAME = 'resize-in-progress-class-name';
 export const ON_HOVER_CLASS_NAME = 'on-hover-class-name';
 export const SELECTION_COLOR = '#348CF7';
+export const GRID_SIZE = 10;
+export const WHITEBOARD_MARGIN = 40;
+export const RULER_WIDTH = 15;
+export const RULER_COLOR = '#00000044';

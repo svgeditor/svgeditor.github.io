@@ -1,0 +1,33 @@
+<svg width="100%" height="100%"
+  xmlns="http://www.w3.org/2000/svg">
+  <path d="M 9 0 H 15" stroke="#00000033"/>
+  <text x="-2" y="7" font-size="8" font-family="sans-serif" fill="#00000033" transform="rotate(-90)">0</text>
+  <path d="M 12 10 H 15" stroke="#00000033"/>
+  <path d="M 12 20 H 15" stroke="#00000033"/>
+  <path d="M 12 30 H 15" stroke="#00000033"/>
+  <path d="M 12 40 H 15" stroke="#00000033"/>
+  <path d="M 7 50 H 15" stroke="#00000033"/>
+  <path d="M 12 60 H 15" stroke="#00000033"/>
+  <path d="M 12 70 H 15" stroke="#00000033"/>
+  <path d="M 12 80 H 15" stroke="#00000033"/>
+  <path d="M 12 90 H 15" stroke="#00000033"/>
+  <path d="M 9 100 H 15" stroke="#00000033"/>
+  <text x="-107" y="7" font-size="8" font-family="sans-serif" fill="#00000033" transform="rotate(-90)">100</text>
+  <path d="M 12 110 H 15" stroke="#00000033"/>
+  <path d="M 12 120 H 15" stroke="#00000033"/>
+  <path d="M 12 130 H 15" stroke="#00000033"/>
+  <path d="M 12 140 H 15" stroke="#00000033"/>
+  <path d="M 7 150 H 15" stroke="#00000033"/>
+  <path d="M 12 160 H 15" stroke="#00000033"/>
+  <path d="M 12 170 H 15" stroke="#00000033"/>
+  <path d="M 12 180 H 15" stroke="#00000033"/>
+  <path d="M 12 190 H 15" stroke="#00000033"/>
+  <path d="M 9 200 H 15" stroke="#00000033"/>
+  <text x="-207" y="7" font-size="8" font-family="sans-serif" fill="#00000033" transform="rotate(-90)">200</text>
+  <path d="M 12 210 H 15" stroke="#00000033"/>
+  <path d="M 12 220 H 15" stroke="#00000033"/>
+  <path d="M 12 230 H 15" stroke="#00000033"/>
+  <path d="M 12 240 H 15" stroke="#00000033"/>
+  <path d="M 7 250 H 15" stroke="#00000033"/>
+</svg>
+

@@ -13,6 +13,6 @@ export default class WhiteboardVerticalRuler extends React.Component<IWhiteboard
   }
 
   public render() {
-    return <div className='whiteboard-vertical-ruler-container whiteboard-ruler-container'></div>;
+    return <div className='whiteboard-vertical-ruler-container'></div>;
   }
 }

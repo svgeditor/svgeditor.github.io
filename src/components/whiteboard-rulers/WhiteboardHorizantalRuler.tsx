@@ -13,6 +13,6 @@ export default class WhiteboardHorizontalRuler extends React.Component<IWhiteboa
   }
 
   public render() {
-    return <div className='whiteboard-horizontal-ruler-container whiteboard-ruler-container'></div>;
+    return <div className='whiteboard-horizontal-ruler-container'></div>;
   }
 }
