@@ -2,14 +2,19 @@ import { Position } from '../../models/Position';
 import { ScrollInfo } from '../../models/ScrollInfo';
 import { WhiteboardLayers } from '../../models/WhiteboardLayers';
 import { ZoomLevel, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
+import { IWhiteboardGridService } from '../api/IWhiteboardGridService';
 import { IWhiteboardLayersService } from '../api/IWhiteboardLayersService';
 import { AppStateService } from './AppStateService';
+import { WhiteboardGridService } from './WhiteboardGridService';
 
 const WHITEBOARD_MARGIN = 25;
 
 export class WhiteboardLayersService implements IWhiteboardLayersService {
   static whiteboardLayers: WhiteboardLayers = null;
-  constructor(private appStateService = AppStateService.getInstance()) {}
+  constructor(
+    private appStateService = AppStateService.getInstance(),
+    private whiteboardGridService: IWhiteboardGridService = new WhiteboardGridService()
+  ) {}
 
   init(layers: WhiteboardLayers): void {
     const whiteboardWindowBoundingRect = layers.whiteboardWindow.getBoundingClientRect();
@@ -31,6 +36,7 @@ export class WhiteboardLayersService implements IWhiteboardLayersService {
         ? whiteboardBackgroundBoundingRect.height / 2 - whiteboardWindowBoundingRect.height / 2
         : whiteboardWindowBoundingRect.height - WHITEBOARD_MARGIN * 2;
     layers.whiteboardWindow.scrollTo(scrollX, scrollY);
+    this.whiteboardGridService.init(layers);
     WhiteboardLayersService.whiteboardLayers = layers;
   }
 

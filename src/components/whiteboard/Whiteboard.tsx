@@ -5,8 +5,8 @@ import { SVG } from '@svgdotjs/svg.js';
 import { IWhiteboardDrawingService } from '../../services/api/IWhiteboardDrawingService';
 import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingService';
 import { AppStateService } from '../../services/impl/AppStateService';
-import { IBackgroundGridService } from '../../services/api/IBackgroundGridService';
-import { BackgroundGridService } from '../../services/impl/BackgroundGridService';
+import { IWhiteboardGridService } from '../../services/api/IWhiteboardGridService';
+import { WhiteboardGridService } from '../../services/impl/WhiteboardGridService';
 import { WhiteboardLayers } from '../../models/WhiteboardLayers';
 import { IWhiteboardLayersService } from '../../services/api/IWhiteboardLayersService';
 import { WhiteboardLayersService } from '../../services/impl/WhiteboardLayersService';
@@ -15,7 +15,7 @@ import { WhiteboardZoomService } from '../../services/impl/WhiteboardZoomService
 
 export interface IWhiteboardProps {
   appStateService?: IAppStateService;
-  backgroundGridService?: IBackgroundGridService;
+  backgroundGridService?: IWhiteboardGridService;
   whiteboardDrawingService?: IWhiteboardDrawingService;
   whiteboardLayersService?: IWhiteboardLayersService;
   whiteboardZoomService?: IWhiteboardZoomService;
@@ -23,7 +23,6 @@ export interface IWhiteboardProps {
 
 export interface IWhiteboardState {}
 
-const SVG_MARGIN = 25;
 const DELETE_KEY_CODE = 46;
 
 export default class Whiteboard extends React.Component<IWhiteboardProps, IWhiteboardState> {
@@ -35,7 +34,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   private whiteboardDrawingService: IWhiteboardDrawingService;
   private whiteboardZoomService: IWhiteboardZoomService;
   private appStateService: IAppStateService;
-  private backgroundGridService: IBackgroundGridService;
+  private backgroundGridService: IWhiteboardGridService;
 
   constructor(props: IWhiteboardProps) {
     super(props);
@@ -46,14 +45,14 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
       ? this.props.whiteboardZoomService
       : new WhiteboardZoomService(this.whiteboardLayersService);
     this.appStateService = this.props.appStateService ? this.props.appStateService : AppStateService.getInstance();
-    this.backgroundGridService = this.backgroundGridService ? this.props.backgroundGridService : new BackgroundGridService();
+    this.backgroundGridService = this.backgroundGridService ? this.props.backgroundGridService : new WhiteboardGridService();
   }
 
   public render() {
     return (
-      <div ref={(ref) => (this.whiteboardWindow = ref)} className='whiteboard-container'>
-        <div ref={(ref) => (this.whiteboardBackground = ref)} className='svg-background'>
-          <div ref={(ref) => (this.whiteboard = ref)} className='svg-container'></div>
+      <div ref={(ref) => (this.whiteboardWindow = ref)} className='whiteboard-window-container'>
+        <div ref={(ref) => (this.whiteboardBackground = ref)} className='whiteboard-background-container'>
+          <div ref={(ref) => (this.whiteboard = ref)} className='whiteboard-container'></div>
         </div>
       </div>
     );

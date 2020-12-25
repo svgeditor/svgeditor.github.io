@@ -1,20 +1,17 @@
 :root {
-  --svg-background-color: var(--color-scale-gray-4);
-  --svg-container-background-color: white;
+  --whiteboard-background-color: var(--color-scale-gray-4);
 }
 
-.whiteboard-container {
+.whiteboard-window-container {
   overflow: auto;
 }
 
-.svg-background {
+.whiteboard-background-container {
   position: relative;
-  background-color: var(--svg-background-color);
+  background-color: var(--whiteboard-background-color);
 }
 
-.svg-container {
+.whiteboard-container {
   position: absolute;
-  background: url('/src/assets/grid.svg');
-  background-color: white;
   box-shadow: 0px 0px 2px 1px #d1d1d1;
 }
