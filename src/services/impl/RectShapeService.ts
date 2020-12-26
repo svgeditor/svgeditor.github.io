@@ -377,10 +377,10 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
   // prettier-ignore
   private createResizeGuide(svg: Svg, x: number, y: number): Shape {
     return svg
-      .circle(this.getZoomedValue(8))
+      .circle(Math.min(this.getZoomedValue(8), 14))
       .cx(x).cy(y)
       .fill('white')
-      .stroke({ color: constants.SELECTION_COLOR, width: this.getZoomedValue() });
+      .stroke({ color: constants.SELECTION_COLOR, width: Math.min(this.getZoomedValue(), 3) });
   }
 
   private getZoomedValue(initialValue = 1): number {

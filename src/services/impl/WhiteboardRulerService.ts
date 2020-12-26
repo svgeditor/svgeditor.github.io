@@ -34,21 +34,23 @@ export class WhiteboardRulerService implements IWhiteboardRulerService {
   private getHorizontalRulerBase64(): string {
     let svg = '<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">';
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const ruleLinesNb = Math.floor(this.appStateService.getWhiteboardWidth() / 10);
+    const whiteboardWidth = this.appStateService.getWhiteboardWidth();
+    const ruleLinesNb = Math.floor(whiteboardWidth / 10);
     for (let i = 0; i <= ruleLinesNb; i++) {
       if (i % 5 == 0) {
         if (i % 10 == 0) {
-          svg += `<path d="M ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} 9 V ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
+          svg += `<path d="M ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} 12 V ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
           svg += `<text x="${
             i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE) - this.getRulerTextMargin(i * GRID_SIZE)
-          }" y="7" font-size="8" font-family="sans-serif" fill="${RULER_COLOR}">${i * GRID_SIZE}</text>`;
+          }" y="10" font-size="9" font-family="sans-serif" fill="${RULER_COLOR}">${i * GRID_SIZE}</text>`;
         } else {
-          svg += `<path d="M ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} 7 V ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
+          svg += `<path d="M ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} 10 V ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
         }
       } else {
-        svg += `<path d="M ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} 12 V ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
+        svg += `<path d="M ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} 15 V ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
       }
     }
+    svg += `<path d="M 0 ${RULER_WIDTH} H ${zoomLevel.getZoomedValueFromInitialValue(whiteboardWidth)}" stroke="${RULER_COLOR}"/>`;
     svg += '</svg>';
     return btoa(svg);
   }
@@ -56,21 +58,23 @@ export class WhiteboardRulerService implements IWhiteboardRulerService {
   private getVerticalRulerBase64(): string {
     let svg = '<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">';
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const ruleLinesNb = Math.floor(this.appStateService.getWhiteboardHeight() / 10);
+    const whiteboardHeight = this.appStateService.getWhiteboardHeight();
+    const ruleLinesNb = Math.floor(whiteboardHeight / 10);
     for (let i = 0; i <= ruleLinesNb; i++) {
       if (i % 5 == 0) {
         if (i % 10 == 0) {
-          svg += `<path d="M 9 ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} H ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
+          svg += `<path d="M 12 ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} H ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
           svg += `<text x="-${
             i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE) + this.getRulerTextMargin(i * GRID_SIZE)
-          }" y="7" font-size="8" font-family="sans-serif" fill="${RULER_COLOR}" transform="rotate(-90)">${i * GRID_SIZE}</text>`;
+          }" y="10" font-size="9" font-family="sans-serif" fill="${RULER_COLOR}" transform="rotate(-90)">${i * GRID_SIZE}</text>`;
         } else {
-          svg += `<path d="M 7 ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} H ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
+          svg += `<path d="M 10 ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} H ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
         }
       } else {
-        svg += `<path d="M 12 ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} H ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
+        svg += `<path d="M 15 ${i * zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE)} H ${RULER_WIDTH}" stroke="${RULER_COLOR}"/>`;
       }
     }
+    svg += `<path d="M ${RULER_WIDTH} 0 V ${zoomLevel.getZoomedValueFromInitialValue(whiteboardHeight)}" stroke="${RULER_COLOR}"/>`;
     svg += '</svg>';
     return btoa(svg);
   }
