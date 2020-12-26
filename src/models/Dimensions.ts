@@ -1,4 +1,3 @@
-export interface Dimensions {
-  width: number;
-  height: number;
+export class Dimensions {
+  constructor(public width: number, public height: number) {}
 }

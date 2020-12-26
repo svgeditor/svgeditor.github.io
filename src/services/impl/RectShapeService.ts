@@ -4,6 +4,8 @@ import { IShapeService } from '../api/IShapeService';
 import { AppStateService } from './AppStateService';
 import { BaseShapeService } from './BaseShapeService';
 import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
+import { AddShapeAction } from '../../models/UndoableAction';
+import { SELECT_SHAPE_EVENT } from '../../models/CustomEvents';
 
 interface Position {
   x: number;
@@ -15,7 +17,7 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
   private element: Rect;
   private initialPosition: Position;
 
-  constructor(private svgService: IWhiteboardDrawingService, appStateService = AppStateService.getInstance()) {
+  constructor(private whiteboardDrawingService: IWhiteboardDrawingService, appStateService = AppStateService.getInstance()) {
     super(appStateService);
     this.createOnMouseDownInProgress = this.createOnMouseDownInProgress.bind(this);
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
@@ -50,7 +52,7 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
 
   // prettier-ignore
   select(shape: Shape): void {
-    this.svgService.unselectAll();
+    this.whiteboardDrawingService.unselectAll();
     shape.addClass(constants.SELECTED_SHAPE_CLASS_NAME);
     const svg = this.appStateService.getSvgRootElement();
     const group = this.appStateService.getSelectedShapesGroup();
@@ -64,6 +66,7 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     group.add(this.createResizeGuideSW(svg, shape));
     group.add(this.createResizeGuideW(svg, shape));
     group.front();
+    document.dispatchEvent(SELECT_SHAPE_EVENT);
   }
 
   getStyles(): string {
@@ -118,6 +121,7 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     if (this.element.width() == 0 || this.element.height() == 0) {
       this.container.remove();
     } else {
+      this.appStateService.pushUndoableUserAction(new AddShapeAction(this.container, this.whiteboardDrawingService));
       this.container.add(this.element.clone()
         .addClass(constants.ON_HOVER_CLASS_NAME)
         .fill('transparent')

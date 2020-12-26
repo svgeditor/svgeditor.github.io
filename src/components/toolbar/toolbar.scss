@@ -2,6 +2,9 @@
   --toolbar-container-background-color: var(--color-scale-gray-5);
   --toolbar-container-border-color: var(--color-scale-gray-4);
   --icon-color: var(--color-scale-gray-1);
+  --user-action-icon-color-on-disabled-state: var(--color-scale-gray-3);
+  --user-action-icon-color-on-hover-state: var(--primary-color);
+  --icons-separator-background-color: var(--color-scale-gray-4);
 }
 .toolbar-container {
   background-color: var(--toolbar-container-background-color);
@@ -10,26 +13,11 @@
   align-items: center;
   justify-content: center;
 
-  & .iconify {
-    margin: 0 0.4rem;
-    font-size: 2.4rem;
-    color: var(--icon-color);
-    cursor: pointer;
-  }
-
-  & .line-separator {
-    margin: 0;
-  }
-
-  & .to-front-icon {
-    font-size: 2rem;
-  }
-
-  & .to-back-icon {
-    font-size: 2.8rem;
-  }
-
-  & .shadow-icon {
-    font-size: 2rem;
+  & .icons-separator {
+    margin: 0 1rem;
+    height: 70%;
+    width: 0.2rem;
+    border-radius: 100rem;
+    background-color: var(--icons-separator-background-color);
   }
 }

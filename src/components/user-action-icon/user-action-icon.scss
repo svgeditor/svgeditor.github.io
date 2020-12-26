@@ -1,0 +1,30 @@
+:root {
+  --user-action-icon-color: var(--color-scale-gray-1);
+  --user-action-icon-color-on-disabled-state: var(--color-scale-gray-3);
+  --user-action-icon-color-on-hover-state: var(--primary-color);
+  --user-action-icon-background-color-on-hover-state: var(--color-scale-gray-4);
+}
+
+.user-action-icon-container {
+  display: flex;
+  position: relative;
+  padding: 0.5rem;
+  border-radius: 0.2rem;
+  cursor: pointer;
+
+  & .iconify {
+    margin: 0 0.5rem;
+    transition: var(--transition);
+    transition-property: color;
+    font-size: 2.4rem;
+    color: var(--user-action-icon-color);
+  }
+
+  &:not(.disabled):hover {
+    background-color: var(--user-action-icon-background-color-on-hover-state);
+  }
+
+  &.disabled .iconify {
+    color: var(--user-action-icon-color-on-disabled-state);
+  }
+}

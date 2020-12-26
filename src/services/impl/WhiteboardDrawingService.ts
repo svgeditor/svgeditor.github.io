@@ -3,8 +3,9 @@ import { SELECTED_SHAPE_CLASS_NAME, SHAPE_CLASS_NAME } from './_constants';
 import { IShapeService } from '../api/IShapeService';
 import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
 import { RectShapeService } from './RectShapeService';
-import { ZoomLevel } from '../../models/ZoomLevel';
 import { AppStateService } from './AppStateService';
+import { DeleteSelectedShapesAction } from '../../models/UndoableAction';
+import { UNSELECT_ALL_SHAPES_EVENT } from '../../models/CustomEvents';
 
 export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private rectService: IShapeService;
@@ -50,17 +51,21 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
       .forEach((shape) => shape.removeClass(`${SELECTED_SHAPE_CLASS_NAME}`));
     this.appStateService.getSelectedShapesGroup().each(function () {
       this.remove();
+      document.dispatchEvent(UNSELECT_ALL_SHAPES_EVENT);
     });
   }
 
   deleteSelectedShapes(): void {
-    this.appStateService
-      .getSvgRootElement()
-      .find(`.${SELECTED_SHAPE_CLASS_NAME}`)
-      .forEach((shape) => shape.remove());
+    const selectedShapes = this.appStateService.getSvgRootElement().find(`.${SELECTED_SHAPE_CLASS_NAME}`);
+    this.appStateService.pushUndoableUserAction(new DeleteSelectedShapesAction(selectedShapes, this));
+    selectedShapes.forEach((shape) => shape.remove());
     this.appStateService.getSelectedShapesGroup().each(function () {
       this.remove();
     });
+  }
+
+  draw(shape: Shape): void {
+    this.appStateService.getSvgRootElement().add(shape);
   }
 
   private getSvgElementService(): IShapeService {

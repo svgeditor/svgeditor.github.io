@@ -1,4 +1,5 @@
 import { G, Svg } from '@svgdotjs/svg.js';
+import { IUndoableAction } from '../../models/UndoableAction';
 import { ZoomLevel } from '../../models/ZoomLevel';
 
 export interface IAppStateService {
@@ -9,4 +10,7 @@ export interface IAppStateService {
   getSelectedShapesGroup(): G;
   setWhiteboardZoomLevel(zoomLevel: ZoomLevel): void;
   getWhiteboardZoomLevel(): ZoomLevel;
+  pushUndoableUserAction(action: IUndoableAction): void;
+  popUndoableUserAction(): IUndoableAction | undefined;
+  getUndoableUserActionsSize(): number;
 }

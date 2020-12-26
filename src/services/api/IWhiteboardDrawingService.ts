@@ -1,3 +1,5 @@
+import { Shape } from '@svgdotjs/svg.js';
+
 export interface IWhiteboardDrawingService {
   handleMouseDownEvent(event: MouseEvent): void;
   handleClickEvent(event: MouseEvent): void;
@@ -5,4 +7,5 @@ export interface IWhiteboardDrawingService {
   resize(): void;
   unselectAll(): void;
   deleteSelectedShapes(): void;
+  draw(shape: Shape): void;
 }
