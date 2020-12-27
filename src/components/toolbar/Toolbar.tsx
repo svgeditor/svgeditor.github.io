@@ -15,12 +15,20 @@ import {
   ZOOM_OUT_EVENT,
 } from '../../models/CustomEvents';
 import { IUndoableAction } from '../../models/UndoableAction';
+import { ChromePicker } from 'react-color';
+import { Shape } from '@svgdotjs/svg.js';
 
 export interface IToolbarProps {
   appStateService?: IAppStateService;
 }
 
-export interface IToolbarState {}
+export interface IToolbarState {
+  displayFillColorPicker: boolean;
+  displayBorderColorPicker: boolean;
+  selectedShape: Shape;
+  selectedShapeColor: string;
+  selectedShapeBorderColor: string;
+}
 
 const Z_KEY_CODE = 90;
 const Y_KEY_CODE = 89;
@@ -35,12 +43,20 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
   private fillColorIcon: UserActionIcon;
   private borderColorIcon: UserActionIcon;
   private lastUndoableAction: IUndoableAction;
+  private fillColorIconContainer: HTMLElement;
+  private borderColorIconContainer: HTMLElement;
 
   constructor(props: IToolbarProps) {
     super(props);
     this.appStateService = this.props.appStateService ? this.props.appStateService : AppStateService.getInstance();
 
-    this.state = {};
+    this.state = {
+      displayFillColorPicker: false,
+      displayBorderColorPicker: false,
+      selectedShape: null,
+      selectedShapeColor: '#FFF',
+      selectedShapeBorderColor: '#FFF',
+    };
   }
 
   public render() {
@@ -81,18 +97,34 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
           onClick={this.handleSendToBackEvent.bind(this)}
         ></UserActionIcon>
         <span className='icons-separator'></span>
-        <UserActionIcon
-          ref={(ref) => (this.fillColorIcon = ref)}
-          name='ic:round-format-color-fill'
-          title='Fill Color'
-          disabled={true}
-        ></UserActionIcon>
-        <UserActionIcon
-          ref={(ref) => (this.borderColorIcon = ref)}
-          name='ic:round-border-color'
-          title='Border Color'
-          disabled={true}
-        ></UserActionIcon>
+        <div ref={(ref) => (this.fillColorIconContainer = ref)} className='color-icon-container'>
+          <UserActionIcon
+            ref={(ref) => (this.fillColorIcon = ref)}
+            name='ic:round-format-color-fill'
+            title='Fill Color'
+            disabled={true}
+            onClick={this.handleFillColorIconClickEvent.bind(this)}
+          ></UserActionIcon>
+          <div className='color-picker'>
+            {this.state.displayFillColorPicker && (
+              <ChromePicker color={this.state.selectedShapeColor} onChange={this.handleFillColorChange.bind(this)} />
+            )}
+          </div>
+        </div>
+        <div ref={(ref) => (this.borderColorIconContainer = ref)} className='color-icon-container'>
+          <UserActionIcon
+            ref={(ref) => (this.borderColorIcon = ref)}
+            name='ic:round-border-color'
+            title='Border Color'
+            disabled={true}
+            onClick={this.handleBorderColorIconClickEvent.bind(this)}
+          ></UserActionIcon>
+          <div className='color-picker'>
+            {this.state.displayBorderColorPicker && (
+              <ChromePicker color={this.state.selectedShapeBorderColor} onChange={this.handleBorderColorChange.bind(this)} />
+            )}
+          </div>
+        </div>
         <span className='icons-separator'></span>
         <UserActionIcon
           ref={(ref) => (this.deleteIcon = ref)}
@@ -111,6 +143,37 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     document.addEventListener(SELECT_SHAPE_EVENT_NAME, this.handleSelectShapeEvent.bind(this));
     document.addEventListener(NEW_UNDOABLE_ACTION_EVENT_NAME, this.handleAddUndoableActionEvent.bind(this));
     document.addEventListener(SELECTED_SHAPES_DELETED_EVENT_NAME, this.handleSelectedShapesDeletedEvent.bind(this));
+    document.addEventListener('click', this.handleDocumentClickEvent.bind(this));
+  }
+
+  private handleFillColorChange(event) {
+    const selectedShape = this.state.selectedShape as Shape;
+    if (selectedShape) {
+      selectedShape.fill(event.hex);
+    }
+  }
+
+  private handleBorderColorChange(event) {
+    const selectedShape = this.state.selectedShape as Shape;
+    if (selectedShape) {
+      selectedShape.stroke(event.hex);
+    }
+  }
+
+  private handleDocumentClickEvent(event) {
+    if (!this.fillColorIconContainer.contains(event.target) && !this.borderColorIconContainer.contains(event.target)) {
+      this.setState({ displayFillColorPicker: false, displayBorderColorPicker: false });
+    }
+  }
+
+  private handleFillColorIconClickEvent(event) {
+    event.stopPropagation();
+    this.setState({ displayFillColorPicker: !this.state.displayFillColorPicker, displayBorderColorPicker: false });
+  }
+
+  private handleBorderColorIconClickEvent(event) {
+    event.stopPropagation();
+    this.setState({ displayFillColorPicker: false, displayBorderColorPicker: !this.state.displayBorderColorPicker });
   }
 
   private handleKeydownEvent(event: KeyboardEvent) {
@@ -155,7 +218,9 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     this.undoIcon.enable();
   }
 
-  private handleSelectShapeEvent(): void {
+  private handleSelectShapeEvent(event): void {
+    const selectedShape = event.detail.shape as Shape;
+    this.setState({ selectedShape, selectedShapeColor: selectedShape.fill(), selectedShapeBorderColor: selectedShape.stroke() });
     this.deleteIcon.enable();
     this.bringShapeToFrontIcon.enable();
     this.sendShapeToBackIcon.enable();

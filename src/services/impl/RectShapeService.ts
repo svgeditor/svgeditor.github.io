@@ -5,7 +5,7 @@ import { AppStateService } from './AppStateService';
 import { BaseShapeService } from './BaseShapeService';
 import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
 import { AddShapeAction } from '../../models/UndoableAction';
-import { SELECT_SHAPE_EVENT } from '../../models/CustomEvents';
+import { createSelectShapeEvent } from '../../models/CustomEvents';
 
 interface Position {
   x: number;
@@ -66,7 +66,8 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     group.add(this.createResizeGuideSW(svg, shape));
     group.add(this.createResizeGuideW(svg, shape));
     group.front();
-    document.dispatchEvent(SELECT_SHAPE_EVENT);
+    const shapeWithShapeClassName = shape.findOne(`.${constants.SHAPE_CLASS_NAME}`);
+    if (shapeWithShapeClassName) document.dispatchEvent(createSelectShapeEvent(shapeWithShapeClassName as Shape));
   }
 
   getStyles(): string {
@@ -123,6 +124,7 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     } else {
       this.appStateService.pushUndoableUserAction(new AddShapeAction(this.container, this.whiteboardDrawingService));
       this.container.add(this.element.clone()
+        .removeClass(constants.SHAPE_CLASS_NAME)
         .addClass(constants.ON_HOVER_CLASS_NAME)
         .fill('transparent')
         .stroke({ color: constants.SELECTION_COLOR, width: 1 }));

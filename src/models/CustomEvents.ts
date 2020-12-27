@@ -1,12 +1,18 @@
+import { Shape } from '@svgdotjs/svg.js';
+
 export const UNSELECT_ALL_SHAPES_EVENT_NAME = 'UNSELECT_ALL_SHAPES_EVENT';
 export const UNSELECT_ALL_SHAPES_EVENT = new CustomEvent(UNSELECT_ALL_SHAPES_EVENT_NAME, {
   detail: {},
 });
 
 export const SELECT_SHAPE_EVENT_NAME = 'SELECT_SHAPE_EVENT_NAME';
-export const SELECT_SHAPE_EVENT = new CustomEvent(SELECT_SHAPE_EVENT_NAME, {
-  detail: {},
-});
+export const createSelectShapeEvent = (shape: Shape) => {
+  return new CustomEvent(SELECT_SHAPE_EVENT_NAME, {
+    detail: {
+      shape: shape,
+    },
+  });
+};
 
 export const NEW_UNDOABLE_ACTION_EVENT_NAME = 'NEW_UNDOABLE_ACTION_EVENT_NAME';
 export const NEW_UNDOABLE_ACTION_EVENT = new CustomEvent(NEW_UNDOABLE_ACTION_EVENT_NAME, {

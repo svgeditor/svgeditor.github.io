@@ -20,4 +20,16 @@
     border-radius: 100rem;
     background-color: var(--icons-separator-background-color);
   }
+
+  & .color-icon-container {
+    position: relative;
+  }
+
+  & .color-picker {
+    z-index: 999;
+    position: absolute;
+    top: calc(100% + 2rem);
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
