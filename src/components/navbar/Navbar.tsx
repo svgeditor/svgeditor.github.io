@@ -13,6 +13,15 @@ export default class Navbar extends React.Component<INavbarProps, INavbarState> 
   }
 
   public render() {
-    return <div className='navbar-container'></div>;
+    return (
+      <div className='navbar-container'>
+        <img className='website-logo' src='/logo.png'></img>
+        <span className='website-name'>Draw SVG</span>
+        <span className='nav-item'>File</span>
+        <span className='nav-item'>Edit</span>
+        <span className='nav-item'>View</span>
+        <span className='nav-item'>Help</span>
+      </div>
+    );
   }
 }
