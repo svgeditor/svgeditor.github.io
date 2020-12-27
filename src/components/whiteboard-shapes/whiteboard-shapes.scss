@@ -5,5 +5,5 @@
 
 .whiteboard-shapes-container {
   background-color: var(--whiteboard-shapes-container-background-color);
-  border-right: 3px solid var(--whiteboard-shapes-container-border-color);
+  border-right: var(--container-border-width) solid var(--whiteboard-shapes-container-border-color);
 }

@@ -8,7 +8,7 @@
 }
 .navbar-container {
   background-color: var(--navbar-container-background-color);
-  border-bottom: 3px solid var(--navbar-container-border-color);
+  border-bottom: var(--container-border-width) solid var(--navbar-container-border-color);
 
   display: flex;
   align-items: center;

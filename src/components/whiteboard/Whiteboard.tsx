@@ -97,7 +97,6 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
 
   private handleDeleteSelectedShapesEvent() {
     this.whiteboardDrawingService.deleteSelectedShapes();
-    document.dispatchEvent(SELECTED_SHAPES_DELETED_EVENT);
   }
 
   private initSvgRootElement(): void {

@@ -4,5 +4,5 @@
 }
 .whiteboard-settings-container {
   background-color: var(--whiteboard-settings-container-background-color);
-  border-left: 3px solid var(--whiteboard-settings-container-border-color);
+  border-left: var(--container-border-width) solid var(--whiteboard-settings-container-border-color);
 }

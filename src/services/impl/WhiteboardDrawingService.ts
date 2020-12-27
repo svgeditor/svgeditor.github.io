@@ -5,7 +5,7 @@ import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
 import { RectShapeService } from './RectShapeService';
 import { AppStateService } from './AppStateService';
 import { DeleteSelectedShapesAction } from '../../models/UndoableAction';
-import { UNSELECT_ALL_SHAPES_EVENT } from '../../models/CustomEvents';
+import { SELECTED_SHAPES_DELETED_EVENT, UNSELECT_ALL_SHAPES_EVENT } from '../../models/CustomEvents';
 
 export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private rectService: IShapeService;
@@ -75,6 +75,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     selectedShapes.forEach((shape) => shape.remove());
     this.appStateService.getSelectedShapesGroup().each(function () {
       this.remove();
+      document.dispatchEvent(SELECTED_SHAPES_DELETED_EVENT);
     });
   }
 

@@ -8,7 +8,7 @@
 }
 .toolbar-container {
   background-color: var(--toolbar-container-background-color);
-  border-bottom: 3px solid var(--toolbar-container-border-color);
+  border-bottom: var(--container-border-width) solid var(--toolbar-container-border-color);
   display: flex;
   align-items: center;
   justify-content: center;
