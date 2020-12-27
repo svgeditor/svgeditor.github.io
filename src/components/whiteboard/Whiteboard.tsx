@@ -10,7 +10,7 @@ import { WhiteboardGridService } from '../../services/impl/WhiteboardGridService
 import { WhiteboardLayers } from '../../models/WhiteboardLayers';
 import { IWhiteboardLayersService } from '../../services/api/IWhiteboardLayersService';
 import { WhiteboardLayersService } from '../../services/impl/WhiteboardLayersService';
-import { DELETE_SELECTED_SHAPES_EVENT_NAME, SELECTED_SHAPES_DELETED_EVENT } from '../../models/CustomEvents';
+import { DELETE_SELECTED_SHAPES_EVENT_NAME, SELECTED_SHAPES_DELETED_EVENT, ZOOM_IN_EVENT_NAME, ZOOM_OUT_EVENT_NAME } from '../../models/CustomEvents';
 
 export interface IWhiteboardProps {
   appStateService?: IAppStateService;
@@ -82,6 +82,8 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     this.whiteboardWindow.addEventListener('wheel', this.handleMouseWheelEvent.bind(this));
     document.addEventListener('keydown', this.handleKeyPressEvent.bind(this));
     document.addEventListener(DELETE_SELECTED_SHAPES_EVENT_NAME, this.handleDeleteSelectedShapesEvent.bind(this));
+    document.addEventListener(ZOOM_IN_EVENT_NAME, () => this.whiteboardLayersService.zoomIn());
+    document.addEventListener(ZOOM_OUT_EVENT_NAME, () => this.whiteboardLayersService.zoomOut());
   }
 
   private handleDeleteSelectedShapesEvent() {

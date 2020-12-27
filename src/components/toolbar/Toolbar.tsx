@@ -9,6 +9,8 @@ import {
   SELECTED_SHAPES_DELETED_EVENT_NAME,
   SELECT_SHAPE_EVENT_NAME,
   UNSELECT_ALL_SHAPES_EVENT_NAME,
+  ZOOM_IN_EVENT,
+  ZOOM_OUT_EVENT,
 } from '../../models/CustomEvents';
 import { IUndoableAction } from '../../models/UndoableAction';
 
@@ -60,8 +62,18 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
           onClick={this.handleRedoEvent.bind(this)}
         ></UserActionIcon>
         <span className='icons-separator'></span>
-        <UserActionIcon ref={(ref) => (this.zoomInIcon = ref)} name='heroicons-outline:zoom-in' title='Zoom In'></UserActionIcon>
-        <UserActionIcon ref={(ref) => (this.zoomOutIcon = ref)} name='heroicons-outline:zoom-out' title='Zoom Out'></UserActionIcon>
+        <UserActionIcon
+          ref={(ref) => (this.zoomInIcon = ref)}
+          name='heroicons-outline:zoom-in'
+          title='Zoom In'
+          onClick={this.handleZoomIn.bind(this)}
+        ></UserActionIcon>
+        <UserActionIcon
+          ref={(ref) => (this.zoomOutIcon = ref)}
+          name='heroicons-outline:zoom-out'
+          title='Zoom Out'
+          onClick={this.handleZoomOut.bind(this)}
+        ></UserActionIcon>
         <span className='icons-separator'></span>
         <UserActionIcon
           ref={(ref) => (this.deleteIcon = ref)}
@@ -124,6 +136,14 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     if (event.keyCode == Y_KEY_CODE && event.ctrlKey) {
       this.handleRedoEvent();
     }
+  }
+
+  private handleZoomIn() {
+    document.dispatchEvent(ZOOM_IN_EVENT);
+  }
+
+  private handleZoomOut() {
+    document.dispatchEvent(ZOOM_OUT_EVENT);
   }
 
   private handleUndoEvent() {

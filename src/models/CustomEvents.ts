@@ -22,3 +22,13 @@ export const SELECTED_SHAPES_DELETED_EVENT_NAME = 'SELECTED_SHAPES_DELETED_EVENT
 export const SELECTED_SHAPES_DELETED_EVENT = new CustomEvent(SELECTED_SHAPES_DELETED_EVENT_NAME, {
   detail: {},
 });
+
+export const ZOOM_IN_EVENT_NAME = 'ZOOM_IN_EVENT_NAME';
+export const ZOOM_IN_EVENT = new CustomEvent(ZOOM_IN_EVENT_NAME, {
+  detail: {},
+});
+
+export const ZOOM_OUT_EVENT_NAME = 'ZOOM_OUT_EVENT_NAME';
+export const ZOOM_OUT_EVENT = new CustomEvent(ZOOM_OUT_EVENT_NAME, {
+  detail: {},
+});
