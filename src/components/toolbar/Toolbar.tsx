@@ -65,14 +65,6 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
         <UserActionIcon name='heroicons-outline:zoom-out' title='Zoom Out' onClick={this.handleZoomOut.bind(this)}></UserActionIcon>
         <span className='icons-separator'></span>
         <UserActionIcon
-          ref={(ref) => (this.deleteIcon = ref)}
-          name='ic:twotone-delete-outline'
-          title='Delete'
-          disabled={true}
-          onClick={this.handleDeleteEvent.bind(this)}
-        ></UserActionIcon>
-        <span className='icons-separator'></span>
-        <UserActionIcon
           ref={(ref) => (this.bringShapeToFrontIcon = ref)}
           name='whh:bringtofront'
           title='Bring to front'
@@ -100,6 +92,14 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
           name='ic:round-border-color'
           title='Border Color'
           disabled={true}
+        ></UserActionIcon>
+        <span className='icons-separator'></span>
+        <UserActionIcon
+          ref={(ref) => (this.deleteIcon = ref)}
+          name='ic:twotone-delete-outline'
+          title='Delete'
+          disabled={true}
+          onClick={this.handleDeleteEvent.bind(this)}
         ></UserActionIcon>
       </div>
     );
