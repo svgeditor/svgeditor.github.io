@@ -3,6 +3,7 @@
   --user-action-icon-color-on-disabled-state: var(--color-scale-gray-3);
   --user-action-icon-color-on-hover-state: var(--primary-color);
   --user-action-icon-background-color-on-hover-state: var(--color-scale-gray-4);
+  --user-action-icon-color-on-selected-state: var(--primary-color);
 }
 
 .user-action-icon-container {
@@ -26,5 +27,9 @@
 
   &.disabled .iconify {
     color: var(--user-action-icon-color-on-disabled-state);
+  }
+
+  &.selected .iconify {
+    color: var(--user-action-icon-color-on-selected-state);
   }
 }
