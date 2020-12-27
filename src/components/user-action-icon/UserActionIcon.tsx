@@ -7,6 +7,7 @@ export interface IUserActionIconProps {
   readonly title: string;
   readonly disabled?: boolean;
   readonly className?: string;
+  readonly rotate?: string;
   readonly onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -20,6 +21,7 @@ export default class UserActionIcon extends React.Component<IUserActionIconProps
   static defaultProps = {
     disabled: false,
     className: '',
+    rotate: '0deg',
   };
 
   constructor(props: IUserActionIconProps) {
@@ -35,7 +37,7 @@ export default class UserActionIcon extends React.Component<IUserActionIconProps
   public render() {
     return (
       <span title={this.props.title} className={this.state.containerClassNames} onClick={this.onClick}>
-        <span className={this.state.iconClassNames} data-icon={this.props.name} data-inline='false'></span>
+        <span className={this.state.iconClassNames} data-icon={this.props.name} data-inline='false' data-rotate={this.props.rotate}></span>
       </span>
     );
   }

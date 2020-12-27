@@ -62,6 +62,12 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
   public render() {
     return (
       <div className='toolbar-container'>
+        <UserActionIcon name='mdi:cursor-default-outline' title='Select'></UserActionIcon>
+        <UserActionIcon name='bx:bx-rectangle' title='Rectangle'></UserActionIcon>
+        <UserActionIcon name='bx:bx-circle' title='Circle'></UserActionIcon>
+        <UserActionIcon name='mdi:ellipse-outline' title='Ellipse'></UserActionIcon>
+        <UserActionIcon name='ant-design:line-outlined' title='Line' rotate='30deg'></UserActionIcon>
+        <span className='whitespace-icons-separator'></span>
         <UserActionIcon
           ref={(ref) => (this.undoIcon = ref)}
           name='ic:round-undo'
