@@ -10,6 +10,7 @@ import { WhiteboardGridService } from '../../services/impl/WhiteboardGridService
 import { WhiteboardLayers } from '../../models/WhiteboardLayers';
 import { IWhiteboardLayersService } from '../../services/api/IWhiteboardLayersService';
 import { WhiteboardLayersService } from '../../services/impl/WhiteboardLayersService';
+import { DELETE_SELECTED_SHAPES_EVENT_NAME, SELECTED_SHAPES_DELETED_EVENT } from '../../models/CustomEvents';
 
 export interface IWhiteboardProps {
   appStateService?: IAppStateService;
@@ -80,6 +81,12 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     this.whiteboard.addEventListener('click', (event) => this.whiteboardDrawingService.handleClickEvent(event));
     this.whiteboardWindow.addEventListener('wheel', this.handleMouseWheelEvent.bind(this));
     document.addEventListener('keydown', this.handleKeyPressEvent.bind(this));
+    document.addEventListener(DELETE_SELECTED_SHAPES_EVENT_NAME, this.handleDeleteSelectedShapesEvent.bind(this));
+  }
+
+  private handleDeleteSelectedShapesEvent() {
+    this.whiteboardDrawingService.deleteSelectedShapes();
+    document.dispatchEvent(SELECTED_SHAPES_DELETED_EVENT);
   }
 
   private initSvgRootElement(): void {

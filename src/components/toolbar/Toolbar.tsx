@@ -3,7 +3,13 @@ import * as React from 'react';
 import { IAppStateService } from '../../services/api/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
 import UserActionIcon from '../user-action-icon/UserActionIcon';
-import { NEW_UNDOABLE_ACTION_EVENT_NAME, SELECT_SHAPE_EVENT_NAME, UNSELECT_ALL_SHAPES_EVENT_NAME } from '../../models/CustomEvents';
+import {
+  DELETE_SELECTED_SHAPES_EVENT,
+  NEW_UNDOABLE_ACTION_EVENT_NAME,
+  SELECTED_SHAPES_DELETED_EVENT_NAME,
+  SELECT_SHAPE_EVENT_NAME,
+  UNSELECT_ALL_SHAPES_EVENT_NAME,
+} from '../../models/CustomEvents';
 import { IUndoableAction } from '../../models/UndoableAction';
 
 export interface IToolbarProps {
@@ -57,7 +63,13 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
         <UserActionIcon ref={(ref) => (this.zoomInIcon = ref)} name='heroicons-outline:zoom-in' title='Zoom In'></UserActionIcon>
         <UserActionIcon ref={(ref) => (this.zoomOutIcon = ref)} name='heroicons-outline:zoom-out' title='Zoom Out'></UserActionIcon>
         <span className='icons-separator'></span>
-        <UserActionIcon ref={(ref) => (this.deleteIcon = ref)} name='ic:twotone-delete-outline' title='Delete' disabled={true}></UserActionIcon>
+        <UserActionIcon
+          ref={(ref) => (this.deleteIcon = ref)}
+          name='ic:twotone-delete-outline'
+          title='Delete'
+          disabled={true}
+          onClick={this.handleDeleteEvent.bind(this)}
+        ></UserActionIcon>
         <span className='icons-separator'></span>
         <UserActionIcon
           ref={(ref) => (this.bringShapeToFrontIcon = ref)}
@@ -102,6 +114,7 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     document.addEventListener(UNSELECT_ALL_SHAPES_EVENT_NAME, this.handleUnselectAllShapesEvent.bind(this));
     document.addEventListener(SELECT_SHAPE_EVENT_NAME, this.handleSelectShapeEvent.bind(this));
     document.addEventListener(NEW_UNDOABLE_ACTION_EVENT_NAME, this.handleAddUndoableActionEvent.bind(this));
+    document.addEventListener(SELECTED_SHAPES_DELETED_EVENT_NAME, this.handleSelectedShapesDeletedEvent.bind(this));
   }
 
   private handleKeydownEvent(event: KeyboardEvent) {
@@ -150,5 +163,18 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
 
   private handleAddUndoableActionEvent(): void {
     this.undoIcon.enable();
+  }
+
+  private handleDeleteEvent(): void {
+    document.dispatchEvent(DELETE_SELECTED_SHAPES_EVENT);
+  }
+
+  private handleSelectedShapesDeletedEvent(): void {
+    this.deleteIcon.disable();
+    this.bringShapeToFrontIcon.disable();
+    this.sendShapeToBackIcon.disable();
+    this.fillColorIcon.disable();
+    this.borderColorIcon.disable();
+    this.addShadowIcon.disable();
   }
 }
