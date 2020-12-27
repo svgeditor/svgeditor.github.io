@@ -1,9 +1,4 @@
 :root {
-  --transition: all 0.15s ease-in-out;
-  --font-family: 'Poppins', sans-serif;
-  --font-size: 62.5%;
-  --container-border-width: 1.5px;
-
   // color inspiration: https://www.htmlcsscolor.com/hex/F5F5F5
   --primary-color: #3282c9;
   --secondary-color: #f57173;
@@ -17,4 +12,10 @@
   --color-scale-gray-7: #f9f9f9;
   --color-scale-gray-8: #fafafa;
   --color-scale-gray-9: #fcfcfc;
+
+  --transition: all 0.15s ease-in-out;
+  --font-family: 'Poppins', sans-serif;
+  --font-size: 62.5%;
+  --container-border-width: 1.5px;
+  --body-color: var(--color-scale-gray-0);
 }

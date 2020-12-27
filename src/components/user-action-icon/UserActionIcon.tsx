@@ -16,7 +16,6 @@ export interface IUserActionIconState {
   containerClassNames: string;
   iconClassNames: string;
   disabled: boolean;
-  selected: boolean;
 }
 
 export default class UserActionIcon extends React.Component<IUserActionIconProps, IUserActionIconState> {
@@ -34,7 +33,6 @@ export default class UserActionIcon extends React.Component<IUserActionIconProps
       containerClassNames: classNames('user-action-icon-container', { disabled: this.props.disabled }, { selected: this.props.selected }),
       iconClassNames: classNames('iconify', this.props.className),
       disabled: this.props.disabled,
-      selected: this.props.selected,
     };
   }
 
@@ -46,24 +44,19 @@ export default class UserActionIcon extends React.Component<IUserActionIconProps
     );
   }
 
+  componentWillReceiveProps(props) {
+    const newClassNames = classNames('user-action-icon-container', { disabled: this.state.disabled }, { selected: props.selected });
+    this.setState({ containerClassNames: newClassNames });
+  }
+
   enable() {
-    const newClassNames = classNames('user-action-icon-container', { disabled: false }, { selected: this.state.selected });
+    const newClassNames = classNames('user-action-icon-container', { disabled: false });
     this.setState({ containerClassNames: newClassNames, disabled: false });
   }
 
   disable() {
-    const newClassNames = classNames('user-action-icon-container', { disabled: true }, { selected: this.state.selected });
+    const newClassNames = classNames('user-action-icon-container', { disabled: true });
     this.setState({ containerClassNames: newClassNames, disabled: true });
-  }
-
-  select() {
-    const newClassNames = classNames('user-action-icon-container', { disabled: this.state.disabled }, { selected: true });
-    this.setState({ containerClassNames: newClassNames, selected: true });
-  }
-
-  unselect() {
-    const newClassNames = classNames('user-action-icon-container', { disabled: this.state.disabled }, { selected: false });
-    this.setState({ containerClassNames: newClassNames, selected: false });
   }
 
   private onClick = (event: React.MouseEvent<HTMLButtonElement>) => {

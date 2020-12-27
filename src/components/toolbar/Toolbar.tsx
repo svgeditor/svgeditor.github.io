@@ -17,6 +17,7 @@ import {
 import { IUndoableAction } from '../../models/UndoableAction';
 import { ChromePicker } from 'react-color';
 import { Shape } from '@svgdotjs/svg.js';
+import { ECursorFunction } from '../../models/ECursorFunction';
 
 export interface IToolbarProps {
   appStateService?: IAppStateService;
@@ -28,6 +29,7 @@ export interface IToolbarState {
   selectedShape: Shape;
   selectedShapeColor: string;
   selectedShapeBorderColor: string;
+  cursorFunction: ECursorFunction;
 }
 
 const Z_KEY_CODE = 90;
@@ -56,17 +58,43 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
       selectedShape: null,
       selectedShapeColor: '#FFF',
       selectedShapeBorderColor: '#FFF',
+      cursorFunction: this.appStateService.getCursorFunction(),
     };
   }
 
   public render() {
     return (
       <div className='toolbar-container'>
-        <UserActionIcon name='mdi:cursor-default-outline' title='Select'></UserActionIcon>
-        <UserActionIcon name='bx:bx-rectangle' title='Rectangle' selected={true}></UserActionIcon>
-        <UserActionIcon name='bx:bx-circle' title='Circle'></UserActionIcon>
-        <UserActionIcon name='mdi:ellipse-outline' title='Ellipse'></UserActionIcon>
-        <UserActionIcon name='la:slash' title='Line'></UserActionIcon>
+        <UserActionIcon
+          name='mdi:cursor-default-outline'
+          selected={this.state.cursorFunction == ECursorFunction.SELECT}
+          title='Select'
+          onClick={() => this.changeCursorFunction(ECursorFunction.SELECT)}
+        ></UserActionIcon>
+        <UserActionIcon
+          name='bx:bx-rectangle'
+          title='Rectangle'
+          selected={this.state.cursorFunction == ECursorFunction.DRAW_RECTANGLES}
+          onClick={() => this.changeCursorFunction(ECursorFunction.DRAW_RECTANGLES)}
+        ></UserActionIcon>
+        <UserActionIcon
+          name='bx:bx-circle'
+          title='Circle'
+          selected={this.state.cursorFunction == ECursorFunction.DRAW_CIRCLES}
+          onClick={() => this.changeCursorFunction(ECursorFunction.DRAW_CIRCLES)}
+        ></UserActionIcon>
+        <UserActionIcon
+          name='mdi:ellipse-outline'
+          title='Ellipse'
+          selected={this.state.cursorFunction == ECursorFunction.DRAW_ELLIPSES}
+          onClick={() => this.changeCursorFunction(ECursorFunction.DRAW_ELLIPSES)}
+        ></UserActionIcon>
+        <UserActionIcon
+          name='la:slash'
+          title='Line'
+          selected={this.state.cursorFunction == ECursorFunction.DRAW_LINES}
+          onClick={() => this.changeCursorFunction(ECursorFunction.DRAW_LINES)}
+        ></UserActionIcon>
         <span className='icons-separator'></span>
         <UserActionIcon
           ref={(ref) => (this.undoIcon = ref)}
@@ -141,6 +169,11 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
         ></UserActionIcon>
       </div>
     );
+  }
+
+  changeCursorFunction(selectedCursorFunction: ECursorFunction): void {
+    this.setState({ cursorFunction: selectedCursorFunction });
+    this.appStateService.setCursorFunction(selectedCursorFunction);
   }
 
   componentDidMount() {

@@ -13,6 +13,10 @@ export default class WhiteboardShapes extends React.Component<IWhiteboardShapesP
   }
 
   public render() {
-    return <div className='whiteboard-shapes-container'></div>;
+    return (
+      <div className='whiteboard-shapes-container'>
+        <h2>Shapes</h2>
+      </div>
+    );
   }
 }

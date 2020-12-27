@@ -1,6 +1,7 @@
 import { G, Svg } from '@svgdotjs/svg.js';
 import { NEW_UNDOABLE_ACTION_EVENT } from '../../models/CustomEvents';
 import { Dimensions } from '../../models/Dimensions';
+import { ECursorFunction } from '../../models/ECursorFunction';
 import { Stack } from '../../models/Stack';
 import { IUndoableAction } from '../../models/UndoableAction';
 import { ZoomLevel } from '../../models/ZoomLevel';
@@ -14,12 +15,20 @@ export class AppStateService implements IAppStateService {
   private whiteboardSvgRootElement: Svg = null;
   private selectedShapeGroup: G = null;
   private undoableUserActions = new Stack<IUndoableAction>();
+  private cursorFunction: ECursorFunction = ECursorFunction.DRAW_RECTANGLES;
 
   static getInstance(): IAppStateService {
     return AppStateService.instance;
   }
 
   private constructor() {}
+
+  getCursorFunction(): ECursorFunction {
+    return this.cursorFunction;
+  }
+  setCursorFunction(cursorFunction: ECursorFunction): void {
+    this.cursorFunction = cursorFunction;
+  }
 
   pushUndoableUserAction(action: IUndoableAction): void {
     this.undoableUserActions.push(action);

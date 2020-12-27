@@ -13,6 +13,10 @@ export default class WhiteboardSettings extends React.Component<IWhiteboardSetti
   }
 
   public render() {
-    return <div className='whiteboard-settings-container'></div>;
+    return (
+      <div className='whiteboard-settings-container'>
+        <h2>Settings</h2>
+      </div>
+    );
   }
 }
