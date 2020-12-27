@@ -4,10 +4,13 @@ import { IAppStateService } from '../../services/api/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
 import UserActionIcon from '../user-action-icon/UserActionIcon';
 import {
+  BRING_SELECTED_SHAPE_TO_FRONT_EVENT,
+  BRING_SELECTED_SHAPE_TO_FRONT_EVENT_NAME,
   DELETE_SELECTED_SHAPES_EVENT,
   NEW_UNDOABLE_ACTION_EVENT_NAME,
   SELECTED_SHAPES_DELETED_EVENT_NAME,
   SELECT_SHAPE_EVENT_NAME,
+  SEND_SELECTED_SHAPE_TO_BACK_EVENT,
   UNSELECT_ALL_SHAPES_EVENT_NAME,
   ZOOM_IN_EVENT,
   ZOOM_OUT_EVENT,
@@ -86,16 +89,18 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
         <UserActionIcon
           ref={(ref) => (this.bringShapeToFrontIcon = ref)}
           name='whh:bringtofront'
-          title='Bring shape to front'
+          title='Bring to front'
           className='bring-to-front-icon'
           disabled={true}
+          onClick={this.handleBringToFrontEvent.bind(this)}
         ></UserActionIcon>
         <UserActionIcon
           ref={(ref) => (this.sendShapeToBackIcon = ref)}
           name='ri:send-to-back'
-          title='Send shape to back'
+          title='Send to back'
           className='send-to-back-icon'
           disabled={true}
+          onClick={this.handleSendToBackEvent.bind(this)}
         ></UserActionIcon>
         <span className='icons-separator'></span>
         <UserActionIcon
@@ -136,6 +141,14 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     if (event.keyCode == Y_KEY_CODE && event.ctrlKey) {
       this.handleRedoEvent();
     }
+  }
+
+  private handleBringToFrontEvent() {
+    document.dispatchEvent(BRING_SELECTED_SHAPE_TO_FRONT_EVENT);
+  }
+
+  private handleSendToBackEvent() {
+    document.dispatchEvent(SEND_SELECTED_SHAPE_TO_BACK_EVENT);
   }
 
   private handleZoomIn() {

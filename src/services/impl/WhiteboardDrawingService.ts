@@ -55,6 +55,20 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     });
   }
 
+  bringSelectedShapesToFront(): void {
+    this.appStateService
+      .getSvgRootElement()
+      .find(`.${SELECTED_SHAPE_CLASS_NAME}`)
+      .forEach((shape) => shape.forward());
+  }
+
+  sendSelectedShapesToBack(): void {
+    this.appStateService
+      .getSvgRootElement()
+      .find(`.${SELECTED_SHAPE_CLASS_NAME}`)
+      .forEach((shape) => shape.backward());
+  }
+
   deleteSelectedShapes(): void {
     const selectedShapes = this.appStateService.getSvgRootElement().find(`.${SELECTED_SHAPE_CLASS_NAME}`);
     this.appStateService.pushUndoableUserAction(new DeleteSelectedShapesAction(selectedShapes, this));

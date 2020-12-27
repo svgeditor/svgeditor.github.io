@@ -10,7 +10,14 @@ import { WhiteboardGridService } from '../../services/impl/WhiteboardGridService
 import { WhiteboardLayers } from '../../models/WhiteboardLayers';
 import { IWhiteboardLayersService } from '../../services/api/IWhiteboardLayersService';
 import { WhiteboardLayersService } from '../../services/impl/WhiteboardLayersService';
-import { DELETE_SELECTED_SHAPES_EVENT_NAME, SELECTED_SHAPES_DELETED_EVENT, ZOOM_IN_EVENT_NAME, ZOOM_OUT_EVENT_NAME } from '../../models/CustomEvents';
+import {
+  BRING_SELECTED_SHAPE_TO_FRONT_EVENT_NAME,
+  DELETE_SELECTED_SHAPES_EVENT_NAME,
+  SELECTED_SHAPES_DELETED_EVENT,
+  SEND_SELECTED_SHAPE_TO_BACK_EVENT_NAME,
+  ZOOM_IN_EVENT_NAME,
+  ZOOM_OUT_EVENT_NAME,
+} from '../../models/CustomEvents';
 
 export interface IWhiteboardProps {
   appStateService?: IAppStateService;
@@ -84,6 +91,8 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     document.addEventListener(DELETE_SELECTED_SHAPES_EVENT_NAME, this.handleDeleteSelectedShapesEvent.bind(this));
     document.addEventListener(ZOOM_IN_EVENT_NAME, () => this.whiteboardLayersService.zoomIn());
     document.addEventListener(ZOOM_OUT_EVENT_NAME, () => this.whiteboardLayersService.zoomOut());
+    document.addEventListener(BRING_SELECTED_SHAPE_TO_FRONT_EVENT_NAME, () => this.whiteboardDrawingService.bringSelectedShapesToFront());
+    document.addEventListener(SEND_SELECTED_SHAPE_TO_BACK_EVENT_NAME, () => this.whiteboardDrawingService.sendSelectedShapesToBack());
   }
 
   private handleDeleteSelectedShapesEvent() {

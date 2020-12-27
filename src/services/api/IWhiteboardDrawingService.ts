@@ -8,4 +8,6 @@ export interface IWhiteboardDrawingService {
   unselectAll(): void;
   deleteSelectedShapes(): void;
   draw(shape: Shape): void;
+  bringSelectedShapesToFront(): void;
+  sendSelectedShapesToBack(): void;
 }
