@@ -5,7 +5,6 @@ import { AppStateService } from '../../services/impl/AppStateService';
 import UserActionIcon from '../user-action-icon/UserActionIcon';
 import {
   BRING_SELECTED_SHAPE_TO_FRONT_EVENT,
-  BRING_SELECTED_SHAPE_TO_FRONT_EVENT_NAME,
   DELETE_SELECTED_SHAPES_EVENT,
   NEW_UNDOABLE_ACTION_EVENT_NAME,
   SELECTED_SHAPES_DELETED_EVENT_NAME,
@@ -30,14 +29,11 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
   private appStateService: IAppStateService;
   private undoIcon: UserActionIcon;
   private redoIcon: UserActionIcon;
-  private zoomInIcon: UserActionIcon;
-  private zoomOutIcon: UserActionIcon;
   private deleteIcon: UserActionIcon;
   private bringShapeToFrontIcon: UserActionIcon;
   private sendShapeToBackIcon: UserActionIcon;
   private fillColorIcon: UserActionIcon;
   private borderColorIcon: UserActionIcon;
-  private addShadowIcon: UserActionIcon;
   private lastUndoableAction: IUndoableAction;
 
   constructor(props: IToolbarProps) {
@@ -65,18 +61,8 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
           onClick={this.handleRedoEvent.bind(this)}
         ></UserActionIcon>
         <span className='icons-separator'></span>
-        <UserActionIcon
-          ref={(ref) => (this.zoomInIcon = ref)}
-          name='heroicons-outline:zoom-in'
-          title='Zoom In'
-          onClick={this.handleZoomIn.bind(this)}
-        ></UserActionIcon>
-        <UserActionIcon
-          ref={(ref) => (this.zoomOutIcon = ref)}
-          name='heroicons-outline:zoom-out'
-          title='Zoom Out'
-          onClick={this.handleZoomOut.bind(this)}
-        ></UserActionIcon>
+        <UserActionIcon name='heroicons-outline:zoom-in' title='Zoom In' onClick={this.handleZoomIn.bind(this)}></UserActionIcon>
+        <UserActionIcon name='heroicons-outline:zoom-out' title='Zoom Out' onClick={this.handleZoomOut.bind(this)}></UserActionIcon>
         <span className='icons-separator'></span>
         <UserActionIcon
           ref={(ref) => (this.deleteIcon = ref)}
@@ -113,13 +99,6 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
           ref={(ref) => (this.borderColorIcon = ref)}
           name='ic:round-border-color'
           title='Border Color'
-          disabled={true}
-        ></UserActionIcon>
-        <UserActionIcon
-          ref={(ref) => (this.addShadowIcon = ref)}
-          name='vaadin:square-shadow'
-          title='Add Shadow'
-          className='shadow-icon'
           disabled={true}
         ></UserActionIcon>
       </div>
@@ -182,7 +161,6 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     this.sendShapeToBackIcon.enable();
     this.fillColorIcon.enable();
     this.borderColorIcon.enable();
-    this.addShadowIcon.enable();
   }
 
   private handleUnselectAllShapesEvent(): void {
@@ -191,7 +169,6 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     this.sendShapeToBackIcon.disable();
     this.fillColorIcon.disable();
     this.borderColorIcon.disable();
-    this.addShadowIcon.disable();
   }
 
   private handleAddUndoableActionEvent(): void {
@@ -208,6 +185,5 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     this.sendShapeToBackIcon.disable();
     this.fillColorIcon.disable();
     this.borderColorIcon.disable();
-    this.addShadowIcon.disable();
   }
 }
