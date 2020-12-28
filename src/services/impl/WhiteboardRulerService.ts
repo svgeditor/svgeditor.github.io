@@ -1,15 +1,21 @@
-import { WhiteboardLayers } from '../../models/WhiteboardLayers';
 import { IWhiteboardRulerService } from '../api/IWhiteboardRulerService';
 import { AppStateService } from './AppStateService';
-import { GRID_SIZE, RULER_COLOR, RULER_WIDTH, WHITEBOARD_MARGIN } from './_constants';
+import { GRID_SIZE, RULER_COLOR, RULER_WIDTH, WHITEBOARD_MARGIN } from '../../constants/constants';
 
 export class WhiteboardRulerService implements IWhiteboardRulerService {
-  constructor(private appStateService = AppStateService.getInstance()) {}
+  private static instance: IWhiteboardRulerService = new WhiteboardRulerService();
 
-  init(layers: WhiteboardLayers) {
+  private constructor(private appStateService = AppStateService.getInstance()) {}
+
+  static getInstance(): IWhiteboardRulerService {
+    return WhiteboardRulerService.instance;
+  }
+
+  resize() {
+    const layers = this.appStateService.getWhiteboardLayers();
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     const whiteboardWindowBoundingRect = layers.whiteboardWindow.getBoundingClientRect();
-    const whiteboardHeight = this.appStateService.getWhiteboardHeight();
+    const whiteboardHeight = this.appStateService.getInitialWhiteboardHeight();
     layers.whiteboardHorizontalRuler.style.margin = `0 ${whiteboardWindowBoundingRect.width - WHITEBOARD_MARGIN}px`;
     layers.whiteboardHorizontalRuler.style.height = `100%`;
     const innerHorizontalRuler = document.createElement('div');
@@ -27,14 +33,10 @@ export class WhiteboardRulerService implements IWhiteboardRulerService {
     layers.whiteboardVerticalRuler.appendChild(innerVerticalRuler);
   }
 
-  resize(layers: WhiteboardLayers) {
-    this.init(layers);
-  }
-
   private getHorizontalRulerBase64(): string {
     let svg = '<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">';
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const whiteboardWidth = this.appStateService.getWhiteboardWidth();
+    const whiteboardWidth = this.appStateService.getInitialWhiteboardWidth();
     const ruleLinesNb = Math.floor(whiteboardWidth / 10);
     for (let i = 0; i <= ruleLinesNb; i++) {
       if (i % 5 == 0) {
@@ -58,7 +60,7 @@ export class WhiteboardRulerService implements IWhiteboardRulerService {
   private getVerticalRulerBase64(): string {
     let svg = '<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">';
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const whiteboardHeight = this.appStateService.getWhiteboardHeight();
+    const whiteboardHeight = this.appStateService.getInitialWhiteboardHeight();
     const ruleLinesNb = Math.floor(whiteboardHeight / 10);
     for (let i = 0; i <= ruleLinesNb; i++) {
       if (i % 5 == 0) {

@@ -1,46 +1,52 @@
-import { G, Rect, Shape, Svg } from '@svgdotjs/svg.js';
-import * as constants from './_constants';
+import { G, Shape, Svg } from '@svgdotjs/svg.js';
+import * as constants from '../../constants/constants';
 import { IShapeService } from '../api/IShapeService';
 import { AppStateService } from './AppStateService';
 import { BaseShapeService } from './BaseShapeService';
-import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
-import { AddShapeAction } from '../../models/UndoableAction';
-import { createSelectShapeEvent } from '../../models/CustomEvents';
-
-interface Position {
-  x: number;
-  y: number;
-}
+import { AddShape } from '../../models/user-actions/AddShape';
+import { ShapeInfo } from '../../models/ShapeInfo';
+import { UserActions } from '../../models/user-actions/UserActions';
+import { SelectShape } from '../../models/user-actions/SelectShape';
+import { Position } from '../../models/Position';
+import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 
 export class RectShapeService extends BaseShapeService implements IShapeService {
-  private container: G;
-  private element: Rect;
-  private initialPosition: Position;
+  private static instance: IShapeService = null;
 
-  constructor(private whiteboardDrawingService: IWhiteboardDrawingService, appStateService = AppStateService.getInstance()) {
-    super(appStateService);
+  private constructor(private whiteboardDrawingService: WhiteboardDrawingService) {
+    super(AppStateService.getInstance());
     this.createOnMouseDownInProgress = this.createOnMouseDownInProgress.bind(this);
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
-  resize(shape: Shape): void {
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeService {
+    if (RectShapeService.instance == null) {
+      RectShapeService.instance = new RectShapeService(whiteboardDrawingService);
+    }
+    return RectShapeService.instance;
+  }
+
+  private initialPosition: Position;
+  private shape: ShapeInfo;
+
+  resize(shape: ShapeInfo): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newX = zoomLevel.getZoomedValueFromPreviousValue(shape.x());
-    const newY = zoomLevel.getZoomedValueFromPreviousValue(shape.y());
-    const newW = zoomLevel.getZoomedValueFromPreviousValue(shape.width());
-    const newH = zoomLevel.getZoomedValueFromPreviousValue(shape.height());
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.attr('stroke-width'));
-    shape.move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
+    const newX = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.x());
+    const newY = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.y());
+    const newW = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.width());
+    const newH = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.height());
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
+    shape.shape.move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
   }
 
   // prettier-ignore
   createOnMouseDown(event: MouseEvent): void {
     const svg = this.appStateService.getSvgRootElement();
-    this.container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
-    this.element = svg.rect();
+    const container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
+    const shape = svg.rect();
     this.initialPosition = { x: event.offsetX, y: event.offsetY };
-    this.container.add(this.element);
-    this.element
+    container.add(shape);
+    shape
       .addClass(constants.SHAPE_CLASS_NAME)
       .move(event.offsetX, event.offsetY)
       .size(0, 0)
@@ -48,14 +54,15 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
       .stroke({color: '#707070', width: this.getZoomedValue()});
     document.addEventListener('mousemove', this.createOnMouseDownInProgress);
     document.addEventListener('mouseup', this.endCreateOnMouseDown);
+    this.shape = new ShapeInfo(container, shape);
   }
 
   // prettier-ignore
-  select(shape: Shape): void {
+  select(shape: ShapeInfo): void {
     this.whiteboardDrawingService.unselectAll();
-    shape.addClass(constants.SELECTED_SHAPE_CLASS_NAME);
+    shape.container.addClass(constants.SELECTED_SHAPE_CLASS_NAME);
     const svg = this.appStateService.getSvgRootElement();
-    const group = this.appStateService.getSelectedShapesGroup();
+    const group = this.whiteboardDrawingService.getSelectedShapesGroup();
     group.add(this.createBorder(svg, shape));
     group.add(this.createResizeGuideNW(svg, shape));
     group.add(this.createResizeGuideN(svg, shape));
@@ -66,42 +73,41 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     group.add(this.createResizeGuideSW(svg, shape));
     group.add(this.createResizeGuideW(svg, shape));
     group.front();
-    const shapeWithShapeClassName = shape.findOne(`.${constants.SHAPE_CLASS_NAME}`);
-    if (shapeWithShapeClassName) document.dispatchEvent(createSelectShapeEvent(shapeWithShapeClassName as Shape));
+    document.dispatchEvent(UserActions.createCustomEvent(new SelectShape(shape)));
   }
 
   getStyles(): string {
     return `
       /* <![CDATA[ */
-        .${constants.ON_HOVER_CLASS_NAME} {
+        .${constants.HOVER_SHAPE_CLASS_NAME} {
           pointer-events: none;
           opacity: 0;
           transition: opacity 0.15s ease-in-out;
         }
-        .${constants.SHAPE_GROUP_CLASS_NAME}:hover .${constants.ON_HOVER_CLASS_NAME} {
+        .${constants.SHAPE_GROUP_CLASS_NAME}:hover .${constants.HOVER_SHAPE_CLASS_NAME} {
           opacity: 1;
         }
 
-        .${constants.SELECTION_GROUP_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
+        .${constants.SELECTED_SHAPE_GROUP_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
           pointer-events: none;
         }
 
-        .${constants.MOVE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_GUIDE_CLASS_NAME},
-        .${constants.RESIZE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_GUIDE_CLASS_NAME} {
+        .${constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME},
+        .${constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME} {
           opacity: 0;
         }
 
-        .${constants.MOVE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME},
-        .${constants.RESIZE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
+        .${constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME},
+        .${constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
           opacity: 0.8;
           stroke-dasharray: 5,5;
         }
 
-        .${constants.RESIZE_GUIDE_CLASS_NAME} {
+        .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME} {
           transition: fill 0.15s ease-in-out;
         }
 
-        .${constants.RESIZE_GUIDE_CLASS_NAME}:hover {
+        .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME}:hover {
           fill: ${constants.SELECTION_COLOR}
         }
       /* ]]> */
@@ -114,58 +120,58 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     const y = Math.min(event.offsetY, this.initialPosition.y);
     const width = Math.abs(event.offsetX - this.initialPosition.x);
     const height = Math.abs(event.offsetY - this.initialPosition.y);
-    this.element.move(x, y).size(width, height);
+    this.shape.shape.move(x, y).size(width, height);
   }
 
   // prettier-ignore
   private endCreateOnMouseDown(event: MouseEvent) {
-    if (this.element.width() == 0 || this.element.height() == 0) {
-      this.container.remove();
+    if (this.shape.shape.width() == 0 || this.shape.shape.height() == 0) {
+      this.shape.container.remove();
     } else {
-      this.appStateService.pushUndoableUserAction(new AddShapeAction(this.container, this.whiteboardDrawingService));
-      this.container.add(this.element.clone()
+      document.dispatchEvent(UserActions.createCustomEvent(new AddShape(this.shape)));
+      this.shape.container.add(this.shape.shape.clone()
         .removeClass(constants.SHAPE_CLASS_NAME)
-        .addClass(constants.ON_HOVER_CLASS_NAME)
+        .addClass(constants.HOVER_SHAPE_CLASS_NAME)
         .fill('transparent')
         .stroke({ color: constants.SELECTION_COLOR, width: 1 }));
-      setTimeout(() => this.select(this.container), 0);
+      setTimeout(() => this.select(this.shape), 0);
     }
     document.removeEventListener('mousemove', this.createOnMouseDownInProgress);
     document.removeEventListener('mouseup', this.endCreateOnMouseDown);
   }
 
-  private createBorder(svg: Svg, shape: Shape): Shape {
+  private createBorder(svg: Svg, shape: ShapeInfo): Shape {
     return svg
       .rect()
       .addClass(constants.SELECTED_SHAPE_BORDER_CLASS_NAME)
-      .move(shape.x(), shape.y())
-      .size(shape.width(), shape.height())
+      .move(shape.container.x(), shape.container.y())
+      .size(shape.container.width(), shape.container.height())
       .fill('transparent')
       .stroke({ color: constants.SELECTION_COLOR, width: 1 });
   }
 
-  private createResizeGuideNW(svg: Svg, shape: Shape): Shape {
-    const circle = this.createResizeGuide(svg, shape.x(), shape.y());
-    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
+  private createResizeGuideNW(svg: Svg, shape: ShapeInfo): Shape {
+    const circle = this.createResizeGuide(svg, shape.container.x(), shape.container.y());
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.x() + shape.width();
-      const shapeInitialY = shape.y() + shape.height();
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialX = shape.container.x() + shape.container.width();
+      const shapeInitialY = shape.container.y() + shape.container.height();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.each(function () {
+        shape.container.each(function () {
           this.move(x, y).size(width, height);
         });
       };
       const handleMouseUp = () => {
         _this.select(shape);
-        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -175,25 +181,25 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     return circle;
   }
 
-  private createResizeGuideN(svg: Svg, shape: Shape): Shape {
-    const circle = this.createResizeGuide(svg, shape.x() + shape.width() / 2, shape.y());
-    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
+  private createResizeGuideN(svg: Svg, shape: ShapeInfo): Shape {
+    const circle = this.createResizeGuide(svg, shape.container.x() + shape.container.width() / 2, shape.container.y());
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialY = shape.y() + shape.height();
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialY = shape.container.y() + shape.container.height();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const y = Math.min(event.offsetY, shapeInitialY);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.each(function () {
+        shape.container.each(function () {
           this.y(y).height(height);
         });
       };
       const handleMouseUp = () => {
         _this.select(shape);
-        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -203,28 +209,28 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     return circle;
   }
 
-  private createResizeGuideNE(svg: Svg, shape: Shape): Shape {
-    const circle = this.createResizeGuide(svg, shape.x() + shape.width(), shape.y());
-    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
+  private createResizeGuideNE(svg: Svg, shape: ShapeInfo): Shape {
+    const circle = this.createResizeGuide(svg, shape.container.x() + shape.container.width(), shape.container.y());
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.x();
-      const shapeInitialY = shape.y() + shape.height();
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialX = shape.container.x();
+      const shapeInitialY = shape.container.y() + shape.container.height();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.each(function () {
+        shape.container.each(function () {
           this.move(x, y).size(width, height);
         });
       };
       const handleMouseUp = () => {
         _this.select(shape);
-        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -234,25 +240,25 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     return circle;
   }
 
-  private createResizeGuideE(svg: Svg, shape: Shape): Shape {
-    const circle = this.createResizeGuide(svg, shape.x() + shape.width(), shape.y() + shape.height() / 2);
-    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
+  private createResizeGuideE(svg: Svg, shape: ShapeInfo): Shape {
+    const circle = this.createResizeGuide(svg, shape.container.x() + shape.container.width(), shape.container.y() + shape.container.height() / 2);
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.x();
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialX = shape.container.x();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const width = Math.abs(event.offsetX - shapeInitialX);
-        shape.each(function () {
+        shape.container.each(function () {
           this.x(x).width(width);
         });
       };
       const handleMouseUp = () => {
         _this.select(shape);
-        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -262,28 +268,28 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     return circle;
   }
 
-  private createResizeGuideSE(svg: Svg, shape: Shape): Shape {
-    const circle = this.createResizeGuide(svg, shape.x() + shape.width(), shape.y() + shape.height());
-    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
+  private createResizeGuideSE(svg: Svg, shape: ShapeInfo): Shape {
+    const circle = this.createResizeGuide(svg, shape.container.x() + shape.container.width(), shape.container.y() + shape.container.height());
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.x();
-      const shapeInitialY = shape.y();
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialX = shape.container.x();
+      const shapeInitialY = shape.container.y();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.each(function () {
+        shape.container.each(function () {
           this.move(x, y).size(width, height);
         });
       };
       const handleMouseUp = () => {
         _this.select(shape);
-        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -293,25 +299,25 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     return circle;
   }
 
-  private createResizeGuideS(svg: Svg, shape: Shape): Shape {
-    const circle = this.createResizeGuide(svg, shape.x() + shape.width() / 2, shape.y() + shape.height());
-    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
+  private createResizeGuideS(svg: Svg, shape: ShapeInfo): Shape {
+    const circle = this.createResizeGuide(svg, shape.container.x() + shape.container.width() / 2, shape.container.y() + shape.container.height());
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialY = shape.y();
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialY = shape.container.y();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const y = Math.min(event.offsetY, shapeInitialY);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.each(function () {
+        shape.container.each(function () {
           this.y(y).height(height);
         });
       };
       const handleMouseUp = () => {
         _this.select(shape);
-        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -321,28 +327,28 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     return circle;
   }
 
-  private createResizeGuideSW(svg: Svg, shape: Shape): Shape {
-    const circle = this.createResizeGuide(svg, shape.x(), shape.y() + shape.height());
-    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
+  private createResizeGuideSW(svg: Svg, shape: ShapeInfo): Shape {
+    const circle = this.createResizeGuide(svg, shape.container.x(), shape.container.y() + shape.container.height());
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.x() + shape.width();
-      const shapeInitialY = shape.y();
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialX = shape.container.x() + shape.container.width();
+      const shapeInitialY = shape.container.y();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.each(function () {
+        shape.container.each(function () {
           this.move(x, y).size(width, height);
         });
       };
       const handleMouseUp = () => {
         _this.select(shape);
-        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
@@ -352,25 +358,25 @@ export class RectShapeService extends BaseShapeService implements IShapeService 
     return circle;
   }
 
-  private createResizeGuideW(svg: Svg, shape: Shape): Shape {
-    const circle = this.createResizeGuide(svg, shape.x(), shape.y() + shape.height() / 2);
-    circle.addClass(constants.RESIZE_GUIDE_CLASS_NAME);
+  private createResizeGuideW(svg: Svg, shape: ShapeInfo): Shape {
+    const circle = this.createResizeGuide(svg, shape.container.x(), shape.container.y() + shape.container.height() / 2);
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
     circle.on('mousedown', () => {
       const _this = this;
-      svg.addClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.x() + shape.width();
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialX = shape.container.x() + shape.container.width();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const width = Math.abs(event.offsetX - shapeInitialX);
-        shape.each(function () {
+        shape.container.each(function () {
           this.x(x).width(width);
         });
       };
       const handleMouseUp = () => {
         _this.select(shape);
-        svg.removeClass(constants.RESIZE_IN_PROGRESS_CLASS_NAME);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };

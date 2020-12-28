@@ -1,74 +1,83 @@
-import { Position } from '../../models/Position';
 import { ScrollInfo } from '../../models/ScrollInfo';
-import { WhiteboardLayers } from '../../models/WhiteboardLayers';
-import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
-import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
-import { IWhiteboardGridService } from '../api/IWhiteboardGridService';
+import { ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
 import { IWhiteboardLayersService } from '../api/IWhiteboardLayersService';
-import { IWhiteboardRulerService } from '../api/IWhiteboardRulerService';
 import { AppStateService } from './AppStateService';
-import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { WhiteboardGridService } from './WhiteboardGridService';
-import { WhiteboardRulerService } from './WhiteboardRulerService';
-import { WHITEBOARD_MARGIN } from './_constants';
+import { WHITEBOARD_MARGIN } from '../../constants/constants';
 
 export class WhiteboardLayersService implements IWhiteboardLayersService {
-  private static whiteboardLayers: WhiteboardLayers = null;
+  private static instance: IWhiteboardLayersService = new WhiteboardLayersService();
 
-  constructor(
-    private appStateService = AppStateService.getInstance(),
-    private whiteboardGridService: IWhiteboardGridService = new WhiteboardGridService(),
-    private whiteboardDrawingService: IWhiteboardDrawingService = new WhiteboardDrawingService(),
-    private whiteboardRulerService: IWhiteboardRulerService = new WhiteboardRulerService()
-  ) {}
+  private constructor(private appStateService = AppStateService.getInstance()) {}
 
-  init(layers: WhiteboardLayers): void {
-    WhiteboardLayersService.whiteboardLayers = layers;
+  static getInstance() {
+    return WhiteboardLayersService.instance;
+  }
+
+  resize(): void {
+    const layers = this.appStateService.getWhiteboardLayers();
+    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     const whiteboardWindowBoundingRect = layers.whiteboardWindow.getBoundingClientRect();
-    const whiteboardWidth = this.appStateService.getWhiteboardWidth();
-    const whiteboardHeight = this.appStateService.getWhiteboardHeight();
+    const whiteboardWidth = zoomLevel.getZoomedValueFromInitialValue(this.appStateService.getInitialWhiteboardWidth());
+    const whiteboardHeight = zoomLevel.getZoomedValueFromInitialValue(this.appStateService.getInitialWhiteboardHeight());
     layers.whiteboard.style.width = `${whiteboardWidth}px`;
     layers.whiteboard.style.height = `${whiteboardHeight}px`;
     layers.whiteboard.style.left = `${whiteboardWindowBoundingRect.width - WHITEBOARD_MARGIN}px`;
     layers.whiteboard.style.top = `${whiteboardWindowBoundingRect.height - WHITEBOARD_MARGIN}px`;
-    layers.whiteboardBackground.style.width = `${(whiteboardWindowBoundingRect.width - WHITEBOARD_MARGIN) * 2 + whiteboardWidth}px`;
-    layers.whiteboardBackground.style.height = `${(whiteboardWindowBoundingRect.height - WHITEBOARD_MARGIN) * 2 + whiteboardHeight}px`;
-    this.whiteboardGridService.init(layers);
-    this.whiteboardRulerService.init(layers);
-    this.scrollOnStartUp(layers);
+    layers.whiteboardBackground.style.width = `${whiteboardWindowBoundingRect.width * 2 + whiteboardWidth - 2 * WHITEBOARD_MARGIN}px`;
+    layers.whiteboardBackground.style.height = `${whiteboardWindowBoundingRect.height * 2 + whiteboardHeight - 2 * WHITEBOARD_MARGIN}px`;
   }
 
-  zoomIn(): void;
-  zoomIn(event: WheelEvent): void;
-  zoomIn(event?: any) {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    if (zoomLevel.currentPercentageZoom >= MAX_ZOOM_PERCENTAGE) return;
-    const currentPercentageZoom = zoomLevel.currentPercentageZoom;
-    zoomLevel.previousPercentageZoom = currentPercentageZoom;
-    zoomLevel.currentPercentageZoom = currentPercentageZoom + ZOOM_PERCENTAGE_STEP;
-    this.appStateService.setWhiteboardZoomLevel(zoomLevel);
-    this.resize();
-    this.continueScrollSouthEast(this.getWhiteboardZoomScroll(currentPercentageZoom, event));
+  centerOnStartUp(): void {
+    const layers = this.appStateService.getWhiteboardLayers();
+    const whiteboardWindowBoundingRect = layers.whiteboardWindow.getBoundingClientRect();
+    const whiteboardWidth = this.appStateService.getInitialWhiteboardWidth();
+    const whiteboardHeight = this.appStateService.getInitialWhiteboardHeight();
+    const whiteboardBackgroundBoundingRect = layers.whiteboardBackground.getBoundingClientRect();
+    const scrollX =
+      whiteboardWidth < whiteboardWindowBoundingRect.width
+        ? whiteboardBackgroundBoundingRect.width / 2 - whiteboardWindowBoundingRect.width / 2
+        : whiteboardWindowBoundingRect.width - WHITEBOARD_MARGIN * 2;
+    const scrollY =
+      whiteboardHeight < whiteboardWindowBoundingRect.height
+        ? whiteboardBackgroundBoundingRect.height / 2 - whiteboardWindowBoundingRect.height / 2
+        : whiteboardWindowBoundingRect.height - WHITEBOARD_MARGIN * 2;
+    layers.whiteboardWindow.scrollTo(scrollX, scrollY);
   }
 
-  zoomOut(): void;
-  zoomOut(event: WheelEvent): void;
-  zoomOut(event?: any) {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    if (zoomLevel.currentPercentageZoom <= MIN_ZOOM_PERCENTAGE) return;
-    const currentPercentageZoom = zoomLevel.currentPercentageZoom;
-    zoomLevel.previousPercentageZoom = currentPercentageZoom;
-    zoomLevel.currentPercentageZoom = currentPercentageZoom - ZOOM_PERCENTAGE_STEP;
-    this.appStateService.setWhiteboardZoomLevel(zoomLevel);
-    this.resize();
-    this.continueScrollNorthWest(this.getWhiteboardZoomScroll(currentPercentageZoom, event));
+  centerOnZoomIn(event?: MouseEvent): void {
+    this.continueScrollToSouthEast(this.getWhiteboardZoomScroll(event));
   }
 
-  getMousePositionRelatedToWhiteboardContainer(event: MouseEvent): Position;
-  getMousePositionRelatedToWhiteboardContainer(): Position;
-  getMousePositionRelatedToWhiteboardContainer(event?: any) {
-    const layers = WhiteboardLayersService.whiteboardLayers;
-    if (!layers) throw Error('the WhiteboardLayersService service is not yet initialized. please call the init() method before');
+  centerOnZoomOut(event?: MouseEvent): void {
+    this.continueScrollToNorthWest(this.getWhiteboardZoomScroll(event));
+  }
+
+  private continueScrollToNorthWest(scrollInfo: ScrollInfo): void {
+    const layers = this.appStateService.getWhiteboardLayers();
+    if (scrollInfo.continueScroll) {
+      layers.whiteboardWindow.scrollTo(
+        layers.whiteboardWindow.scrollLeft - scrollInfo.scrollX,
+        layers.whiteboardWindow.scrollTop - scrollInfo.scrollY
+      );
+    } else {
+      layers.whiteboardWindow.scrollTo(scrollInfo.scrollX, scrollInfo.scrollY);
+    }
+  }
+
+  private continueScrollToSouthEast(scrollInfo: ScrollInfo): void {
+    const layers = this.appStateService.getWhiteboardLayers();
+    if (scrollInfo.continueScroll) {
+      layers.whiteboardWindow.scrollTo(
+        layers.whiteboardWindow.scrollLeft + scrollInfo.scrollX,
+        layers.whiteboardWindow.scrollTop + scrollInfo.scrollY
+      );
+    } else {
+      layers.whiteboardWindow.scrollTo(scrollInfo.scrollX, scrollInfo.scrollY);
+    }
+  }
+
+  private getMousePositionRelatedToWhiteboardContainer(event?: MouseEvent) {
+    const layers = this.appStateService.getWhiteboardLayers();
     if (event) {
       const whiteboardWindowBoundingRect = layers.whiteboardWindow.getBoundingClientRect();
       const whiteboardBackgroundBoundingRect = layers.whiteboardBackground.getBoundingClientRect();
@@ -85,9 +94,8 @@ export class WhiteboardLayersService implements IWhiteboardLayersService {
     }
   }
 
-  getWhiteboardZoomScroll(zoomPercentage: number): ScrollInfo;
-  getWhiteboardZoomScroll(zoomPercentage: number, event: MouseEvent): ScrollInfo;
-  getWhiteboardZoomScroll(zoomPercentage: any, event?: any) {
+  private getWhiteboardZoomScroll(event?: MouseEvent): ScrollInfo {
+    const zoomPercentage = this.appStateService.getWhiteboardZoomLevel().previousPercentageZoom;
     const mousePositionRelatedToWhiteboardContainer = this.getMousePositionRelatedToWhiteboardContainer(event);
     const scrollX = Math.floor((mousePositionRelatedToWhiteboardContainer.x * ZOOM_PERCENTAGE_STEP) / zoomPercentage);
     const scrollY = Math.floor((mousePositionRelatedToWhiteboardContainer.y * ZOOM_PERCENTAGE_STEP) / zoomPercentage);
@@ -96,63 +104,5 @@ export class WhiteboardLayersService implements IWhiteboardLayersService {
       scrollY,
       continueScroll: true,
     };
-  }
-
-  resize(): void {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const layers = WhiteboardLayersService.whiteboardLayers;
-    if (!layers) throw Error('the WhiteboardLayersService service is not yet initialized. please call the init() method before');
-    const whiteboardWindowBoundingRect = layers.whiteboardWindow.getBoundingClientRect();
-    const whiteboardWidth = zoomLevel.getZoomedValueFromInitialValue(this.appStateService.getWhiteboardWidth());
-    const whiteboardHeight = zoomLevel.getZoomedValueFromInitialValue(this.appStateService.getWhiteboardHeight());
-    layers.whiteboard.style.width = `${whiteboardWidth}px`;
-    layers.whiteboard.style.height = `${whiteboardHeight}px`;
-    layers.whiteboardBackground.style.width = `${whiteboardWindowBoundingRect.width * 2 + whiteboardWidth - 2 * WHITEBOARD_MARGIN}px`;
-    layers.whiteboardBackground.style.height = `${whiteboardWindowBoundingRect.height * 2 + whiteboardHeight - 2 * WHITEBOARD_MARGIN}px`;
-    this.whiteboardGridService.resize(layers);
-    this.whiteboardRulerService.resize(layers);
-    this.whiteboardDrawingService.resize();
-  }
-
-  continueScrollNorthWest(scrollInfo: ScrollInfo): void {
-    const layers = WhiteboardLayersService.whiteboardLayers;
-    if (!layers) throw Error('the WhiteboardLayersService service is not yet initialized. please call the init() method before');
-    if (scrollInfo.continueScroll) {
-      layers.whiteboardWindow.scrollTo(
-        layers.whiteboardWindow.scrollLeft - scrollInfo.scrollX,
-        layers.whiteboardWindow.scrollTop - scrollInfo.scrollY
-      );
-    } else {
-      layers.whiteboardWindow.scrollTo(scrollInfo.scrollX, scrollInfo.scrollY);
-    }
-  }
-
-  continueScrollSouthEast(scrollInfo: ScrollInfo): void {
-    const layers = WhiteboardLayersService.whiteboardLayers;
-    if (!layers) throw Error('the WhiteboardLayersService service is not yet initialized. please call the init() method before');
-    if (scrollInfo.continueScroll) {
-      layers.whiteboardWindow.scrollTo(
-        layers.whiteboardWindow.scrollLeft + scrollInfo.scrollX,
-        layers.whiteboardWindow.scrollTop + scrollInfo.scrollY
-      );
-    } else {
-      layers.whiteboardWindow.scrollTo(scrollInfo.scrollX, scrollInfo.scrollY);
-    }
-  }
-
-  private scrollOnStartUp(layers: WhiteboardLayers) {
-    const whiteboardWindowBoundingRect = layers.whiteboardWindow.getBoundingClientRect();
-    const whiteboardWidth = this.appStateService.getWhiteboardWidth();
-    const whiteboardHeight = this.appStateService.getWhiteboardHeight();
-    const whiteboardBackgroundBoundingRect = layers.whiteboardBackground.getBoundingClientRect();
-    const scrollX =
-      whiteboardWidth < whiteboardWindowBoundingRect.width
-        ? whiteboardBackgroundBoundingRect.width / 2 - whiteboardWindowBoundingRect.width / 2
-        : whiteboardWindowBoundingRect.width - WHITEBOARD_MARGIN * 2;
-    const scrollY =
-      whiteboardHeight < whiteboardWindowBoundingRect.height
-        ? whiteboardBackgroundBoundingRect.height / 2 - whiteboardWindowBoundingRect.height / 2
-        : whiteboardWindowBoundingRect.height - WHITEBOARD_MARGIN * 2;
-    layers.whiteboardWindow.scrollTo(scrollX, scrollY);
   }
 }

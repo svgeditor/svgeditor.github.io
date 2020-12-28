@@ -1,7 +1,7 @@
 import './whiteboard.scss';
 import * as React from 'react';
 import { IAppStateService } from '../../services/api/IAppStateService';
-import { SVG } from '@svgdotjs/svg.js';
+import { G, Shape, SVG } from '@svgdotjs/svg.js';
 import { IWhiteboardDrawingService } from '../../services/api/IWhiteboardDrawingService';
 import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingService';
 import { AppStateService } from '../../services/impl/AppStateService';
@@ -10,25 +10,26 @@ import { WhiteboardGridService } from '../../services/impl/WhiteboardGridService
 import { WhiteboardLayers } from '../../models/WhiteboardLayers';
 import { IWhiteboardLayersService } from '../../services/api/IWhiteboardLayersService';
 import { WhiteboardLayersService } from '../../services/impl/WhiteboardLayersService';
-import {
-  BRING_SELECTED_SHAPE_TO_FRONT_EVENT_NAME,
-  DELETE_SELECTED_SHAPES_EVENT_NAME,
-  SELECTED_SHAPES_DELETED_EVENT,
-  SEND_SELECTED_SHAPE_TO_BACK_EVENT_NAME,
-  ZOOM_IN_EVENT_NAME,
-  ZOOM_OUT_EVENT_NAME,
-} from '../../models/CustomEvents';
+import { SHAPE_CLASS_NAME, USER_ACTION_EVENT_NAME } from '../../constants/constants';
+import { IUserAction } from '../../models/user-actions/IUserAction';
+import { DeleteShape } from '../../models/user-actions/DeleteShape';
+import { ZoomInWhiteboard } from '../../models/user-actions/ZoomInWhiteboard';
+import { ZoomOutWhiteboard } from '../../models/user-actions/ZoomOutWhiteboard';
+import { BringShapeToFront } from '../../models/user-actions/BringShapeToFront';
+import { SendShapeToBack } from '../../models/user-actions/SendShapeToBack';
+import { ShapeInfo } from '../../models/ShapeInfo';
+import { IWhiteboardRulerService } from '../../services/api/IWhiteboardRulerService';
+import { WhiteboardRulerService } from '../../services/impl/WhiteboardRulerService';
 
 export interface IWhiteboardProps {
   appStateService?: IAppStateService;
   backgroundGridService?: IWhiteboardGridService;
   whiteboardDrawingService?: IWhiteboardDrawingService;
   whiteboardLayersService?: IWhiteboardLayersService;
+  whiteboardRulerService?: IWhiteboardRulerService;
 }
 
 export interface IWhiteboardState {}
-
-const DELETE_KEY_CODE = 46;
 
 export default class Whiteboard extends React.Component<IWhiteboardProps, IWhiteboardState> {
   private whiteboard: HTMLElement;
@@ -39,16 +40,20 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   private whiteboardLayers: WhiteboardLayers;
   private whiteboardLayersService: IWhiteboardLayersService;
   private whiteboardDrawingService: IWhiteboardDrawingService;
+  private whiteboardGridService: IWhiteboardGridService;
+  private whiteboardRulerService: IWhiteboardRulerService;
   private appStateService: IAppStateService;
-  private backgroundGridService: IWhiteboardGridService;
 
   constructor(props: IWhiteboardProps) {
     super(props);
     this.state = {};
-    this.whiteboardLayersService = this.props.whiteboardLayersService ? this.props.whiteboardLayersService : new WhiteboardLayersService();
-    this.whiteboardDrawingService = this.props.whiteboardDrawingService ? this.props.whiteboardDrawingService : new WhiteboardDrawingService();
+    this.whiteboardLayersService = this.props.whiteboardLayersService ? this.props.whiteboardLayersService : WhiteboardLayersService.getInstance();
+    this.whiteboardDrawingService = this.props.whiteboardDrawingService
+      ? this.props.whiteboardDrawingService
+      : WhiteboardDrawingService.getInstance();
+    this.whiteboardGridService = this.whiteboardGridService ? this.props.backgroundGridService : WhiteboardGridService.getInstance();
+    this.whiteboardRulerService = this.whiteboardRulerService ? this.props.whiteboardRulerService : WhiteboardRulerService.getInstance();
     this.appStateService = this.props.appStateService ? this.props.appStateService : AppStateService.getInstance();
-    this.backgroundGridService = this.backgroundGridService ? this.props.backgroundGridService : new WhiteboardGridService();
   }
 
   public render() {
@@ -75,50 +80,109 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   }
 
   componentDidMount() {
+    this.initWhiteboardLayers();
+    this.whiteboardLayersService.resize();
+    this.whiteboardGridService.resize();
+    this.whiteboardRulerService.resize();
+    this.whiteboardLayersService.centerOnStartUp();
+    this.whiteboard.addEventListener('mousedown', this.handleMouseDownEvent.bind(this));
+    this.whiteboard.addEventListener('click', this.handleClickEvent.bind(this));
+    this.whiteboardWindow.addEventListener('wheel', this.handleMouseWheelEvent.bind(this));
+    window.addEventListener('resize', this.handleWindowResizeEvent.bind(this));
+    document.addEventListener(USER_ACTION_EVENT_NAME, this.handleUserActionEvent.bind(this));
+  }
+
+  private handleWindowResizeEvent() {
+    this.whiteboardLayersService.resize();
+    this.whiteboardLayersService.centerOnStartUp();
+  }
+
+  private handleUserActionEvent(event: CustomEvent<IUserAction>) {
+    const userAction: IUserAction = event.detail;
+    switch (true) {
+      case userAction instanceof DeleteShape:
+        this.whiteboardDrawingService.deleteShape((userAction as DeleteShape).shape);
+        return;
+      case userAction instanceof ZoomInWhiteboard:
+        this.zoomIn();
+        return;
+      case userAction instanceof ZoomOutWhiteboard:
+        this.zoomOut();
+        return;
+      case userAction instanceof BringShapeToFront:
+        this.whiteboardDrawingService.bringShapeToFront((userAction as BringShapeToFront).shape);
+        return;
+      case userAction instanceof SendShapeToBack:
+        this.whiteboardDrawingService.sendShapeToBack((userAction as SendShapeToBack).shape);
+        return;
+      default:
+      // no thing to do here!
+    }
+  }
+
+  private initWhiteboardLayers(): void {
+    const svgRootElement = SVG().addTo(this.whiteboard).size('100%', '100%');
+    svgRootElement.element('style').words(this.whiteboardDrawingService.getStyles());
     this.whiteboardLayers = new WhiteboardLayers(
       this.whiteboard,
       this.whiteboardWindow,
       this.whiteboardBackground,
       this.whiteboardVerticalRuler,
-      this.whiteboardHorizontalRuler
+      this.whiteboardHorizontalRuler,
+      svgRootElement
     );
-    this.whiteboardLayersService.init(this.whiteboardLayers);
-    this.initSvgRootElement();
-    this.whiteboard.addEventListener('mousedown', (event) => this.whiteboardDrawingService.handleMouseDownEvent(event));
-    this.whiteboard.addEventListener('click', (event) => this.whiteboardDrawingService.handleClickEvent(event));
-    this.whiteboardWindow.addEventListener('wheel', this.handleMouseWheelEvent.bind(this));
-    document.addEventListener('keydown', this.handleKeyPressEvent.bind(this));
-    document.addEventListener(DELETE_SELECTED_SHAPES_EVENT_NAME, this.handleDeleteSelectedShapesEvent.bind(this));
-    document.addEventListener(ZOOM_IN_EVENT_NAME, () => this.whiteboardLayersService.zoomIn());
-    document.addEventListener(ZOOM_OUT_EVENT_NAME, () => this.whiteboardLayersService.zoomOut());
-    document.addEventListener(BRING_SELECTED_SHAPE_TO_FRONT_EVENT_NAME, () => this.whiteboardDrawingService.bringSelectedShapesToFront());
-    document.addEventListener(SEND_SELECTED_SHAPE_TO_BACK_EVENT_NAME, () => this.whiteboardDrawingService.sendSelectedShapesToBack());
-  }
-
-  private handleDeleteSelectedShapesEvent() {
-    this.whiteboardDrawingService.deleteSelectedShapes();
-  }
-
-  private initSvgRootElement(): void {
-    const svgRootElement = SVG().addTo(this.whiteboard).size('100%', '100%');
-    svgRootElement.element('style').words(this.whiteboardDrawingService.getStyles());
-    this.appStateService.setSvgRootElement(svgRootElement);
-  }
-
-  private handleKeyPressEvent(event: KeyboardEvent) {
-    if (event.keyCode == DELETE_KEY_CODE) {
-      this.whiteboardDrawingService.deleteSelectedShapes();
-    }
+    this.appStateService.setWhiteboardLayers(this.whiteboardLayers);
   }
 
   private handleMouseWheelEvent(event: WheelEvent): void {
     if (event.ctrlKey) {
       event.preventDefault();
       if (event.deltaY < 0) {
-        this.whiteboardLayersService.zoomIn(event);
+        this.zoomIn(event);
       } else {
-        this.whiteboardLayersService.zoomOut(event);
+        this.zoomOut(event);
       }
     }
+  }
+
+  handleClickEvent(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains(SHAPE_CLASS_NAME)) {
+      return this.whiteboardDrawingService.select(this.toShape(target));
+    }
+    this.whiteboardDrawingService.unselectAll();
+  }
+
+  handleMouseDownEvent(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target instanceof SVGSVGElement) {
+      return this.whiteboardDrawingService.createShapeOnMouseDown(event);
+    }
+    if (target.classList.contains(SHAPE_CLASS_NAME)) {
+      return this.whiteboardDrawingService.move(event, this.toShape(target));
+    }
+  }
+
+  private zoomIn(event?: MouseEvent) {
+    this.appStateService.increaseWhiteboardZoomLevel();
+    this.whiteboardLayersService.resize();
+    this.whiteboardGridService.resize();
+    this.whiteboardRulerService.resize();
+    this.whiteboardDrawingService.resize();
+    this.whiteboardLayersService.centerOnZoomIn(event);
+  }
+
+  private zoomOut(event?: MouseEvent) {
+    this.appStateService.decreaseWhiteboardZoomLevel();
+    this.whiteboardLayersService.resize();
+    this.whiteboardGridService.resize();
+    this.whiteboardRulerService.resize();
+    this.whiteboardDrawingService.resize();
+    this.whiteboardLayersService.centerOnZoomOut(event);
+  }
+
+  private toShape(target): ShapeInfo {
+    const shape = SVG(target) as Shape;
+    return new ShapeInfo(shape.parent() as G, shape);
   }
 }

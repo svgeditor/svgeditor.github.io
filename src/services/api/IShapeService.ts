@@ -1,9 +1,10 @@
 import { Shape } from '@svgdotjs/svg.js';
+import { ShapeInfo } from '../../models/ShapeInfo';
 
 export interface IShapeService {
   createOnMouseDown(event: MouseEvent): void;
-  move(event: MouseEvent, shapeToMove: Shape): void;
-  select(shape: Shape): void;
+  move(event: MouseEvent, shapeToMove: ShapeInfo): void;
+  select(shape: ShapeInfo): void;
   getStyles(): string;
-  resize(shape: Shape): void;
+  resize(shape: ShapeInfo): void;
 }

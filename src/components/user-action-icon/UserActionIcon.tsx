@@ -12,11 +12,7 @@ export interface IUserActionIconProps {
   readonly onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export interface IUserActionIconState {
-  containerClassNames: string;
-  iconClassNames: string;
-  disabled: boolean;
-}
+export interface IUserActionIconState {}
 
 export default class UserActionIcon extends React.Component<IUserActionIconProps, IUserActionIconState> {
   static defaultProps = {
@@ -29,39 +25,28 @@ export default class UserActionIcon extends React.Component<IUserActionIconProps
   constructor(props: IUserActionIconProps) {
     super(props);
 
-    this.state = {
-      containerClassNames: classNames('user-action-icon-container', { disabled: this.props.disabled }, { selected: this.props.selected }),
-      iconClassNames: classNames('iconify', this.props.className),
-      disabled: this.props.disabled,
-    };
+    this.state = {};
   }
 
   public render() {
     return (
-      <span title={this.props.title} className={this.state.containerClassNames} onClick={this.onClick}>
-        <span className={this.state.iconClassNames} data-icon={this.props.name} data-inline='false' data-rotate={this.props.rotate}></span>
+      <span title={this.props.title} className={this.getContainerClassNames()} onClick={this.onClick}>
+        <span className={this.getIconClassNames()} data-icon={this.props.name} data-inline='false' data-rotate={this.props.rotate}></span>
       </span>
     );
   }
 
-  componentWillReceiveProps(props) {
-    const newClassNames = classNames('user-action-icon-container', { disabled: this.state.disabled }, { selected: props.selected });
-    this.setState({ containerClassNames: newClassNames });
-  }
-
-  enable() {
-    const newClassNames = classNames('user-action-icon-container', { disabled: false });
-    this.setState({ containerClassNames: newClassNames, disabled: false });
-  }
-
-  disable() {
-    const newClassNames = classNames('user-action-icon-container', { disabled: true });
-    this.setState({ containerClassNames: newClassNames, disabled: true });
-  }
-
   private onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (!this.state.disabled && this.props.onClick) {
+    if (!this.props.disabled && this.props.onClick) {
       this.props.onClick(event);
     }
   };
+
+  private getContainerClassNames(): string {
+    return classNames('user-action-icon-container', { disabled: this.props.disabled }, { selected: this.props.selected });
+  }
+
+  private getIconClassNames(): string {
+    return classNames('iconify', this.props.className);
+  }
 }

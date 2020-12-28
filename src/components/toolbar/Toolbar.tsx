@@ -3,62 +3,47 @@ import * as React from 'react';
 import { IAppStateService } from '../../services/api/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
 import UserActionIcon from '../user-action-icon/UserActionIcon';
-import {
-  BRING_SELECTED_SHAPE_TO_FRONT_EVENT,
-  DELETE_SELECTED_SHAPES_EVENT,
-  NEW_UNDOABLE_ACTION_EVENT_NAME,
-  SELECTED_SHAPES_DELETED_EVENT_NAME,
-  SELECT_SHAPE_EVENT_NAME,
-  SEND_SELECTED_SHAPE_TO_BACK_EVENT,
-  UNSELECT_ALL_SHAPES_EVENT_NAME,
-  ZOOM_IN_EVENT,
-  ZOOM_OUT_EVENT,
-} from '../../models/CustomEvents';
-import { IUndoableAction } from '../../models/UndoableAction';
-import { ChromePicker } from 'react-color';
-import { Shape } from '@svgdotjs/svg.js';
+import { UndoableUserAction } from '../../models/user-actions/IUndoableUserAction';
 import { ECursorFunction } from '../../models/ECursorFunction';
+import { UserActions } from '../../models/user-actions/UserActions';
+import { BringShapeToFront } from '../../models/user-actions/BringShapeToFront';
+import { SendShapeToBack } from '../../models/user-actions/SendShapeToBack';
+import { ZoomInWhiteboard } from '../../models/user-actions/ZoomInWhiteboard';
+import { ZoomOutWhiteboard } from '../../models/user-actions/ZoomOutWhiteboard';
+import { ShapeInfo } from '../../models/ShapeInfo';
+import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
+import { DeleteShape } from '../../models/user-actions/DeleteShape';
+import { IUserAction } from '../../models/user-actions/IUserAction';
+import { SelectShape } from '../../models/user-actions/SelectShape';
+import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 
 export interface IToolbarProps {
   appStateService?: IAppStateService;
 }
 
 export interface IToolbarState {
-  displayFillColorPicker: boolean;
-  displayBorderColorPicker: boolean;
-  selectedShape: Shape;
-  selectedShapeColor: string;
-  selectedShapeBorderColor: string;
   cursorFunction: ECursorFunction;
+  undoableUserActions: UndoableUserAction[];
+  lastUndoableAction: UndoableUserAction;
+  selectedShape: ShapeInfo;
 }
 
 const Z_KEY_CODE = 90;
 const Y_KEY_CODE = 89;
+const DELETE_KEY_CODE = 46;
 
 export default class Toolbar extends React.Component<IToolbarProps, IToolbarState> {
   private appStateService: IAppStateService;
-  private undoIcon: UserActionIcon;
-  private redoIcon: UserActionIcon;
-  private deleteIcon: UserActionIcon;
-  private bringShapeToFrontIcon: UserActionIcon;
-  private sendShapeToBackIcon: UserActionIcon;
-  private fillColorIcon: UserActionIcon;
-  private borderColorIcon: UserActionIcon;
-  private lastUndoableAction: IUndoableAction;
-  private fillColorIconContainer: HTMLElement;
-  private borderColorIconContainer: HTMLElement;
 
   constructor(props: IToolbarProps) {
     super(props);
     this.appStateService = this.props.appStateService ? this.props.appStateService : AppStateService.getInstance();
 
     this.state = {
-      displayFillColorPicker: false,
-      displayBorderColorPicker: false,
-      selectedShape: null,
-      selectedShapeColor: '#FFF',
-      selectedShapeBorderColor: '#FFF',
       cursorFunction: this.appStateService.getCursorFunction(),
+      undoableUserActions: [],
+      lastUndoableAction: null,
+      selectedShape: null,
     };
   }
 
@@ -97,17 +82,15 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
         ></UserActionIcon>
         <span className='icons-separator'></span>
         <UserActionIcon
-          ref={(ref) => (this.undoIcon = ref)}
           name='ic:round-undo'
           title='Undo (Ctrl + Z)'
-          disabled={true}
+          disabled={this.state.undoableUserActions.length == 0}
           onClick={this.handleUndoEvent.bind(this)}
         ></UserActionIcon>
         <UserActionIcon
-          ref={(ref) => (this.redoIcon = ref)}
           name='ic:round-redo'
-          title='Redo'
-          disabled={true}
+          title='Redo (Ctrl + Y)'
+          disabled={this.state.lastUndoableAction == null}
           onClick={this.handleRedoEvent.bind(this)}
         ></UserActionIcon>
         <span className='icons-separator'></span>
@@ -115,104 +98,38 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
         <UserActionIcon name='heroicons-outline:zoom-out' title='Zoom Out' onClick={this.handleZoomOut.bind(this)}></UserActionIcon>
         <span className='icons-separator'></span>
         <UserActionIcon
-          ref={(ref) => (this.bringShapeToFrontIcon = ref)}
           name='whh:bringtofront'
           title='Bring to front'
           className='bring-to-front-icon'
-          disabled={true}
+          disabled={this.state.selectedShape === null}
           onClick={this.handleBringToFrontEvent.bind(this)}
         ></UserActionIcon>
         <UserActionIcon
-          ref={(ref) => (this.sendShapeToBackIcon = ref)}
           name='ri:send-to-back'
           title='Send to back'
           className='send-to-back-icon'
-          disabled={true}
+          disabled={this.state.selectedShape === null}
           onClick={this.handleSendToBackEvent.bind(this)}
         ></UserActionIcon>
         <span className='icons-separator'></span>
-        <div ref={(ref) => (this.fillColorIconContainer = ref)} className='color-icon-container'>
-          <UserActionIcon
-            ref={(ref) => (this.fillColorIcon = ref)}
-            name='ic:round-format-color-fill'
-            title='Fill Color'
-            disabled={true}
-            onClick={this.handleFillColorIconClickEvent.bind(this)}
-          ></UserActionIcon>
-          <div className='color-picker'>
-            {this.state.displayFillColorPicker && (
-              <ChromePicker color={this.state.selectedShapeColor} onChange={this.handleFillColorChange.bind(this)} />
-            )}
-          </div>
-        </div>
-        <div ref={(ref) => (this.borderColorIconContainer = ref)} className='color-icon-container'>
-          <UserActionIcon
-            ref={(ref) => (this.borderColorIcon = ref)}
-            name='ic:round-border-color'
-            title='Border Color'
-            disabled={true}
-            onClick={this.handleBorderColorIconClickEvent.bind(this)}
-          ></UserActionIcon>
-          <div className='color-picker'>
-            {this.state.displayBorderColorPicker && (
-              <ChromePicker color={this.state.selectedShapeBorderColor} onChange={this.handleBorderColorChange.bind(this)} />
-            )}
-          </div>
-        </div>
-        <span className='icons-separator'></span>
         <UserActionIcon
-          ref={(ref) => (this.deleteIcon = ref)}
           name='ic:twotone-delete-outline'
           title='Delete'
-          disabled={true}
+          disabled={this.state.selectedShape === null}
           onClick={this.handleDeleteEvent.bind(this)}
         ></UserActionIcon>
       </div>
     );
   }
 
-  changeCursorFunction(selectedCursorFunction: ECursorFunction): void {
-    this.setState({ cursorFunction: selectedCursorFunction });
-    this.appStateService.setCursorFunction(selectedCursorFunction);
-  }
-
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeydownEvent.bind(this));
-    document.addEventListener(UNSELECT_ALL_SHAPES_EVENT_NAME, this.handleUnselectAllShapesEvent.bind(this));
-    document.addEventListener(SELECT_SHAPE_EVENT_NAME, this.handleSelectShapeEvent.bind(this));
-    document.addEventListener(NEW_UNDOABLE_ACTION_EVENT_NAME, this.handleAddUndoableActionEvent.bind(this));
-    document.addEventListener(SELECTED_SHAPES_DELETED_EVENT_NAME, this.handleSelectedShapesDeletedEvent.bind(this));
-    document.addEventListener('click', this.handleDocumentClickEvent.bind(this));
+    document.addEventListener(USER_ACTION_EVENT_NAME, this.handleUserActionEvent.bind(this));
   }
 
-  private handleFillColorChange(event) {
-    const selectedShape = this.state.selectedShape as Shape;
-    if (selectedShape) {
-      selectedShape.fill(event.hex);
-    }
-  }
-
-  private handleBorderColorChange(event) {
-    const selectedShape = this.state.selectedShape as Shape;
-    if (selectedShape) {
-      selectedShape.stroke(event.hex);
-    }
-  }
-
-  private handleDocumentClickEvent(event) {
-    if (!this.fillColorIconContainer.contains(event.target) && !this.borderColorIconContainer.contains(event.target)) {
-      this.setState({ displayFillColorPicker: false, displayBorderColorPicker: false });
-    }
-  }
-
-  private handleFillColorIconClickEvent(event) {
-    event.stopPropagation();
-    this.setState({ displayFillColorPicker: !this.state.displayFillColorPicker, displayBorderColorPicker: false });
-  }
-
-  private handleBorderColorIconClickEvent(event) {
-    event.stopPropagation();
-    this.setState({ displayFillColorPicker: false, displayBorderColorPicker: !this.state.displayBorderColorPicker });
+  private changeCursorFunction(selectedCursorFunction: ECursorFunction): void {
+    this.setState({ cursorFunction: selectedCursorFunction });
+    this.appStateService.setCursorFunction(selectedCursorFunction);
   }
 
   private handleKeydownEvent(event: KeyboardEvent) {
@@ -222,72 +139,66 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     if (event.keyCode == Y_KEY_CODE && event.ctrlKey) {
       this.handleRedoEvent();
     }
-  }
-
-  private handleBringToFrontEvent() {
-    document.dispatchEvent(BRING_SELECTED_SHAPE_TO_FRONT_EVENT);
-  }
-
-  private handleSendToBackEvent() {
-    document.dispatchEvent(SEND_SELECTED_SHAPE_TO_BACK_EVENT);
-  }
-
-  private handleZoomIn() {
-    document.dispatchEvent(ZOOM_IN_EVENT);
-  }
-
-  private handleZoomOut() {
-    document.dispatchEvent(ZOOM_OUT_EVENT);
+    if (event.keyCode == DELETE_KEY_CODE && this.state.selectedShape) {
+      document.dispatchEvent(UserActions.createCustomEvent(new DeleteShape(this.state.selectedShape)));
+    }
   }
 
   private handleUndoEvent() {
-    if (this.appStateService.getUndoableUserActionsSize() > 0) {
-      this.lastUndoableAction = this.appStateService.popUndoableUserAction().undo();
-      this.redoIcon.enable();
-      if (this.appStateService.getUndoableUserActionsSize() == 0) {
-        this.undoIcon.disable();
-      }
+    if (this.state.undoableUserActions.length > 0) {
+      const lastUndoableAction = this.state.undoableUserActions.pop();
+      lastUndoableAction.undo();
+      this.setState({ undoableUserActions: [...this.state.undoableUserActions], lastUndoableAction: lastUndoableAction });
     }
   }
 
   private handleRedoEvent() {
-    this.lastUndoableAction.redo();
-    this.redoIcon.disable();
-    this.appStateService.pushUndoableUserAction(this.lastUndoableAction);
-    this.undoIcon.enable();
+    if (this.state.lastUndoableAction) {
+      this.state.lastUndoableAction.redo();
+      this.setState({ undoableUserActions: [...this.state.undoableUserActions, this.state.lastUndoableAction], lastUndoableAction: null });
+    }
   }
 
-  private handleSelectShapeEvent(event): void {
-    const selectedShape = event.detail.shape as Shape;
-    this.setState({ selectedShape, selectedShapeColor: selectedShape.fill(), selectedShapeBorderColor: selectedShape.stroke() });
-    this.deleteIcon.enable();
-    this.bringShapeToFrontIcon.enable();
-    this.sendShapeToBackIcon.enable();
-    this.fillColorIcon.enable();
-    this.borderColorIcon.enable();
+  private handleBringToFrontEvent() {
+    if (this.state.selectedShape) {
+      document.dispatchEvent(UserActions.createCustomEvent(new BringShapeToFront(this.state.selectedShape)));
+    }
   }
 
-  private handleUnselectAllShapesEvent(): void {
-    this.deleteIcon.disable();
-    this.bringShapeToFrontIcon.disable();
-    this.sendShapeToBackIcon.disable();
-    this.fillColorIcon.disable();
-    this.borderColorIcon.disable();
+  private handleSendToBackEvent() {
+    if (this.state.selectedShape) {
+      document.dispatchEvent(UserActions.createCustomEvent(new SendShapeToBack(this.state.selectedShape)));
+    }
   }
 
-  private handleAddUndoableActionEvent(): void {
-    this.undoIcon.enable();
+  private handleZoomIn() {
+    document.dispatchEvent(UserActions.createCustomEvent(new ZoomInWhiteboard()));
+  }
+
+  private handleZoomOut() {
+    document.dispatchEvent(UserActions.createCustomEvent(new ZoomOutWhiteboard()));
   }
 
   private handleDeleteEvent(): void {
-    document.dispatchEvent(DELETE_SELECTED_SHAPES_EVENT);
+    if (this.state.selectedShape) {
+      document.dispatchEvent(UserActions.createCustomEvent(new DeleteShape(this.state.selectedShape)));
+    }
   }
 
-  private handleSelectedShapesDeletedEvent(): void {
-    this.deleteIcon.disable();
-    this.bringShapeToFrontIcon.disable();
-    this.sendShapeToBackIcon.disable();
-    this.fillColorIcon.disable();
-    this.borderColorIcon.disable();
+  private handleUserActionEvent(event: CustomEvent<IUserAction>): void {
+    const userAction: IUserAction = event.detail;
+    switch (true) {
+      case userAction instanceof UndoableUserAction:
+        this.setState({ undoableUserActions: [...this.state.undoableUserActions, userAction as UndoableUserAction] });
+        return;
+      case userAction instanceof SelectShape:
+        this.setState({ selectedShape: (userAction as SelectShape).shape });
+        return;
+      case userAction instanceof UnselectAllShapes:
+        this.setState({ selectedShape: null });
+        return;
+      default:
+      // no thing to do here!
+    }
   }
 }
