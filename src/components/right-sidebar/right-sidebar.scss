@@ -1,0 +1,9 @@
+:root {
+  --right-sidebar-container-background-color: var(--color-scale-gray-5);
+  --right-sidebar-container-border-color: var(--color-scale-gray-4);
+}
+
+.right-sidebar-container {
+  background-color: var(--right-sidebar-container-background-color);
+  border-right: var(--container-border-width) solid var(--right-sidebar-container-border-color);
+}

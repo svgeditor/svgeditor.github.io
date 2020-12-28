@@ -1,5 +1,6 @@
 :root {
   --icon-color: var(--color-scale-gray-1);
+  --section-title-border-color: var(--color-scale-gray-4);
 }
 
 *,
@@ -22,4 +23,12 @@ html {
 body {
   font-family: var(--font-family);
   color: var(--body-color);
+}
+
+.sidebar-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--section-title-border-color);
 }

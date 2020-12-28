@@ -1,9 +1,0 @@
-:root {
-  --whiteboard-shapes-container-background-color: var(--color-scale-gray-5);
-  --whiteboard-shapes-container-border-color: var(--color-scale-gray-4);
-}
-
-.whiteboard-shapes-container {
-  background-color: var(--whiteboard-shapes-container-background-color);
-  border-right: var(--container-border-width) solid var(--whiteboard-shapes-container-border-color);
-}
