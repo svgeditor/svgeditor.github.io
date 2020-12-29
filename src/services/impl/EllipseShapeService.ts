@@ -1,4 +1,4 @@
-import { Circle } from '@svgdotjs/svg.js';
+import { Ellipse } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
 import { IShapeService } from '../api/IShapeService';
 import { AppStateService } from './AppStateService';
@@ -45,14 +45,24 @@ export class EllipseShapeService extends BaseShapeService implements IShapeServi
     this.shape = new ShapeInfo(container, shape);
   }
 
+  resize(shape: ShapeInfo): void {
+    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
+    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
+    const newRx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('rx'));
+    const newRy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('ry'));
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
+    shape.shape.center(newCx, newCy).attr('rx', newRx).attr('ry', newRy).attr('stroke-width', strokeWidth);
+  }
+
   private createOnMouseDownInProgress(event: MouseEvent): void {
     event.preventDefault();
     const x = (event.offsetX + this.initialPosition.x) / 2;
     const y = (event.offsetY + this.initialPosition.y) / 2;
-    const width = Math.abs(event.offsetX - this.initialPosition.x);
-    const height = Math.abs(event.offsetY - this.initialPosition.y);
+    const width = Math.abs(event.offsetX - this.initialPosition.x) / 2;
+    const height = Math.abs(event.offsetY - this.initialPosition.y) / 2;
     const radius = Math.max(width / 2, height / 2);
-    (this.shape.shape as Circle).radius(radius).center(x, y);
+    (this.shape.shape as Ellipse).center(x, y).radius(width, height);
   }
 
   // prettier-ignore
@@ -71,6 +81,4 @@ export class EllipseShapeService extends BaseShapeService implements IShapeServi
     document.removeEventListener('mousemove', this.createOnMouseDownInProgress);
     document.removeEventListener('mouseup', this.endCreateOnMouseDown);
   }
-
-  resize(shape: ShapeInfo): void {}
 }

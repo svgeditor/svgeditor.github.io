@@ -9,20 +9,24 @@ import { UserActions } from '../../models/user-actions/UserActions';
 import { ShapeInfo } from '../../models/ShapeInfo';
 import { CircleShapeService } from './CircleShapeService';
 import { ECursorFunction } from '../../models/ECursorFunction';
+import { EllipseShapeService } from './EllipseShapeService';
 
 export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private static instance: IWhiteboardDrawingService = new WhiteboardDrawingService();
   private rectangleShapeService: IShapeService;
   private circleShapeService: IShapeService;
+  private ellipseShapeService: IShapeService;
   private selectedShapeGroup: G = null;
 
   private constructor(
     private appStateService = AppStateService.getInstance(),
     rectangleShapeService?: IShapeService,
-    circleShapeService?: IShapeService
+    circleShapeService?: IShapeService,
+    ellipseShapeService?: IShapeService
   ) {
     this.rectangleShapeService = rectangleShapeService ? rectangleShapeService : RectangleShapeService.getInstance(this);
     this.circleShapeService = circleShapeService ? circleShapeService : CircleShapeService.getInstance(this);
+    this.ellipseShapeService = ellipseShapeService ? ellipseShapeService : EllipseShapeService.getInstance(this);
   }
 
   static getInstance(): IWhiteboardDrawingService {
@@ -36,6 +40,8 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
         return this.rectangleShapeService.createOnMouseDown(event);
       case ECursorFunction.DRAW_CIRCLES:
         return this.circleShapeService.createOnMouseDown(event);
+      case ECursorFunction.DRAW_ELLIPSES:
+        return this.ellipseShapeService.createOnMouseDown(event);
       default:
         return this.rectangleShapeService.createOnMouseDown(event);
     }
@@ -63,6 +69,10 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     svg.find('circle').forEach((shape) => {
       const container = shape.parent() as G;
       this.circleShapeService.resize(new ShapeInfo(container, shape));
+    });
+    svg.find('ellipse').forEach((shape) => {
+      const container = shape.parent() as G;
+      this.ellipseShapeService.resize(new ShapeInfo(container, shape));
     });
   }
 
