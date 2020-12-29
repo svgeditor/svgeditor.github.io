@@ -44,6 +44,8 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
         return this.rectangleDrawingService.createOnMouseDown(event);
       case ECursorFunction.DRAW_CIRCLES:
         return this.circleDrawingService.createOnMouseDown(event);
+      case ECursorFunction.DRAW_ELLIPSES:
+        return this.ellipseDrawingService.createOnMouseDown(event);
       case ECursorFunction.DRAW_LINES:
         return this.lineDrawingService.createOnMouseDown(event);
       default:

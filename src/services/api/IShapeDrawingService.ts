@@ -6,4 +6,6 @@ export interface IShapeDrawingService {
   select(shape: ShapeInfo): void;
   getStyles(): string;
   resize(shape: ShapeInfo): void;
+  drawOnHoverGuide(shape: ShapeInfo): void;
+  redrawOnHoverGuide(shape: ShapeInfo): void;
 }
