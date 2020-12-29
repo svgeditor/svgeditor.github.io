@@ -1,10 +1,11 @@
+import { Shape } from '@svgdotjs/svg.js';
 import { IWhiteboardDrawingService } from '../../services/api/IWhiteboardDrawingService';
 import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingService';
 import { ShapeInfo } from '../ShapeInfo';
 import { UndoableUserAction } from './IUndoableUserAction';
 
 export class DeleteShape extends UndoableUserAction {
-  constructor(public shape: ShapeInfo, private whiteboardDrawingService: IWhiteboardDrawingService = WhiteboardDrawingService.getInstance()) {
+  constructor(public shape: ShapeInfo<Shape>, private whiteboardDrawingService: IWhiteboardDrawingService = WhiteboardDrawingService.getInstance()) {
     super();
   }
 

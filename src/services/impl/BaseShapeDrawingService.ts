@@ -8,9 +8,9 @@ import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { SelectShape } from '../../models/user-actions/SelectShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 
-export abstract class BaseShapeDrawingService implements IShapeDrawingService {
+export abstract class BaseShapeDrawingService<T extends Shape> implements IShapeDrawingService<T> {
   abstract createOnMouseDown(event: MouseEvent): void;
-  abstract resize(shape: ShapeInfo): void;
+  abstract resize(shape: ShapeInfo<T>): void;
 
   private mousePosition: Position;
   private shapeToMoveContainer: G;
@@ -21,7 +21,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     this.endMove = this.endMove.bind(this);
   }
 
-  move(event: MouseEvent, shapeToMove: ShapeInfo): void {
+  move(event: MouseEvent, shapeToMove: ShapeInfo<T>): void {
     this.select(shapeToMove);
     this.moveInProgressFlag = false;
     this.mousePosition = { x: event.clientX, y: event.clientY };
@@ -72,7 +72,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
   }
 
   // prettier-ignore
-  select(shape: ShapeInfo): void {
+  select(shape: ShapeInfo<T>): void {
     this.whiteboardDrawingService.unselectAll();
     shape.container.addClass(constants.SELECTED_SHAPE_CLASS_NAME);
     const group = this.whiteboardDrawingService.getSelectedShapesGroup();
@@ -94,7 +94,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     return zoomLevel.getZoomedValueFromInitialValue(initialValue);
   }
 
-  drawOnHoverGuide(shape: ShapeInfo): void {
+  drawOnHoverGuide(shape: ShapeInfo<T>): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     shape.container.add(
       shape.shape
@@ -106,7 +106,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     );
   }
 
-  redrawOnHoverGuide(shape: ShapeInfo): void {
+  redrawOnHoverGuide(shape: ShapeInfo<T>): void {
     shape.container.find(`.${constants.HOVER_SHAPE_CLASS_NAME}`).forEach((shape) => shape.remove());
     this.drawOnHoverGuide(shape);
   }
@@ -128,7 +128,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     document.removeEventListener('mouseup', this.endMove);
   }
 
-  private createBorder(shape: ShapeInfo): Shape {
+  private createBorder(shape: ShapeInfo<T>): Shape {
     return this.appStateService
       .getSvgRootElement()
       .rect()
@@ -139,7 +139,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
       .stroke({ color: constants.SELECTION_COLOR, width: 1 });
   }
 
-  private createResizeGuideNW(shape: ShapeInfo): Shape {
+  private createResizeGuideNW(shape: ShapeInfo<T>): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x(), shape.container.y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -171,7 +171,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     return circle;
   }
 
-  private createResizeGuideN(shape: ShapeInfo): Shape {
+  private createResizeGuideN(shape: ShapeInfo<T>): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x() + shape.container.width() / 2, shape.container.y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -200,7 +200,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     return circle;
   }
 
-  private createResizeGuideNE(shape: ShapeInfo): Shape {
+  private createResizeGuideNE(shape: ShapeInfo<T>): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x() + shape.container.width(), shape.container.y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -232,7 +232,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     return circle;
   }
 
-  private createResizeGuideE(shape: ShapeInfo): Shape {
+  private createResizeGuideE(shape: ShapeInfo<T>): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x() + shape.container.width(), shape.container.y() + shape.container.height() / 2);
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -261,7 +261,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     return circle;
   }
 
-  private createResizeGuideSE(shape: ShapeInfo): Shape {
+  private createResizeGuideSE(shape: ShapeInfo<T>): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x() + shape.container.width(), shape.container.y() + shape.container.height());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -293,7 +293,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     return circle;
   }
 
-  private createResizeGuideS(shape: ShapeInfo): Shape {
+  private createResizeGuideS(shape: ShapeInfo<T>): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x() + shape.container.width() / 2, shape.container.y() + shape.container.height());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -322,7 +322,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     return circle;
   }
 
-  private createResizeGuideSW(shape: ShapeInfo): Shape {
+  private createResizeGuideSW(shape: ShapeInfo<T>): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x(), shape.container.y() + shape.container.height());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -354,7 +354,7 @@ export abstract class BaseShapeDrawingService implements IShapeDrawingService {
     return circle;
   }
 
-  private createResizeGuideW(shape: ShapeInfo): Shape {
+  private createResizeGuideW(shape: ShapeInfo<T>): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x(), shape.container.y() + shape.container.height() / 2);
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);

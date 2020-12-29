@@ -4,14 +4,14 @@ import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseShapeDrawingService } from './BaseShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { ShapeInfo } from '../../models/ShapeInfo';
+import { LineInfo, ShapeInfo } from '../../models/ShapeInfo';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { SelectShape } from '../../models/user-actions/SelectShape';
 
-export class LineDrawingService extends BaseShapeDrawingService implements IShapeDrawingService {
-  private static instance: IShapeDrawingService = null;
+export class LineDrawingService extends BaseShapeDrawingService<Line> implements IShapeDrawingService<Line> {
+  private static instance: IShapeDrawingService<Line> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
@@ -19,7 +19,7 @@ export class LineDrawingService extends BaseShapeDrawingService implements IShap
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService {
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService<Line> {
     if (LineDrawingService.instance == null) {
       LineDrawingService.instance = new LineDrawingService(whiteboardDrawingService);
     }
@@ -27,7 +27,7 @@ export class LineDrawingService extends BaseShapeDrawingService implements IShap
   }
 
   private initialPosition: Position;
-  private shape: ShapeInfo;
+  private shape: LineInfo;
 
   // prettier-ignore
   createOnMouseDown(event: MouseEvent): void {
@@ -48,30 +48,30 @@ export class LineDrawingService extends BaseShapeDrawingService implements IShap
     this.shape = new ShapeInfo(container, shape);
   }
 
-  resize(shape: ShapeInfo): void {
+  resize(shape: LineInfo): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const line = shape.shape as Line;
-    const newX1 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('x1'));
-    const newY1 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('y1'));
-    const newX2 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('x2'));
-    const newY2 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('y2'));
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
+    const line = shape.shape;
+    const newX1 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('x1'));
+    const newY1 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('y1'));
+    const newX2 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('x2'));
+    const newY2 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('y2'));
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(line.attr('stroke-width'));
     line.attr('x1', newX1).attr('y1', newY1).attr('x2', newX2).attr('y2', newY2).attr('stroke-width', strokeWidth);
   }
 
-  select(shape: ShapeInfo): void {
+  select(shape: LineInfo): void {
     this.whiteboardDrawingService.unselectAll();
     shape.container.addClass(constants.SELECTED_SHAPE_CLASS_NAME);
     const group = this.whiteboardDrawingService.getSelectedShapesGroup();
     group.add(this.createLineBorder(shape));
-    group.add(this.createResizeGuideP1(shape));
-    group.add(this.createResizeGuideP2(shape));
+    group.add(this.createLineResizeGuide(shape, 'x1', 'y1'));
+    group.add(this.createLineResizeGuide(shape, 'x2', 'y2'));
     group.front();
     document.dispatchEvent(UserActions.createCustomEvent(new SelectShape(shape)));
   }
 
-  private createLineBorder(shape: ShapeInfo): Shape {
-    const line = shape.shape as Line;
+  private createLineBorder(shape: LineInfo): Shape {
+    const line = shape.shape;
     return this.appStateService
       .getSvgRootElement()
       .line(line.array())
@@ -80,11 +80,11 @@ export class LineDrawingService extends BaseShapeDrawingService implements IShap
       .stroke({ color: constants.SELECTION_COLOR, width: 1 });
   }
 
-  createResizeGuideP1(shape: ShapeInfo): Shape {
+  private createLineResizeGuide(shape: LineInfo, xAttributeName: string, yAttributeName: string): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const line = shape.shape as Line;
-    const x = line.attr('x1');
-    const y = line.attr('y1');
+    const x = line.attr(xAttributeName);
+    const y = line.attr(yAttributeName);
     const circle = this.createResizeGuide(x, y);
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
@@ -95,41 +95,11 @@ export class LineDrawingService extends BaseShapeDrawingService implements IShap
         event.preventDefault();
         const newX = event.offsetX;
         const newY = event.offsetY;
-        line.attr('x1', newX).attr('y1', newY);
+        line.attr(xAttributeName, newX).attr(yAttributeName, newY);
       };
       const handleMouseUp = () => {
         _this.redrawOnHoverGuide(shape);
         _this.select(shape);
-        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    });
-    return circle;
-  }
-
-  createResizeGuideP2(shape: ShapeInfo): Shape {
-    const svg = this.appStateService.getSvgRootElement();
-    const line = shape.shape as Line;
-    const x = line.attr('x2');
-    const y = line.attr('y2');
-    const circle = this.createResizeGuide(x, y);
-    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
-    circle.css('cursor', 'nwse-resize');
-    circle.on('mousedown', () => {
-      const _this = this;
-      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      const handleMouseMove = (event) => {
-        event.preventDefault();
-        const newX = event.offsetX;
-        const newY = event.offsetY;
-        line.attr('x2', newX).attr('y2', newY);
-      };
-      const handleMouseUp = () => {
-        _this.select(shape);
-        _this.redrawOnHoverGuide(shape);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -147,7 +117,6 @@ export class LineDrawingService extends BaseShapeDrawingService implements IShap
     (this.shape.shape as Line).plot(this.initialPosition.x, this.initialPosition.y, x, y);
   }
 
-  // prettier-ignore
   private endCreateOnMouseDown(event: MouseEvent) {
     if (this.shape.shape.width() == 0 || this.shape.shape.height() == 0) {
       this.shape.container.remove();

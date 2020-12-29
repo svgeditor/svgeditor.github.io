@@ -16,6 +16,7 @@ import { DeleteShape } from '../../models/user-actions/DeleteShape';
 import { IUserAction } from '../../models/user-actions/IUserAction';
 import { SelectShape } from '../../models/user-actions/SelectShape';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
+import { Shape } from '@svgdotjs/svg.js';
 
 export interface IToolbarProps {
   appStateService?: IAppStateService;
@@ -25,7 +26,7 @@ export interface IToolbarState {
   cursorFunction: ECursorFunction;
   undoableUserActions: UndoableUserAction[];
   lastUndoableAction: UndoableUserAction;
-  selectedShape: ShapeInfo;
+  selectedShape: ShapeInfo<Shape>;
 }
 
 const Z_KEY_CODE = 90;

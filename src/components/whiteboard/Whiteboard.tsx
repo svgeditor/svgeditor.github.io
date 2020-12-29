@@ -181,7 +181,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     this.whiteboardWindowService.centerOnZoomOut(event);
   }
 
-  private toShape(target): ShapeInfo {
+  private toShape(target): ShapeInfo<Shape> {
     const shape = SVG(target) as Shape;
     return new ShapeInfo(shape.parent() as G, shape);
   }

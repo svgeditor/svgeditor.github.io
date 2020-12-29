@@ -4,13 +4,13 @@ import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseShapeDrawingService } from './BaseShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { ShapeInfo } from '../../models/ShapeInfo';
+import { EllipseInfo, ShapeInfo } from '../../models/ShapeInfo';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 
-export class EllipseDrawingService extends BaseShapeDrawingService implements IShapeDrawingService {
-  private static instance: IShapeDrawingService = null;
+export class EllipseDrawingService extends BaseShapeDrawingService<Ellipse> implements IShapeDrawingService<Ellipse> {
+  private static instance: IShapeDrawingService<Ellipse> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
@@ -18,7 +18,7 @@ export class EllipseDrawingService extends BaseShapeDrawingService implements IS
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService {
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService<Ellipse> {
     if (EllipseDrawingService.instance == null) {
       EllipseDrawingService.instance = new EllipseDrawingService(whiteboardDrawingService);
     }
@@ -26,7 +26,7 @@ export class EllipseDrawingService extends BaseShapeDrawingService implements IS
   }
 
   private initialPosition: Position;
-  private shape: ShapeInfo;
+  private shape: EllipseInfo;
 
   // prettier-ignore
   createOnMouseDown(event: MouseEvent): void {
@@ -45,7 +45,7 @@ export class EllipseDrawingService extends BaseShapeDrawingService implements IS
     this.shape = new ShapeInfo(container, shape);
   }
 
-  resize(shape: ShapeInfo): void {
+  resize(shape: EllipseInfo): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
     const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
@@ -62,7 +62,7 @@ export class EllipseDrawingService extends BaseShapeDrawingService implements IS
     const width = Math.abs(event.offsetX - this.initialPosition.x) / 2;
     const height = Math.abs(event.offsetY - this.initialPosition.y) / 2;
     const radius = Math.max(width / 2, height / 2);
-    (this.shape.shape as Ellipse).center(x, y).radius(width, height);
+    this.shape.shape.center(x, y).radius(width, height);
   }
 
   // prettier-ignore
@@ -71,11 +71,7 @@ export class EllipseDrawingService extends BaseShapeDrawingService implements IS
       this.shape.container.remove();
     } else {
       document.dispatchEvent(UserActions.createCustomEvent(new AddShape(this.shape)));
-      this.shape.container.add(this.shape.shape.clone()
-        .removeClass(constants.SHAPE_CLASS_NAME)
-        .addClass(constants.HOVER_SHAPE_CLASS_NAME)
-        .fill('transparent')
-        .stroke({ color: constants.SELECTION_COLOR, width: 1 }));
+      this.drawOnHoverGuide(this.shape);
       setTimeout(() => this.select(this.shape), 0);
     }
     document.removeEventListener('mousemove', this.createOnMouseDownInProgress);

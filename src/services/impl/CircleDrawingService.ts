@@ -4,13 +4,13 @@ import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseShapeDrawingService } from './BaseShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { ShapeInfo } from '../../models/ShapeInfo';
+import { CircleInfo, ShapeInfo } from '../../models/ShapeInfo';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 
-export class CircleDrawingService extends BaseShapeDrawingService implements IShapeDrawingService {
-  private static instance: IShapeDrawingService = null;
+export class CircleDrawingService extends BaseShapeDrawingService<Circle> implements IShapeDrawingService<Circle> {
+  private static instance: IShapeDrawingService<Circle> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
@@ -18,7 +18,7 @@ export class CircleDrawingService extends BaseShapeDrawingService implements ISh
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService {
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService<Circle> {
     if (CircleDrawingService.instance == null) {
       CircleDrawingService.instance = new CircleDrawingService(whiteboardDrawingService);
     }
@@ -26,7 +26,7 @@ export class CircleDrawingService extends BaseShapeDrawingService implements ISh
   }
 
   private initialPosition: Position;
-  private shape: ShapeInfo;
+  private shape: CircleInfo;
 
   // prettier-ignore
   createOnMouseDown(event: MouseEvent): void {
@@ -45,7 +45,7 @@ export class CircleDrawingService extends BaseShapeDrawingService implements ISh
     this.shape = new ShapeInfo(container, shape);
   }
 
-  resize(shape: ShapeInfo): void {
+  resize(shape: CircleInfo): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
     const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
@@ -61,7 +61,7 @@ export class CircleDrawingService extends BaseShapeDrawingService implements ISh
     const width = Math.abs(event.offsetX - this.initialPosition.x);
     const height = Math.abs(event.offsetY - this.initialPosition.y);
     const radius = Math.max(width / 2, height / 2);
-    (this.shape.shape as Circle).radius(radius).center(x, y);
+    this.shape.shape.radius(radius).center(x, y);
   }
 
   // prettier-ignore
@@ -70,11 +70,7 @@ export class CircleDrawingService extends BaseShapeDrawingService implements ISh
       this.shape.container.remove();
     } else {
       document.dispatchEvent(UserActions.createCustomEvent(new AddShape(this.shape)));
-      this.shape.container.add(this.shape.shape.clone()
-        .removeClass(constants.SHAPE_CLASS_NAME)
-        .addClass(constants.HOVER_SHAPE_CLASS_NAME)
-        .fill('transparent')
-        .stroke({ color: constants.SELECTION_COLOR, width: 1 }));
+      this.drawOnHoverGuide(this.shape);
       setTimeout(() => this.select(this.shape), 0);
     }
     document.removeEventListener('mousemove', this.createOnMouseDownInProgress);
