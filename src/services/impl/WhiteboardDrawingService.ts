@@ -2,19 +2,27 @@ import { G } from '@svgdotjs/svg.js';
 import { SELECTED_SHAPE_CLASS_NAME, SELECTED_SHAPE_GROUP_CLASS_NAME } from '../../constants/constants';
 import { IShapeService } from '../api/IShapeService';
 import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
-import { RectShapeService } from './RectShapeService';
+import { RectangleShapeService } from './RectangleShapeService';
 import { AppStateService } from './AppStateService';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { ShapeInfo } from '../../models/ShapeInfo';
+import { CircleShapeService } from './CircleShapeService';
+import { ECursorFunction } from '../../models/ECursorFunction';
 
 export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private static instance: IWhiteboardDrawingService = new WhiteboardDrawingService();
-  private rectService: IShapeService;
+  private rectangleShapeService: IShapeService;
+  private circleShapeService: IShapeService;
   private selectedShapeGroup: G = null;
 
-  private constructor(private appStateService = AppStateService.getInstance(), rectService?: IShapeService) {
-    this.rectService = rectService ? rectService : RectShapeService.getInstance(this);
+  private constructor(
+    private appStateService = AppStateService.getInstance(),
+    rectangleShapeService?: IShapeService,
+    circleShapeService?: IShapeService
+  ) {
+    this.rectangleShapeService = rectangleShapeService ? rectangleShapeService : RectangleShapeService.getInstance(this);
+    this.circleShapeService = circleShapeService ? circleShapeService : CircleShapeService.getInstance(this);
   }
 
   static getInstance(): IWhiteboardDrawingService {
@@ -22,19 +30,27 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   }
 
   createShapeOnMouseDown(event: MouseEvent): void {
-    this.rectService.createOnMouseDown(event);
+    const cursorFunction = this.appStateService.getCursorFunction();
+    switch (cursorFunction) {
+      case ECursorFunction.DRAW_RECTANGLES:
+        return this.rectangleShapeService.createOnMouseDown(event);
+      case ECursorFunction.DRAW_CIRCLES:
+        return this.circleShapeService.createOnMouseDown(event);
+      default:
+        return this.rectangleShapeService.createOnMouseDown(event);
+    }
   }
 
   select(shape: ShapeInfo): void {
-    this.rectService.select(shape);
+    this.rectangleShapeService.select(shape);
   }
 
   move(event: MouseEvent, shape: ShapeInfo): void {
-    this.rectService.move(event, shape);
+    this.rectangleShapeService.move(event, shape);
   }
 
   getStyles(): string {
-    return this.rectService.getStyles();
+    return this.rectangleShapeService.getStyles();
   }
 
   resize(): void {
@@ -42,7 +58,11 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     this.unselectAll();
     svg.find('rect').forEach((shape) => {
       const container = shape.parent() as G;
-      this.rectService.resize(new ShapeInfo(container, shape));
+      this.rectangleShapeService.resize(new ShapeInfo(container, shape));
+    });
+    svg.find('circle').forEach((shape) => {
+      const container = shape.parent() as G;
+      this.circleShapeService.resize(new ShapeInfo(container, shape));
     });
   }
 
