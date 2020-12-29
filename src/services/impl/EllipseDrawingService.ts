@@ -1,15 +1,16 @@
+import { Ellipse } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
-import { IShapeService } from '../api/IShapeService';
+import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { AppStateService } from './AppStateService';
-import { BaseShapeService } from './BaseShapeService';
+import { BaseShapeDrawingService } from './BaseShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
 import { ShapeInfo } from '../../models/ShapeInfo';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 
-export class RectangleShapeService extends BaseShapeService implements IShapeService {
-  private static instance: IShapeService = null;
+export class EllipseDrawingService extends BaseShapeDrawingService implements IShapeDrawingService {
+  private static instance: IShapeDrawingService = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
@@ -17,37 +18,26 @@ export class RectangleShapeService extends BaseShapeService implements IShapeSer
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeService {
-    if (RectangleShapeService.instance == null) {
-      RectangleShapeService.instance = new RectangleShapeService(whiteboardDrawingService);
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService {
+    if (EllipseDrawingService.instance == null) {
+      EllipseDrawingService.instance = new EllipseDrawingService(whiteboardDrawingService);
     }
-    return RectangleShapeService.instance;
+    return EllipseDrawingService.instance;
   }
 
   private initialPosition: Position;
   private shape: ShapeInfo;
 
-  resize(shape: ShapeInfo): void {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newX = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.x());
-    const newY = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.y());
-    const newW = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.width());
-    const newH = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.height());
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
-    shape.shape.move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
-  }
-
   // prettier-ignore
   createOnMouseDown(event: MouseEvent): void {
     const svg = this.appStateService.getSvgRootElement();
     const container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
-    const shape = svg.rect();
     this.initialPosition = { x: event.offsetX, y: event.offsetY };
+    const shape = svg.ellipse(0).move(this.initialPosition.x, this.initialPosition.y);
     container.add(shape);
     shape
       .addClass(constants.SHAPE_CLASS_NAME)
       .move(event.offsetX, event.offsetY)
-      .size(0, 0)
       .fill('white')
       .stroke({color: '#707070', width: this.getZoomedValue()});
     document.addEventListener('mousemove', this.createOnMouseDownInProgress);
@@ -55,13 +45,24 @@ export class RectangleShapeService extends BaseShapeService implements IShapeSer
     this.shape = new ShapeInfo(container, shape);
   }
 
+  resize(shape: ShapeInfo): void {
+    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
+    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
+    const newRx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('rx'));
+    const newRy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('ry'));
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
+    shape.shape.center(newCx, newCy).attr('rx', newRx).attr('ry', newRy).attr('stroke-width', strokeWidth);
+  }
+
   private createOnMouseDownInProgress(event: MouseEvent): void {
     event.preventDefault();
-    const x = Math.min(event.offsetX, this.initialPosition.x);
-    const y = Math.min(event.offsetY, this.initialPosition.y);
-    const width = Math.abs(event.offsetX - this.initialPosition.x);
-    const height = Math.abs(event.offsetY - this.initialPosition.y);
-    this.shape.shape.move(x, y).size(width, height);
+    const x = (event.offsetX + this.initialPosition.x) / 2;
+    const y = (event.offsetY + this.initialPosition.y) / 2;
+    const width = Math.abs(event.offsetX - this.initialPosition.x) / 2;
+    const height = Math.abs(event.offsetY - this.initialPosition.y) / 2;
+    const radius = Math.max(width / 2, height / 2);
+    (this.shape.shape as Ellipse).center(x, y).radius(width, height);
   }
 
   // prettier-ignore

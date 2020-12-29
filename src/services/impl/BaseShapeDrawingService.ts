@@ -1,5 +1,5 @@
 import * as constants from '../../constants/constants';
-import { IShapeService } from '../api/IShapeService';
+import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { IAppStateService } from '../api/IAppStateService';
 import { Position } from '../../models/Position';
 import { ShapeInfo } from '../../models/ShapeInfo';
@@ -8,7 +8,7 @@ import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { SelectShape } from '../../models/user-actions/SelectShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 
-export abstract class BaseShapeService implements IShapeService {
+export abstract class BaseShapeDrawingService implements IShapeDrawingService {
   abstract createOnMouseDown(event: MouseEvent): void;
   abstract resize(shape: ShapeInfo): void;
 

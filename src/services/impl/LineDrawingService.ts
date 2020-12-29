@@ -1,16 +1,16 @@
-import { Circle } from '@svgdotjs/svg.js';
+import { Line } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
-import { IShapeService } from '../api/IShapeService';
+import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { AppStateService } from './AppStateService';
-import { BaseShapeService } from './BaseShapeService';
+import { BaseShapeDrawingService } from './BaseShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
 import { ShapeInfo } from '../../models/ShapeInfo';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 
-export class CircleShapeService extends BaseShapeService implements IShapeService {
-  private static instance: IShapeService = null;
+export class LineDrawingService extends BaseShapeDrawingService implements IShapeDrawingService {
+  private static instance: IShapeDrawingService = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
@@ -18,11 +18,11 @@ export class CircleShapeService extends BaseShapeService implements IShapeServic
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeService {
-    if (CircleShapeService.instance == null) {
-      CircleShapeService.instance = new CircleShapeService(whiteboardDrawingService);
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService {
+    if (LineDrawingService.instance == null) {
+      LineDrawingService.instance = new LineDrawingService(whiteboardDrawingService);
     }
-    return CircleShapeService.instance;
+    return LineDrawingService.instance;
   }
 
   private initialPosition: Position;
@@ -33,7 +33,9 @@ export class CircleShapeService extends BaseShapeService implements IShapeServic
     const svg = this.appStateService.getSvgRootElement();
     const container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
     this.initialPosition = { x: event.offsetX, y: event.offsetY };
-    const shape = svg.circle(0).move(this.initialPosition.x, this.initialPosition.y);
+    const shape = svg
+      .line(this.initialPosition.x, this.initialPosition.y, this.initialPosition.x, this.initialPosition.y)
+      .move(this.initialPosition.x, this.initialPosition.y);
     container.add(shape);
     shape
       .addClass(constants.SHAPE_CLASS_NAME)
@@ -47,21 +49,20 @@ export class CircleShapeService extends BaseShapeService implements IShapeServic
 
   resize(shape: ShapeInfo): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
-    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
-    const newRadius = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('r'));
+    const line = shape.shape as Line;
+    const newX1 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('x1'));
+    const newY1 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('y1'));
+    const newX2 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('x2'));
+    const newY2 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('y2'));
     const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
-    shape.shape.center(newCx, newCy).attr('r', newRadius).attr('stroke-width', strokeWidth);
+    line.attr('x1', newX1).attr('y1', newY1).attr('x2', newX2).attr('y2', newY2).attr('stroke-width', strokeWidth);
   }
 
   private createOnMouseDownInProgress(event: MouseEvent): void {
     event.preventDefault();
-    const x = (event.offsetX + this.initialPosition.x) / 2;
-    const y = (event.offsetY + this.initialPosition.y) / 2;
-    const width = Math.abs(event.offsetX - this.initialPosition.x);
-    const height = Math.abs(event.offsetY - this.initialPosition.y);
-    const radius = Math.max(width / 2, height / 2);
-    (this.shape.shape as Circle).radius(radius).center(x, y);
+    const x = event.offsetX;
+    const y = event.offsetY;
+    (this.shape.shape as Line).plot(this.initialPosition.x, this.initialPosition.y, x, y);
   }
 
   // prettier-ignore

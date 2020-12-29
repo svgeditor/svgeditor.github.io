@@ -1,36 +1,36 @@
 import { G } from '@svgdotjs/svg.js';
 import { SELECTED_SHAPE_CLASS_NAME, SELECTED_SHAPE_GROUP_CLASS_NAME } from '../../constants/constants';
-import { IShapeService } from '../api/IShapeService';
+import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
-import { RectangleShapeService } from './RectangleShapeService';
+import { RectangleDrawingService } from './RectangleDrawingService';
 import { AppStateService } from './AppStateService';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { ShapeInfo } from '../../models/ShapeInfo';
-import { CircleShapeService } from './CircleShapeService';
+import { CircleDrawingService } from './CircleDrawingService';
 import { ECursorFunction } from '../../models/ECursorFunction';
-import { EllipseShapeService } from './EllipseShapeService';
-import { LineShapeService } from './LineShapeService';
+import { EllipseDrawingService } from './EllipseDrawingService';
+import { LineDrawingService } from './LineDrawingService';
 
 export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private static instance: IWhiteboardDrawingService = new WhiteboardDrawingService();
-  private rectangleShapeService: IShapeService;
-  private circleShapeService: IShapeService;
-  private ellipseShapeService: IShapeService;
-  private lineShapeService: IShapeService;
+  private rectangleDrawingService: IShapeDrawingService;
+  private circleDrawingService: IShapeDrawingService;
+  private ellipseDrawingService: IShapeDrawingService;
+  private lineDrawingService: IShapeDrawingService;
   private selectedShapeGroup: G = null;
 
   private constructor(
     private appStateService = AppStateService.getInstance(),
-    rectangleShapeService?: IShapeService,
-    circleShapeService?: IShapeService,
-    ellipseShapeService?: IShapeService,
-    lineShapeService?: IShapeService
+    rectangleDrawingService?: IShapeDrawingService,
+    circleDrawingService?: IShapeDrawingService,
+    ellipseDrawingService?: IShapeDrawingService,
+    lineDrawingService?: IShapeDrawingService
   ) {
-    this.rectangleShapeService = rectangleShapeService ? rectangleShapeService : RectangleShapeService.getInstance(this);
-    this.circleShapeService = circleShapeService ? circleShapeService : CircleShapeService.getInstance(this);
-    this.ellipseShapeService = ellipseShapeService ? ellipseShapeService : EllipseShapeService.getInstance(this);
-    this.lineShapeService = lineShapeService ? lineShapeService : LineShapeService.getInstance(this);
+    this.rectangleDrawingService = rectangleDrawingService ? rectangleDrawingService : RectangleDrawingService.getInstance(this);
+    this.circleDrawingService = circleDrawingService ? circleDrawingService : CircleDrawingService.getInstance(this);
+    this.ellipseDrawingService = ellipseDrawingService ? ellipseDrawingService : EllipseDrawingService.getInstance(this);
+    this.lineDrawingService = lineDrawingService ? lineDrawingService : LineDrawingService.getInstance(this);
   }
 
   static getInstance(): IWhiteboardDrawingService {
@@ -41,26 +41,26 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     const cursorFunction = this.appStateService.getCursorFunction();
     switch (cursorFunction) {
       case ECursorFunction.DRAW_RECTANGLES:
-        return this.rectangleShapeService.createOnMouseDown(event);
+        return this.rectangleDrawingService.createOnMouseDown(event);
       case ECursorFunction.DRAW_CIRCLES:
-        return this.circleShapeService.createOnMouseDown(event);
+        return this.circleDrawingService.createOnMouseDown(event);
       case ECursorFunction.DRAW_LINES:
-        return this.lineShapeService.createOnMouseDown(event);
+        return this.lineDrawingService.createOnMouseDown(event);
       default:
-        return this.rectangleShapeService.createOnMouseDown(event);
+        return this.rectangleDrawingService.createOnMouseDown(event);
     }
   }
 
   select(shape: ShapeInfo): void {
-    this.rectangleShapeService.select(shape);
+    this.rectangleDrawingService.select(shape);
   }
 
   move(event: MouseEvent, shape: ShapeInfo): void {
-    this.rectangleShapeService.move(event, shape);
+    this.rectangleDrawingService.move(event, shape);
   }
 
   getStyles(): string {
-    return this.rectangleShapeService.getStyles();
+    return this.rectangleDrawingService.getStyles();
   }
 
   resize(): void {
@@ -68,19 +68,19 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     this.unselectAll();
     svg.find('rect').forEach((shape) => {
       const container = shape.parent() as G;
-      this.rectangleShapeService.resize(new ShapeInfo(container, shape));
+      this.rectangleDrawingService.resize(new ShapeInfo(container, shape));
     });
     svg.find('circle').forEach((shape) => {
       const container = shape.parent() as G;
-      this.circleShapeService.resize(new ShapeInfo(container, shape));
+      this.circleDrawingService.resize(new ShapeInfo(container, shape));
     });
     svg.find('ellipse').forEach((shape) => {
       const container = shape.parent() as G;
-      this.ellipseShapeService.resize(new ShapeInfo(container, shape));
+      this.ellipseDrawingService.resize(new ShapeInfo(container, shape));
     });
     svg.find('line').forEach((shape) => {
       const container = shape.parent() as G;
-      this.lineShapeService.resize(new ShapeInfo(container, shape));
+      this.lineDrawingService.resize(new ShapeInfo(container, shape));
     });
   }
 

@@ -1,16 +1,15 @@
-import { Circle, Line } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
-import { IShapeService } from '../api/IShapeService';
+import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { AppStateService } from './AppStateService';
-import { BaseShapeService } from './BaseShapeService';
+import { BaseShapeDrawingService } from './BaseShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
 import { ShapeInfo } from '../../models/ShapeInfo';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 
-export class LineShapeService extends BaseShapeService implements IShapeService {
-  private static instance: IShapeService = null;
+export class RectangleDrawingService extends BaseShapeDrawingService implements IShapeDrawingService {
+  private static instance: IShapeDrawingService = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
@@ -18,28 +17,37 @@ export class LineShapeService extends BaseShapeService implements IShapeService 
     this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeService {
-    if (LineShapeService.instance == null) {
-      LineShapeService.instance = new LineShapeService(whiteboardDrawingService);
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService {
+    if (RectangleDrawingService.instance == null) {
+      RectangleDrawingService.instance = new RectangleDrawingService(whiteboardDrawingService);
     }
-    return LineShapeService.instance;
+    return RectangleDrawingService.instance;
   }
 
   private initialPosition: Position;
   private shape: ShapeInfo;
 
+  resize(shape: ShapeInfo): void {
+    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const newX = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.x());
+    const newY = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.y());
+    const newW = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.width());
+    const newH = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.height());
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
+    shape.shape.move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
+  }
+
   // prettier-ignore
   createOnMouseDown(event: MouseEvent): void {
     const svg = this.appStateService.getSvgRootElement();
     const container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
+    const shape = svg.rect();
     this.initialPosition = { x: event.offsetX, y: event.offsetY };
-    const shape = svg
-      .line(this.initialPosition.x, this.initialPosition.y, this.initialPosition.x, this.initialPosition.y)
-      .move(this.initialPosition.x, this.initialPosition.y);
     container.add(shape);
     shape
       .addClass(constants.SHAPE_CLASS_NAME)
       .move(event.offsetX, event.offsetY)
+      .size(0, 0)
       .fill('white')
       .stroke({color: '#707070', width: this.getZoomedValue()});
     document.addEventListener('mousemove', this.createOnMouseDownInProgress);
@@ -47,22 +55,13 @@ export class LineShapeService extends BaseShapeService implements IShapeService 
     this.shape = new ShapeInfo(container, shape);
   }
 
-  resize(shape: ShapeInfo): void {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const line = shape.shape as Line;
-    const newX1 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('x1'));
-    const newY1 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('y1'));
-    const newX2 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('x2'));
-    const newY2 = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('y2'));
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
-    line.attr('x1', newX1).attr('y1', newY1).attr('x2', newX2).attr('y2', newY2).attr('stroke-width', strokeWidth);
-  }
-
   private createOnMouseDownInProgress(event: MouseEvent): void {
     event.preventDefault();
-    const x = event.offsetX;
-    const y = event.offsetY;
-    (this.shape.shape as Line).plot(this.initialPosition.x, this.initialPosition.y, x, y);
+    const x = Math.min(event.offsetX, this.initialPosition.x);
+    const y = Math.min(event.offsetY, this.initialPosition.y);
+    const width = Math.abs(event.offsetX - this.initialPosition.x);
+    const height = Math.abs(event.offsetY - this.initialPosition.y);
+    this.shape.shape.move(x, y).size(width, height);
   }
 
   // prettier-ignore
