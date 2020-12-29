@@ -7,9 +7,9 @@ import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingS
 import { AppStateService } from '../../services/impl/AppStateService';
 import { IWhiteboardGridService } from '../../services/api/IWhiteboardGridService';
 import { WhiteboardGridService } from '../../services/impl/WhiteboardGridService';
-import { WhiteboardLayers } from '../../models/WhiteboardLayers';
-import { IWhiteboardLayersService } from '../../services/api/IWhiteboardLayersService';
-import { WhiteboardLayersService } from '../../services/impl/WhiteboardLayersService';
+import { WhiteboardWindow } from '../../models/WhiteboardLayers';
+import { IWhiteboardWindowService } from '../../services/api/IWhiteboardWindowService';
+import { WhiteboardWindowService } from '../../services/impl/WhiteboardWindowService';
 import { SHAPE_CLASS_NAME, USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
 import { DeleteShape } from '../../models/user-actions/DeleteShape';
@@ -25,7 +25,7 @@ export interface IWhiteboardProps {
   appStateService?: IAppStateService;
   backgroundGridService?: IWhiteboardGridService;
   whiteboardDrawingService?: IWhiteboardDrawingService;
-  whiteboardLayersService?: IWhiteboardLayersService;
+  whiteboardWindowsService?: IWhiteboardWindowService;
   whiteboardRulerService?: IWhiteboardRulerService;
 }
 
@@ -37,8 +37,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   private whiteboardBackground: HTMLElement;
   private whiteboardVerticalRuler: HTMLElement;
   private whiteboardHorizontalRuler: HTMLElement;
-  private whiteboardLayers: WhiteboardLayers;
-  private whiteboardLayersService: IWhiteboardLayersService;
+  private whiteboardWindowService: IWhiteboardWindowService;
   private whiteboardDrawingService: IWhiteboardDrawingService;
   private whiteboardGridService: IWhiteboardGridService;
   private whiteboardRulerService: IWhiteboardRulerService;
@@ -47,7 +46,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   constructor(props: IWhiteboardProps) {
     super(props);
     this.state = {};
-    this.whiteboardLayersService = this.props.whiteboardLayersService ? this.props.whiteboardLayersService : WhiteboardLayersService.getInstance();
+    this.whiteboardWindowService = this.props.whiteboardWindowsService ? this.props.whiteboardWindowsService : WhiteboardWindowService.getInstance();
     this.whiteboardDrawingService = this.props.whiteboardDrawingService
       ? this.props.whiteboardDrawingService
       : WhiteboardDrawingService.getInstance();
@@ -80,11 +79,11 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   }
 
   componentDidMount() {
-    this.initWhiteboardLayers();
-    this.whiteboardLayersService.resize();
+    this.initWhiteboardWindow();
+    this.whiteboardWindowService.resize();
     this.whiteboardGridService.resize();
     this.whiteboardRulerService.resize();
-    this.whiteboardLayersService.centerOnStartUp();
+    this.whiteboardWindowService.centerOnStartUp();
     this.whiteboard.addEventListener('mousedown', this.handleMouseDownEvent.bind(this));
     this.whiteboard.addEventListener('click', this.handleClickEvent.bind(this));
     this.whiteboardWindow.addEventListener('wheel', this.handleMouseWheelEvent.bind(this));
@@ -93,8 +92,8 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   }
 
   private handleWindowResizeEvent() {
-    this.whiteboardLayersService.resize();
-    this.whiteboardLayersService.centerOnStartUp();
+    this.whiteboardWindowService.resize();
+    this.whiteboardWindowService.centerOnStartUp();
   }
 
   private handleUserActionEvent(event: CustomEvent<IUserAction>) {
@@ -120,18 +119,19 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     }
   }
 
-  private initWhiteboardLayers(): void {
+  private initWhiteboardWindow(): void {
     const svgRootElement = SVG().addTo(this.whiteboard).size('100%', '100%');
     svgRootElement.element('style').words(this.whiteboardDrawingService.getStyles());
-    this.whiteboardLayers = new WhiteboardLayers(
-      this.whiteboard,
-      this.whiteboardWindow,
-      this.whiteboardBackground,
-      this.whiteboardVerticalRuler,
-      this.whiteboardHorizontalRuler,
-      svgRootElement
+    this.appStateService.setWhiteboardWindow(
+      new WhiteboardWindow(
+        this.whiteboard,
+        this.whiteboardWindow,
+        this.whiteboardBackground,
+        this.whiteboardVerticalRuler,
+        this.whiteboardHorizontalRuler,
+        svgRootElement
+      )
     );
-    this.appStateService.setWhiteboardLayers(this.whiteboardLayers);
   }
 
   private handleMouseWheelEvent(event: WheelEvent): void {
@@ -165,20 +165,20 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
 
   private zoomIn(event?: MouseEvent) {
     this.appStateService.increaseWhiteboardZoomLevel();
-    this.whiteboardLayersService.resize();
+    this.whiteboardWindowService.resize();
     this.whiteboardGridService.resize();
     this.whiteboardRulerService.resize();
     this.whiteboardDrawingService.resize();
-    this.whiteboardLayersService.centerOnZoomIn(event);
+    this.whiteboardWindowService.centerOnZoomIn(event);
   }
 
   private zoomOut(event?: MouseEvent) {
     this.appStateService.decreaseWhiteboardZoomLevel();
-    this.whiteboardLayersService.resize();
+    this.whiteboardWindowService.resize();
     this.whiteboardGridService.resize();
     this.whiteboardRulerService.resize();
     this.whiteboardDrawingService.resize();
-    this.whiteboardLayersService.centerOnZoomOut(event);
+    this.whiteboardWindowService.centerOnZoomOut(event);
   }
 
   private toShape(target): ShapeInfo {

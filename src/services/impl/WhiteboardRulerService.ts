@@ -12,25 +12,25 @@ export class WhiteboardRulerService implements IWhiteboardRulerService {
   }
 
   resize() {
-    const layers = this.appStateService.getWhiteboardLayers();
+    const whiteboardWindow = this.appStateService.getWhiteboardWindow();
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const whiteboardWindowBoundingRect = layers.whiteboardWindow.getBoundingClientRect();
+    const whiteboardWindowBoundingRect = whiteboardWindow.whiteboardWindow.getBoundingClientRect();
     const whiteboardHeight = this.appStateService.getInitialWhiteboardHeight();
-    layers.whiteboardHorizontalRuler.style.margin = `0 ${whiteboardWindowBoundingRect.width - WHITEBOARD_MARGIN}px`;
-    layers.whiteboardHorizontalRuler.style.height = `100%`;
+    whiteboardWindow.whiteboardHorizontalRuler.style.margin = `0 ${whiteboardWindowBoundingRect.width - WHITEBOARD_MARGIN}px`;
+    whiteboardWindow.whiteboardHorizontalRuler.style.height = `100%`;
     const innerHorizontalRuler = document.createElement('div');
     innerHorizontalRuler.style.background = `url(data:image/svg+xml;base64,${this.getHorizontalRulerBase64()})`;
     innerHorizontalRuler.style.height = '100%';
-    layers.whiteboardHorizontalRuler.innerHTML = '';
-    layers.whiteboardHorizontalRuler.appendChild(innerHorizontalRuler);
+    whiteboardWindow.whiteboardHorizontalRuler.innerHTML = '';
+    whiteboardWindow.whiteboardHorizontalRuler.appendChild(innerHorizontalRuler);
 
-    layers.whiteboardVerticalRuler.style.margin = `${whiteboardWindowBoundingRect.height - WHITEBOARD_MARGIN}px 0`;
-    layers.whiteboardVerticalRuler.style.height = `${zoomLevel.getZoomedValueFromInitialValue(whiteboardHeight)}px`;
+    whiteboardWindow.whiteboardVerticalRuler.style.margin = `${whiteboardWindowBoundingRect.height - WHITEBOARD_MARGIN}px 0`;
+    whiteboardWindow.whiteboardVerticalRuler.style.height = `${zoomLevel.getZoomedValueFromInitialValue(whiteboardHeight)}px`;
     const innerVerticalRuler = document.createElement('div');
     innerVerticalRuler.style.background = `url(data:image/svg+xml;base64,${this.getVerticalRulerBase64()})`;
     innerVerticalRuler.style.height = '100%';
-    layers.whiteboardVerticalRuler.innerHTML = '';
-    layers.whiteboardVerticalRuler.appendChild(innerVerticalRuler);
+    whiteboardWindow.whiteboardVerticalRuler.innerHTML = '';
+    whiteboardWindow.whiteboardVerticalRuler.appendChild(innerVerticalRuler);
   }
 
   private getHorizontalRulerBase64(): string {

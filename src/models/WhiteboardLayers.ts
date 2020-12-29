@@ -1,6 +1,6 @@
 import { Svg } from '@svgdotjs/svg.js';
 
-export class WhiteboardLayers {
+export class WhiteboardWindow {
   constructor(
     public whiteboard: HTMLElement,
     public whiteboardWindow: HTMLElement,

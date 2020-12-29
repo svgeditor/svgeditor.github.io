@@ -1,4 +1,3 @@
-import { Shape } from '@svgdotjs/svg.js';
 import { ShapeInfo } from '../../models/ShapeInfo';
 
 export interface IShapeService {

@@ -3,14 +3,14 @@ import { Dimensions } from '../../models/Dimensions';
 import { ECursorFunction } from '../../models/ECursorFunction';
 import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZoomLevel, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
 import { IAppStateService } from '../api/IAppStateService';
-import { WhiteboardLayers } from '../../models/WhiteboardLayers';
+import { WhiteboardWindow } from '../../models/WhiteboardLayers';
 
 export class AppStateService implements IAppStateService {
   private static instance: IAppStateService = new AppStateService();
   private whiteboardDimensions = new Dimensions(800, 1100);
   private whiteboardZoomLevel = new ZoomLevel();
   private cursorFunction: ECursorFunction = ECursorFunction.DRAW_RECTANGLES;
-  private whiteboardLayers: WhiteboardLayers;
+  private whiteboardLayers: WhiteboardWindow;
 
   static getInstance(): IAppStateService {
     return AppStateService.instance;
@@ -18,11 +18,11 @@ export class AppStateService implements IAppStateService {
 
   private constructor() {}
 
-  setWhiteboardLayers(layers: WhiteboardLayers): void {
+  setWhiteboardWindow(layers: WhiteboardWindow): void {
     this.whiteboardLayers = layers;
   }
 
-  getWhiteboardLayers(): WhiteboardLayers {
+  getWhiteboardWindow(): WhiteboardWindow {
     return this.whiteboardLayers;
   }
 

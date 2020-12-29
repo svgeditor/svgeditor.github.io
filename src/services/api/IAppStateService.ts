@@ -1,14 +1,14 @@
-import { G, Svg } from '@svgdotjs/svg.js';
+import { Svg } from '@svgdotjs/svg.js';
 import { ECursorFunction } from '../../models/ECursorFunction';
-import { WhiteboardLayers } from '../../models/WhiteboardLayers';
+import { WhiteboardWindow } from '../../models/WhiteboardLayers';
 import { ZoomLevel } from '../../models/ZoomLevel';
 
 export interface IAppStateService {
   getCursorFunction(): ECursorFunction;
   setCursorFunction(cursorFunction: ECursorFunction): void;
   getSvgRootElement(): Svg;
-  setWhiteboardLayers(layers: WhiteboardLayers): void;
-  getWhiteboardLayers(): WhiteboardLayers;
+  setWhiteboardWindow(whiteboardWindow: WhiteboardWindow): void;
+  getWhiteboardWindow(): WhiteboardWindow;
   getInitialWhiteboardWidth(): number;
   getInitialWhiteboardHeight(): number;
   setWhiteboardZoomLevel(zoomLevel: ZoomLevel): void;
