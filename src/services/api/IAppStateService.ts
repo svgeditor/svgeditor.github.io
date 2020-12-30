@@ -1,11 +1,11 @@
 import { Svg } from '@svgdotjs/svg.js';
-import { ECursorFunction } from '../../models/ECursorFunction';
+import { ESvgElement } from '../../models/SvgElement';
 import { WhiteboardWindow } from '../../models/WhiteboardLayers';
 import { ZoomLevel } from '../../models/ZoomLevel';
 
 export interface IAppStateService {
-  getCursorFunction(): ECursorFunction;
-  setCursorFunction(cursorFunction: ECursorFunction): void;
+  getShapeToDraw(): ESvgElement;
+  setShapeToDraw(shapeToDraw: ESvgElement): void;
   getSvgRootElement(): Svg;
   setWhiteboardWindow(whiteboardWindow: WhiteboardWindow): void;
   getWhiteboardWindow(): WhiteboardWindow;

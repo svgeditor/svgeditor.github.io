@@ -4,7 +4,7 @@ import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseShapeDrawingService } from './BaseShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { EllipseInfo, ShapeInfo } from '../../models/ShapeInfo';
+import { SvgEllipse, SvgElement } from '../../models/SvgElement';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
@@ -26,10 +26,10 @@ export class EllipseDrawingService extends BaseShapeDrawingService<Ellipse> impl
   }
 
   private initialPosition: Position;
-  private shape: EllipseInfo;
+  private shape: SvgEllipse;
 
   // prettier-ignore
-  createOnMouseDown(event: MouseEvent): void {
+  draw(event: MouseEvent): void {
     const svg = this.appStateService.getSvgRootElement();
     const container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
     this.initialPosition = { x: event.offsetX, y: event.offsetY };
@@ -42,17 +42,17 @@ export class EllipseDrawingService extends BaseShapeDrawingService<Ellipse> impl
       .stroke({color: '#707070', width: this.getZoomedValue()});
     document.addEventListener('mousemove', this.createOnMouseDownInProgress);
     document.addEventListener('mouseup', this.endCreateOnMouseDown);
-    this.shape = new ShapeInfo(container, shape);
+    this.shape = new SvgElement(container, shape);
   }
 
-  resize(shape: EllipseInfo): void {
+  resize(shape: SvgEllipse): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
-    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
-    const newRx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('rx'));
-    const newRy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('ry'));
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
-    shape.shape.center(newCx, newCy).attr('rx', newRx).attr('ry', newRy).attr('stroke-width', strokeWidth);
+    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.element.cx());
+    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.element.cy());
+    const newRx = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('rx'));
+    const newRy = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('ry'));
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('stroke-width'));
+    shape.element.center(newCx, newCy).attr('rx', newRx).attr('ry', newRy).attr('stroke-width', strokeWidth);
   }
 
   private createOnMouseDownInProgress(event: MouseEvent): void {
@@ -62,16 +62,16 @@ export class EllipseDrawingService extends BaseShapeDrawingService<Ellipse> impl
     const width = Math.abs(event.offsetX - this.initialPosition.x) / 2;
     const height = Math.abs(event.offsetY - this.initialPosition.y) / 2;
     const radius = Math.max(width / 2, height / 2);
-    this.shape.shape.center(x, y).radius(width, height);
+    this.shape.element.center(x, y).radius(width, height);
   }
 
   // prettier-ignore
   private endCreateOnMouseDown(event: MouseEvent) {
-    if (this.shape.shape.width() == 0 || this.shape.shape.height() == 0) {
+    if (this.shape.element.width() == 0 || this.shape.element.height() == 0) {
       this.shape.container.remove();
     } else {
       document.dispatchEvent(UserActions.createCustomEvent(new AddShape(this.shape)));
-      this.drawOnHoverGuide(this.shape);
+      this.drawHoverGuide(this.shape);
       setTimeout(() => this.select(this.shape), 0);
     }
     document.removeEventListener('mousemove', this.createOnMouseDownInProgress);

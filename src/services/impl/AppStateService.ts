@@ -1,6 +1,6 @@
 import { Svg } from '@svgdotjs/svg.js';
 import { Dimensions } from '../../models/Dimensions';
-import { ECursorFunction } from '../../models/ECursorFunction';
+import { ESvgElement } from '../../models/SvgElement';
 import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZoomLevel, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
 import { IAppStateService } from '../api/IAppStateService';
 import { WhiteboardWindow } from '../../models/WhiteboardLayers';
@@ -9,7 +9,7 @@ export class AppStateService implements IAppStateService {
   private static instance: IAppStateService = new AppStateService();
   private whiteboardDimensions = new Dimensions(800, 1100);
   private whiteboardZoomLevel = new ZoomLevel();
-  private cursorFunction: ECursorFunction = ECursorFunction.DRAW_RECTANGLES;
+  private cursorFunction: ESvgElement = ESvgElement.RECTANGLE;
   private whiteboardLayers: WhiteboardWindow;
 
   static getInstance(): IAppStateService {
@@ -26,10 +26,10 @@ export class AppStateService implements IAppStateService {
     return this.whiteboardLayers;
   }
 
-  getCursorFunction(): ECursorFunction {
+  getShapeToDraw(): ESvgElement {
     return this.cursorFunction;
   }
-  setCursorFunction(cursorFunction: ECursorFunction): void {
+  setShapeToDraw(cursorFunction: ESvgElement): void {
     this.cursorFunction = cursorFunction;
   }
 

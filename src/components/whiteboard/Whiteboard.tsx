@@ -17,7 +17,7 @@ import { ZoomInWhiteboard } from '../../models/user-actions/ZoomInWhiteboard';
 import { ZoomOutWhiteboard } from '../../models/user-actions/ZoomOutWhiteboard';
 import { BringShapeToFront } from '../../models/user-actions/BringShapeToFront';
 import { SendShapeToBack } from '../../models/user-actions/SendShapeToBack';
-import { ShapeInfo } from '../../models/ShapeInfo';
+import { SvgElement } from '../../models/SvgElement';
 import { IWhiteboardRulerService } from '../../services/api/IWhiteboardRulerService';
 import { WhiteboardRulerService } from '../../services/impl/WhiteboardRulerService';
 
@@ -100,7 +100,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     const userAction: IUserAction = event.detail;
     switch (true) {
       case userAction instanceof DeleteShape:
-        this.whiteboardDrawingService.deleteShape((userAction as DeleteShape).shape);
+        this.whiteboardDrawingService.delete((userAction as DeleteShape).shape);
         return;
       case userAction instanceof ZoomInWhiteboard:
         this.zoomIn();
@@ -109,10 +109,10 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
         this.zoomOut();
         return;
       case userAction instanceof BringShapeToFront:
-        this.whiteboardDrawingService.bringShapeToFront((userAction as BringShapeToFront).shape);
+        this.whiteboardDrawingService.bringToFront((userAction as BringShapeToFront).shape);
         return;
       case userAction instanceof SendShapeToBack:
-        this.whiteboardDrawingService.sendShapeToBack((userAction as SendShapeToBack).shape);
+        this.whiteboardDrawingService.sendToBack((userAction as SendShapeToBack).shape);
         return;
       default:
       // no thing to do here!
@@ -146,17 +146,21 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   }
 
   handleClickEvent(event: MouseEvent): void {
+    this.whiteboardDrawingService.unselectAllShapes();
     const target = event.target as HTMLElement;
     if (target.classList.contains(SHAPE_CLASS_NAME)) {
       return this.whiteboardDrawingService.select(this.toShape(target));
     }
-    this.whiteboardDrawingService.unselectAll();
   }
 
   handleMouseDownEvent(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (target instanceof SVGSVGElement) {
-      return this.whiteboardDrawingService.createShapeOnMouseDown(event);
+      const shapeToDraw = this.appStateService.getShapeToDraw();
+      if (shapeToDraw !== null) {
+        return this.whiteboardDrawingService.drawOnMouseDown(event);
+      }
+      return this.whiteboardDrawingService.selectOnMouseDown(event);
     }
     if (target.classList.contains(SHAPE_CLASS_NAME)) {
       return this.whiteboardDrawingService.move(event, this.toShape(target));
@@ -168,7 +172,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     this.whiteboardWindowService.resize();
     this.whiteboardGridService.resize();
     this.whiteboardRulerService.resize();
-    this.whiteboardDrawingService.resize();
+    this.whiteboardDrawingService.resizeAllShapes();
     this.whiteboardWindowService.centerOnZoomIn(event);
   }
 
@@ -177,12 +181,12 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     this.whiteboardWindowService.resize();
     this.whiteboardGridService.resize();
     this.whiteboardRulerService.resize();
-    this.whiteboardDrawingService.resize();
+    this.whiteboardDrawingService.resizeAllShapes();
     this.whiteboardWindowService.centerOnZoomOut(event);
   }
 
-  private toShape(target): ShapeInfo<Shape> {
+  private toShape(target): SvgElement<Shape> {
     const shape = SVG(target) as Shape;
-    return new ShapeInfo(shape.parent() as G, shape);
+    return new SvgElement(shape.parent() as G, shape);
   }
 }

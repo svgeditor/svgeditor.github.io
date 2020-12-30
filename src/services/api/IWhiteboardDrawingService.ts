@@ -1,16 +1,16 @@
-import { G, Shape } from '@svgdotjs/svg.js';
-import { ShapeInfo } from '../../models/ShapeInfo';
+import { Shape } from '@svgdotjs/svg.js';
+import { SvgElement } from '../../models/SvgElement';
 
 export interface IWhiteboardDrawingService {
-  createShapeOnMouseDown(event: MouseEvent): void;
-  move(event: MouseEvent, shape: ShapeInfo<Shape>): void;
-  select(shape: ShapeInfo<Shape>): void;
+  draw(shape: SvgElement<Shape>): void;
+  drawOnMouseDown(event: MouseEvent): void;
+  move(event: MouseEvent, shape: SvgElement<Shape>): void;
+  select(shape: SvgElement<Shape>): void;
+  selectOnMouseDown(event: MouseEvent): void;
+  delete(shape: SvgElement<Shape>): void;
+  bringToFront(shape: SvgElement<Shape>): void;
+  sendToBack(shape: SvgElement<Shape>): void;
+  resizeAllShapes(): void;
+  unselectAllShapes(): void;
   getStyles(): string;
-  resize(): void;
-  unselectAll(): void;
-  deleteShape(shape: ShapeInfo<Shape>): void;
-  draw(shape: ShapeInfo<Shape>): void;
-  bringShapeToFront(shape: ShapeInfo<Shape>): void;
-  sendShapeToBack(shape: ShapeInfo<Shape>): void;
-  getSelectedShapesGroup(): G;
 }

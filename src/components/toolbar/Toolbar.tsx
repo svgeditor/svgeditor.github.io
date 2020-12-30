@@ -4,13 +4,13 @@ import { IAppStateService } from '../../services/api/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
 import UserActionIcon from '../user-action-icon/UserActionIcon';
 import { UndoableUserAction } from '../../models/user-actions/IUndoableUserAction';
-import { ECursorFunction } from '../../models/ECursorFunction';
+import { ESvgElement } from '../../models/SvgElement';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { BringShapeToFront } from '../../models/user-actions/BringShapeToFront';
 import { SendShapeToBack } from '../../models/user-actions/SendShapeToBack';
 import { ZoomInWhiteboard } from '../../models/user-actions/ZoomInWhiteboard';
 import { ZoomOutWhiteboard } from '../../models/user-actions/ZoomOutWhiteboard';
-import { ShapeInfo } from '../../models/ShapeInfo';
+import { SvgElement } from '../../models/SvgElement';
 import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { DeleteShape } from '../../models/user-actions/DeleteShape';
 import { IUserAction } from '../../models/user-actions/IUserAction';
@@ -23,10 +23,10 @@ export interface IToolbarProps {
 }
 
 export interface IToolbarState {
-  cursorFunction: ECursorFunction;
+  shapeToDraw: ESvgElement;
   undoableUserActions: UndoableUserAction[];
   lastUndoableAction: UndoableUserAction;
-  selectedShape: ShapeInfo<Shape>;
+  selectedShape: SvgElement<Shape>;
 }
 
 const Z_KEY_CODE = 90;
@@ -41,7 +41,7 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     this.appStateService = this.props.appStateService ? this.props.appStateService : AppStateService.getInstance();
 
     this.state = {
-      cursorFunction: this.appStateService.getCursorFunction(),
+      shapeToDraw: this.appStateService.getShapeToDraw(),
       undoableUserActions: [],
       lastUndoableAction: null,
       selectedShape: null,
@@ -53,33 +53,33 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
       <div className='toolbar-container'>
         <UserActionIcon
           name='mdi:cursor-default-outline'
-          selected={this.state.cursorFunction == ECursorFunction.SELECT}
+          selected={this.state.shapeToDraw == null}
           title='Select'
-          onClick={() => this.changeCursorFunction(ECursorFunction.SELECT)}
+          onClick={() => this.changeShapeToDraw(null)}
         ></UserActionIcon>
         <UserActionIcon
           name='bx:bx-rectangle'
           title='Rectangle'
-          selected={this.state.cursorFunction == ECursorFunction.DRAW_RECTANGLES}
-          onClick={() => this.changeCursorFunction(ECursorFunction.DRAW_RECTANGLES)}
+          selected={this.state.shapeToDraw == ESvgElement.RECTANGLE}
+          onClick={() => this.changeShapeToDraw(ESvgElement.RECTANGLE)}
         ></UserActionIcon>
         <UserActionIcon
           name='bx:bx-circle'
           title='Circle'
-          selected={this.state.cursorFunction == ECursorFunction.DRAW_CIRCLES}
-          onClick={() => this.changeCursorFunction(ECursorFunction.DRAW_CIRCLES)}
+          selected={this.state.shapeToDraw == ESvgElement.CIRCLE}
+          onClick={() => this.changeShapeToDraw(ESvgElement.CIRCLE)}
         ></UserActionIcon>
         <UserActionIcon
           name='mdi:ellipse-outline'
           title='Ellipse'
-          selected={this.state.cursorFunction == ECursorFunction.DRAW_ELLIPSES}
-          onClick={() => this.changeCursorFunction(ECursorFunction.DRAW_ELLIPSES)}
+          selected={this.state.shapeToDraw == ESvgElement.ELLIPSE}
+          onClick={() => this.changeShapeToDraw(ESvgElement.ELLIPSE)}
         ></UserActionIcon>
         <UserActionIcon
           name='la:slash'
           title='Line'
-          selected={this.state.cursorFunction == ECursorFunction.DRAW_LINES}
-          onClick={() => this.changeCursorFunction(ECursorFunction.DRAW_LINES)}
+          selected={this.state.shapeToDraw == ESvgElement.LINE}
+          onClick={() => this.changeShapeToDraw(ESvgElement.LINE)}
         ></UserActionIcon>
         <span className='icons-separator'></span>
         <UserActionIcon
@@ -128,9 +128,9 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
     document.addEventListener(USER_ACTION_EVENT_NAME, this.handleUserActionEvent.bind(this));
   }
 
-  private changeCursorFunction(selectedCursorFunction: ECursorFunction): void {
-    this.setState({ cursorFunction: selectedCursorFunction });
-    this.appStateService.setCursorFunction(selectedCursorFunction);
+  private changeShapeToDraw(selectedShapeToDraw: ESvgElement): void {
+    this.setState({ shapeToDraw: selectedShapeToDraw });
+    this.appStateService.setShapeToDraw(selectedShapeToDraw);
   }
 
   private handleKeydownEvent(event: KeyboardEvent) {

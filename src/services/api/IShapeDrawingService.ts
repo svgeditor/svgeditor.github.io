@@ -1,12 +1,11 @@
 import { Shape } from '@svgdotjs/svg.js';
-import { ShapeInfo } from '../../models/ShapeInfo';
+import { SvgElement } from '../../models/SvgElement';
 
 export interface IShapeDrawingService<T extends Shape> {
-  createOnMouseDown(event: MouseEvent): void;
-  move(event: MouseEvent, shapeToMove: ShapeInfo<T>): void;
-  select(shape: ShapeInfo<T>): void;
-  getStyles(): string;
-  resize(shape: ShapeInfo<T>): void;
-  drawOnHoverGuide(shape: ShapeInfo<T>): void;
-  redrawOnHoverGuide(shape: ShapeInfo<T>): void;
+  draw(event: MouseEvent): void;
+  move(event: MouseEvent, shapeToMove: SvgElement<T>): void;
+  select(shape: SvgElement<T>): void;
+  resize(shape: SvgElement<T>): void;
+  drawHoverGuide(shape: SvgElement<T>): void;
+  redrawHoverGuide(shape: SvgElement<T>): void;
 }

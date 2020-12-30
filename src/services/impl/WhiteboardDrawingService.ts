@@ -1,3 +1,4 @@
+import * as constants from '../../constants/constants';
 import { Circle, Ellipse, G, Line, Rect, Shape } from '@svgdotjs/svg.js';
 import { SELECTED_SHAPE_CLASS_NAME, SELECTED_SHAPE_GROUP_CLASS_NAME } from '../../constants/constants';
 import { IShapeDrawingService } from '../api/IShapeDrawingService';
@@ -6,9 +7,9 @@ import { RectangleDrawingService } from './RectangleDrawingService';
 import { AppStateService } from './AppStateService';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { UserActions } from '../../models/user-actions/UserActions';
-import { CircleInfo, EllipseInfo, LineInfo, RectangleInfo, ShapeInfo } from '../../models/ShapeInfo';
+import { SvgCircle, SvgEllipse, SvgLine, SvgRectangle, SvgElement } from '../../models/SvgElement';
 import { CircleDrawingService } from './CircleDrawingService';
-import { ECursorFunction } from '../../models/ECursorFunction';
+import { ESvgElement } from '../../models/SvgElement';
 import { EllipseDrawingService } from './EllipseDrawingService';
 import { LineDrawingService } from './LineDrawingService';
 
@@ -37,78 +38,82 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     return WhiteboardDrawingService.instance;
   }
 
-  createShapeOnMouseDown(event: MouseEvent): void {
-    const cursorFunction = this.appStateService.getCursorFunction();
-    switch (cursorFunction) {
-      case ECursorFunction.DRAW_RECTANGLES:
-        return this.rectangleDrawingService.createOnMouseDown(event);
-      case ECursorFunction.DRAW_CIRCLES:
-        return this.circleDrawingService.createOnMouseDown(event);
-      case ECursorFunction.DRAW_ELLIPSES:
-        return this.ellipseDrawingService.createOnMouseDown(event);
-      case ECursorFunction.DRAW_LINES:
-        return this.lineDrawingService.createOnMouseDown(event);
+  draw(shape: SvgElement<Shape>): void {
+    this.appStateService.getSvgRootElement().add(shape.container);
+  }
+
+  drawOnMouseDown(event: MouseEvent): void {
+    const shapeToDraw = this.appStateService.getShapeToDraw();
+    switch (shapeToDraw) {
+      case ESvgElement.RECTANGLE:
+        return this.rectangleDrawingService.draw(event);
+      case ESvgElement.CIRCLE:
+        return this.circleDrawingService.draw(event);
+      case ESvgElement.ELLIPSE:
+        return this.ellipseDrawingService.draw(event);
+      case ESvgElement.LINE:
+        return this.lineDrawingService.draw(event);
       default:
-        return this.rectangleDrawingService.createOnMouseDown(event);
+      // no thing to do by default
     }
   }
 
-  select(shape: ShapeInfo<Shape>): void {
+  select(shape: SvgElement<Shape>): void {
     switch (true) {
-      case shape.shape instanceof Rect:
-        return this.rectangleDrawingService.select(shape as RectangleInfo);
-      case shape.shape instanceof Circle:
-        return this.circleDrawingService.select(shape as CircleInfo);
-      case shape.shape instanceof Ellipse:
-        return this.ellipseDrawingService.select(shape as EllipseInfo);
-      case shape.shape instanceof Line:
-        return this.lineDrawingService.select(shape as LineInfo);
+      case shape.element instanceof Rect:
+        return this.rectangleDrawingService.select(shape as SvgRectangle);
+      case shape.element instanceof Circle:
+        return this.circleDrawingService.select(shape as SvgCircle);
+      case shape.element instanceof Ellipse:
+        return this.ellipseDrawingService.select(shape as SvgEllipse);
+      case shape.element instanceof Line:
+        return this.lineDrawingService.select(shape as SvgLine);
       default:
       // nothing to do by default
     }
   }
 
-  move(event: MouseEvent, shape: ShapeInfo<Shape>): void {
+  selectOnMouseDown(event: MouseEvent): void {
+    console.log('selectOnMouseDown');
+  }
+
+  move(event: MouseEvent, shape: SvgElement<Shape>): void {
     switch (true) {
-      case shape.shape instanceof Rect:
-        return this.rectangleDrawingService.move(event, shape as RectangleInfo);
-      case shape.shape instanceof Circle:
-        return this.circleDrawingService.move(event, shape as CircleInfo);
-      case shape.shape instanceof Ellipse:
-        return this.ellipseDrawingService.move(event, shape as EllipseInfo);
-      case shape.shape instanceof Line:
-        return this.lineDrawingService.move(event, shape as LineInfo);
+      case shape.element instanceof Rect:
+        return this.rectangleDrawingService.move(event, shape as SvgRectangle);
+      case shape.element instanceof Circle:
+        return this.circleDrawingService.move(event, shape as SvgCircle);
+      case shape.element instanceof Ellipse:
+        return this.ellipseDrawingService.move(event, shape as SvgEllipse);
+      case shape.element instanceof Line:
+        return this.lineDrawingService.move(event, shape as SvgLine);
       default:
       // nothing to do by default
     }
   }
 
-  getStyles(): string {
-    return this.rectangleDrawingService.getStyles();
-  }
-
-  resize(): void {
+  resizeAllShapes(): void {
     const svg = this.appStateService.getSvgRootElement();
-    this.unselectAll();
+    this.unselectAllShapes();
     svg.find('rect').forEach((shape) => {
       const container = shape.parent() as G;
-      this.rectangleDrawingService.resize(new RectangleInfo(container, shape as Rect));
+      this.rectangleDrawingService.resize(new SvgRectangle(container, shape as Rect));
     });
     svg.find('circle').forEach((shape) => {
       const container = shape.parent() as G;
-      this.circleDrawingService.resize(new CircleInfo(container, shape as Circle));
+      this.circleDrawingService.resize(new SvgCircle(container, shape as Circle));
     });
     svg.find('ellipse').forEach((shape) => {
       const container = shape.parent() as G;
-      this.ellipseDrawingService.resize(new EllipseInfo(container, shape as Ellipse));
+      this.ellipseDrawingService.resize(new SvgEllipse(container, shape as Ellipse));
     });
     svg.find('line').forEach((shape) => {
       const container = shape.parent() as G;
-      this.lineDrawingService.resize(new LineInfo(container, shape as Line));
+      this.lineDrawingService.resize(new SvgLine(container, shape as Line));
     });
   }
 
-  unselectAll(): void {
+  unselectAllShapes(): void {
     this.appStateService
       .getSvgRootElement()
       .find(`.${SELECTED_SHAPE_CLASS_NAME}`)
@@ -119,21 +124,17 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     document.dispatchEvent(UserActions.createCustomEvent(new UnselectAllShapes()));
   }
 
-  bringShapeToFront(shape: ShapeInfo<Shape>): void {
+  bringToFront(shape: SvgElement<Shape>): void {
     shape.container.forward();
   }
 
-  sendShapeToBack(shape: ShapeInfo<Shape>): void {
+  sendToBack(shape: SvgElement<Shape>): void {
     shape.container.backward();
   }
 
-  deleteShape(shape: ShapeInfo<Shape>): void {
+  delete(shape: SvgElement<Shape>): void {
     shape.container.remove();
-    this.unselectAll();
-  }
-
-  draw(shape: ShapeInfo<Shape>): void {
-    this.appStateService.getSvgRootElement().add(shape.container);
+    this.unselectAllShapes();
   }
 
   getSelectedShapesGroup(): G {
@@ -144,5 +145,46 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     if (!selectedShapeGroup) selectedShapeGroup = svg.group().addClass(`${SELECTED_SHAPE_GROUP_CLASS_NAME}`);
     this.selectedShapeGroup = selectedShapeGroup;
     return selectedShapeGroup;
+  }
+
+  getStyles(): string {
+    return `
+      /* <![CDATA[ */
+        .${constants.SHAPE_CLASS_NAME} {
+          cursor: move;
+        }
+        .${constants.HOVER_SHAPE_CLASS_NAME} {
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.15s ease-in-out;
+        }
+        .${constants.SHAPE_GROUP_CLASS_NAME}:hover .${constants.HOVER_SHAPE_CLASS_NAME} {
+          opacity: 1;
+        }
+
+        .${constants.SELECTED_SHAPE_GROUP_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
+          pointer-events: none;
+        }
+
+        .${constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME},
+        .${constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME} {
+          opacity: 0;
+        }
+
+        .${constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME},
+        .${constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
+          opacity: 0.8;
+          stroke-dasharray: ${constants.STROKE_DASH_ARRAY};
+        }
+
+        .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME} {
+          transition: fill 0.15s ease-in-out;
+        }
+
+        .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME}:hover {
+          fill: ${constants.SELECTION_COLOR}
+        }
+      /* ]]> */
+    `;
   }
 }

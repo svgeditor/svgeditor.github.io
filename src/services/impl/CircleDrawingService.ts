@@ -4,7 +4,7 @@ import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseShapeDrawingService } from './BaseShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { CircleInfo, ShapeInfo } from '../../models/ShapeInfo';
+import { SvgCircle, SvgElement } from '../../models/SvgElement';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
@@ -26,10 +26,10 @@ export class CircleDrawingService extends BaseShapeDrawingService<Circle> implem
   }
 
   private initialPosition: Position;
-  private shape: CircleInfo;
+  private shape: SvgCircle;
 
   // prettier-ignore
-  createOnMouseDown(event: MouseEvent): void {
+  draw(event: MouseEvent): void {
     const svg = this.appStateService.getSvgRootElement();
     const container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
     this.initialPosition = { x: event.offsetX, y: event.offsetY };
@@ -42,16 +42,16 @@ export class CircleDrawingService extends BaseShapeDrawingService<Circle> implem
       .stroke({color: '#707070', width: this.getZoomedValue()});
     document.addEventListener('mousemove', this.createOnMouseDownInProgress);
     document.addEventListener('mouseup', this.endCreateOnMouseDown);
-    this.shape = new ShapeInfo(container, shape);
+    this.shape = new SvgElement(container, shape);
   }
 
-  resize(shape: CircleInfo): void {
+  resize(shape: SvgCircle): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
-    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
-    const newRadius = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('r'));
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
-    shape.shape.center(newCx, newCy).attr('r', newRadius).attr('stroke-width', strokeWidth);
+    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.element.cx());
+    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.element.cy());
+    const newRadius = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('r'));
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('stroke-width'));
+    shape.element.center(newCx, newCy).attr('r', newRadius).attr('stroke-width', strokeWidth);
   }
 
   private createOnMouseDownInProgress(event: MouseEvent): void {
@@ -61,16 +61,16 @@ export class CircleDrawingService extends BaseShapeDrawingService<Circle> implem
     const width = Math.abs(event.offsetX - this.initialPosition.x);
     const height = Math.abs(event.offsetY - this.initialPosition.y);
     const radius = Math.max(width / 2, height / 2);
-    this.shape.shape.radius(radius).center(x, y);
+    this.shape.element.radius(radius).center(x, y);
   }
 
   // prettier-ignore
   private endCreateOnMouseDown(event: MouseEvent) {
-    if (this.shape.shape.width() == 0 || this.shape.shape.height() == 0) {
+    if (this.shape.element.width() == 0 || this.shape.element.height() == 0) {
       this.shape.container.remove();
     } else {
       document.dispatchEvent(UserActions.createCustomEvent(new AddShape(this.shape)));
-      this.drawOnHoverGuide(this.shape);
+      this.drawHoverGuide(this.shape);
       setTimeout(() => this.select(this.shape), 0);
     }
     document.removeEventListener('mousemove', this.createOnMouseDownInProgress);

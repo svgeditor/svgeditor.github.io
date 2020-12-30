@@ -1,7 +1,7 @@
 import { Shape } from '@svgdotjs/svg.js';
-import { ShapeInfo } from '../ShapeInfo';
+import { SvgElement } from '../SvgElement';
 import { IUserAction } from './IUserAction';
 
 export class SelectShape implements IUserAction {
-  constructor(public shape: ShapeInfo<Shape>) {}
+  constructor(public shape: SvgElement<Shape>) {}
 }

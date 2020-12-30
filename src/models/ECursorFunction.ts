@@ -1,7 +1,0 @@
-export enum ECursorFunction {
-  SELECT,
-  DRAW_RECTANGLES,
-  DRAW_CIRCLES,
-  DRAW_ELLIPSES,
-  DRAW_LINES,
-}
