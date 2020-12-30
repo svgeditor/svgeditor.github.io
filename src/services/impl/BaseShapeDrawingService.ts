@@ -57,7 +57,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
         .${constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME},
         .${constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
           opacity: 0.8;
-          stroke-dasharray: 5,5;
+          stroke-dasharray: ${constants.STROKE_DASH_ARRAY};
         }
 
         .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME} {
@@ -136,7 +136,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
       .move(shape.container.x(), shape.container.y())
       .size(shape.container.width(), shape.container.height())
       .fill('transparent')
-      .stroke({ color: constants.SELECTION_COLOR, width: 1 });
+      .stroke({ color: constants.SELECTION_COLOR, width: 1, dasharray: constants.STROKE_DASH_ARRAY });
   }
 
   private createResizeGuideNW(shape: ShapeInfo<T>): Shape {
