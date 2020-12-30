@@ -1,23 +1,23 @@
 import { Line, Shape } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
-import { IShapeDrawingService } from '../api/IShapeDrawingService';
+import { ISvgShapeDrawingService } from '../api/ISvgShapeDrawingService';
 import { AppStateService } from './AppStateService';
-import { BaseShapeDrawingService } from './BaseShapeDrawingService';
+import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { SvgLine } from '../../models/SvgElement';
+import { SvgLine } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { SelectShape } from '../../models/user-actions/SelectShape';
 
-export class LineDrawingService extends BaseShapeDrawingService<Line> implements IShapeDrawingService<Line> {
-  private static instance: IShapeDrawingService<Line> = null;
+export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> implements ISvgShapeDrawingService<SvgLine> {
+  private static instance: ISvgShapeDrawingService<SvgLine> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
   }
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService<Line> {
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgLine> {
     if (LineDrawingService.instance == null) {
       LineDrawingService.instance = new LineDrawingService(whiteboardDrawingService);
     }
@@ -58,7 +58,7 @@ export class LineDrawingService extends BaseShapeDrawingService<Line> implements
 
   resize(shape: SvgLine): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const line = shape.element;
+    const line = shape.shape;
     const newX1 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('x1'));
     const newY1 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('y1'));
     const newX2 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('x2'));
@@ -79,7 +79,7 @@ export class LineDrawingService extends BaseShapeDrawingService<Line> implements
   }
 
   private createLineBorder(shape: SvgLine): Shape {
-    const line = shape.element;
+    const line = shape.shape;
     return this.appStateService
       .getSvgRootElement()
       .line(line.array())
@@ -90,7 +90,7 @@ export class LineDrawingService extends BaseShapeDrawingService<Line> implements
 
   private createLineResizeGuide(shape: SvgLine, xAttributeName: string, yAttributeName: string): Shape {
     const svg = this.appStateService.getSvgRootElement();
-    const line = shape.element as Line;
+    const line = shape.shape as Line;
     const x = line.attr(xAttributeName);
     const y = line.attr(yAttributeName);
     const circle = this.createResizeGuide(x, y);
@@ -123,6 +123,7 @@ export class LineDrawingService extends BaseShapeDrawingService<Line> implements
     return this.appStateService
       .getSvgRootElement()
       .line(position.x, position.y, position.x, position.y)
+      .addClass(constants.SHAPE_CLASS_NAME)
       .move(position.x, position.y)
       .fill('white')
       .stroke({ color: '#707070', width: this.getZoomedValue() });

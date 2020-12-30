@@ -1,22 +1,22 @@
 import * as constants from '../../constants/constants';
-import { IShapeDrawingService } from '../api/IShapeDrawingService';
+import { ISvgShapeDrawingService } from '../api/ISvgShapeDrawingService';
 import { AppStateService } from './AppStateService';
-import { BaseShapeDrawingService } from './BaseShapeDrawingService';
+import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { SvgRectangle } from '../../models/SvgElement';
+import { SvgRectangle } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Rect } from '@svgdotjs/svg.js';
 
-export class RectangleDrawingService extends BaseShapeDrawingService<Rect> implements IShapeDrawingService<Rect> {
-  private static instance: IShapeDrawingService<Rect> = null;
+export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRectangle> implements ISvgShapeDrawingService<SvgRectangle> {
+  private static instance: ISvgShapeDrawingService<SvgRectangle> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
   }
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService<Rect> {
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgRectangle> {
     if (RectangleDrawingService.instance == null) {
       RectangleDrawingService.instance = new RectangleDrawingService(whiteboardDrawingService);
     }
@@ -58,12 +58,12 @@ export class RectangleDrawingService extends BaseShapeDrawingService<Rect> imple
 
   resize(shape: SvgRectangle): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newX = zoomLevel.getZoomedValueFromPreviousValue(shape.element.x());
-    const newY = zoomLevel.getZoomedValueFromPreviousValue(shape.element.y());
-    const newW = zoomLevel.getZoomedValueFromPreviousValue(shape.element.width());
-    const newH = zoomLevel.getZoomedValueFromPreviousValue(shape.element.height());
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('stroke-width'));
-    shape.element.move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
+    const newX = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.x());
+    const newY = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.y());
+    const newW = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.width());
+    const newH = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.height());
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
+    shape.shape.move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
   }
 
   private createRectangle(position: Position): Rect {

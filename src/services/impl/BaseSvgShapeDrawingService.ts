@@ -1,42 +1,53 @@
 import * as constants from '../../constants/constants';
-import { IShapeDrawingService } from '../api/IShapeDrawingService';
+import { ISvgShapeDrawingService } from '../api/ISvgShapeDrawingService';
 import { IAppStateService } from '../api/IAppStateService';
-import { Position } from '../../models/Position';
-import { SvgElement } from '../../models/SvgElement';
+import { SvgShape } from '../../models/SvgShape';
 import { G, Shape } from '@svgdotjs/svg.js';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { SelectShape } from '../../models/user-actions/SelectShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 
-export abstract class BaseShapeDrawingService<T extends Shape> implements IShapeDrawingService<T> {
+export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> implements ISvgShapeDrawingService<T> {
   abstract draw(event: MouseEvent): void;
-  abstract resize(shape: SvgElement<T>): void;
+  abstract resize(shape: T): void;
 
-  private mousePosition: Position;
-  private shapeToMoveContainer: G;
-  private moveInProgressFlag: boolean;
-
-  constructor(protected appStateService: IAppStateService, protected whiteboardDrawingService: WhiteboardDrawingService) {
-    this.moveInProgress = this.moveInProgress.bind(this);
-    this.endMove = this.endMove.bind(this);
-  }
+  constructor(protected appStateService: IAppStateService, protected whiteboardDrawingService: WhiteboardDrawingService) {}
 
   unselectAllShapes(): void {
     this.whiteboardDrawingService.unselectAllShapes();
   }
 
-  move(event: MouseEvent, shapeToMove: SvgElement<T>): void {
-    this.unselectAllShapes();
-    this.select(shapeToMove);
-    this.moveInProgressFlag = false;
-    this.mousePosition = { x: event.clientX, y: event.clientY };
-    this.shapeToMoveContainer = shapeToMove.container;
-    document.addEventListener('mousemove', this.moveInProgress);
-    document.addEventListener('mouseup', this.endMove);
+  move(event: MouseEvent, shapeToMove: T): void {
+    const _this = this;
+    let moveInProgressFlag = false;
+    let mousePosition = { x: event.clientX, y: event.clientY };
+    const shapeToMoveContainer = shapeToMove.container;
+    _this.unselectAllShapes();
+    _this.select(shapeToMove);
+
+    const onMouseMove = (event: MouseEvent) => {
+      if (!moveInProgressFlag) _this.appStateService.getSvgRootElement().addClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      moveInProgressFlag = true;
+      event.preventDefault();
+      let previousMousePosition = { ...mousePosition };
+      mousePosition = { x: event.clientX, y: event.clientY };
+      const x = shapeToMoveContainer.x() + (mousePosition.x - previousMousePosition.x);
+      const y = shapeToMoveContainer.y() + (mousePosition.y - previousMousePosition.y);
+      shapeToMoveContainer.move(x, y);
+    };
+
+    const onMouseUp = () => {
+      _this.appStateService.getSvgRootElement().removeClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   }
 
   // prettier-ignore
-  select(shape: SvgElement<T>): void {
+  select(shape: T): void {
     shape.container.addClass(constants.SELECTED_SHAPE_CLASS_NAME);
     const group = this.whiteboardDrawingService.getSelectedShapesGroup();
     group.add(this.createBorder(shape));
@@ -49,7 +60,6 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     group.add(this.createResizeGuideSW(shape));
     group.add(this.createResizeGuideW(shape));
     group.front();
-    document.dispatchEvent(UserActions.createCustomEvent(new SelectShape(shape)));
   }
 
   getZoomedValue(initialValue = 1): number {
@@ -57,10 +67,10 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     return zoomLevel.getZoomedValueFromInitialValue(initialValue);
   }
 
-  drawHoverGuide(shape: SvgElement<T>): void {
+  drawHoverGuide(shape: T): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     shape.container.add(
-      shape.element
+      shape.shape
         .clone()
         .removeClass(constants.SHAPE_CLASS_NAME)
         .addClass(constants.HOVER_SHAPE_CLASS_NAME)
@@ -69,7 +79,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     );
   }
 
-  redrawHoverGuide(shape: SvgElement<T>): void {
+  redrawHoverGuide(shape: T): void {
     shape.container.find(`.${constants.HOVER_SHAPE_CLASS_NAME}`).forEach((shape) => shape.remove());
     this.drawHoverGuide(shape);
   }
@@ -78,24 +88,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     return this.appStateService.getSvgRootElement().group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
   }
 
-  private moveInProgress(event: MouseEvent): void {
-    if (!this.moveInProgressFlag) this.appStateService.getSvgRootElement().addClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
-    this.moveInProgressFlag = true;
-    event.preventDefault();
-    let previousMousePosition = { ...this.mousePosition };
-    this.mousePosition = { x: event.clientX, y: event.clientY };
-    const x = this.shapeToMoveContainer.x() + (this.mousePosition.x - previousMousePosition.x);
-    const y = this.shapeToMoveContainer.y() + (this.mousePosition.y - previousMousePosition.y);
-    this.shapeToMoveContainer.move(x, y);
-  }
-
-  private endMove(): void {
-    this.appStateService.getSvgRootElement().removeClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
-    document.removeEventListener('mousemove', this.moveInProgress);
-    document.removeEventListener('mouseup', this.endMove);
-  }
-
-  private createBorder(shape: SvgElement<T>): Shape {
+  private createBorder(shape: T): Shape {
     return this.appStateService
       .getSvgRootElement()
       .rect()
@@ -106,7 +99,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
       .stroke({ color: constants.SELECTION_BORDER_COLOR, width: 1, dasharray: constants.STROKE_DASH_ARRAY });
   }
 
-  private createResizeGuideNW(shape: SvgElement<T>): Shape {
+  private createResizeGuideNW(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x(), shape.container.y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -139,7 +132,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     return circle;
   }
 
-  private createResizeGuideN(shape: SvgElement<T>): Shape {
+  private createResizeGuideN(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x() + shape.container.width() / 2, shape.container.y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -169,7 +162,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     return circle;
   }
 
-  private createResizeGuideNE(shape: SvgElement<T>): Shape {
+  private createResizeGuideNE(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x() + shape.container.width(), shape.container.y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -202,7 +195,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     return circle;
   }
 
-  private createResizeGuideE(shape: SvgElement<T>): Shape {
+  private createResizeGuideE(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x() + shape.container.width(), shape.container.y() + shape.container.height() / 2);
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -232,7 +225,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     return circle;
   }
 
-  private createResizeGuideSE(shape: SvgElement<T>): Shape {
+  private createResizeGuideSE(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x() + shape.container.width(), shape.container.y() + shape.container.height());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -265,7 +258,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     return circle;
   }
 
-  private createResizeGuideS(shape: SvgElement<T>): Shape {
+  private createResizeGuideS(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x() + shape.container.width() / 2, shape.container.y() + shape.container.height());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -295,7 +288,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     return circle;
   }
 
-  private createResizeGuideSW(shape: SvgElement<T>): Shape {
+  private createResizeGuideSW(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x(), shape.container.y() + shape.container.height());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -328,7 +321,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     return circle;
   }
 
-  private createResizeGuideW(shape: SvgElement<T>): Shape {
+  private createResizeGuideW(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.container.x(), shape.container.y() + shape.container.height() / 2);
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);

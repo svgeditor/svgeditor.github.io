@@ -1,22 +1,22 @@
 import { Circle } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
-import { IShapeDrawingService } from '../api/IShapeDrawingService';
+import { ISvgShapeDrawingService } from '../api/ISvgShapeDrawingService';
 import { AppStateService } from './AppStateService';
-import { BaseShapeDrawingService } from './BaseShapeDrawingService';
+import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { SvgCircle } from '../../models/SvgElement';
+import { SvgCircle } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Position } from '../../models/Position';
 
-export class CircleDrawingService extends BaseShapeDrawingService<Circle> implements IShapeDrawingService<Circle> {
-  private static instance: IShapeDrawingService<Circle> = null;
+export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> implements ISvgShapeDrawingService<SvgCircle> {
+  private static instance: ISvgShapeDrawingService<SvgCircle> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
   }
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService<Circle> {
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgCircle> {
     if (CircleDrawingService.instance == null) {
       CircleDrawingService.instance = new CircleDrawingService(whiteboardDrawingService);
     }
@@ -58,11 +58,11 @@ export class CircleDrawingService extends BaseShapeDrawingService<Circle> implem
 
   resize(shape: SvgCircle): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.element.cx());
-    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.element.cy());
-    const newRadius = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('r'));
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('stroke-width'));
-    shape.element.center(newCx, newCy).attr('r', newRadius).attr('stroke-width', strokeWidth);
+    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
+    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
+    const newRadius = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('r'));
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
+    shape.shape.center(newCx, newCy).attr('r', newRadius).attr('stroke-width', strokeWidth);
   }
 
   private createCircle(position: Position): Circle {

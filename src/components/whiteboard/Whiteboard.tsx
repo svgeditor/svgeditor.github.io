@@ -12,14 +12,15 @@ import { IWhiteboardWindowService } from '../../services/api/IWhiteboardWindowSe
 import { WhiteboardWindowService } from '../../services/impl/WhiteboardWindowService';
 import { SHAPE_CLASS_NAME, USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
-import { DeleteShape } from '../../models/user-actions/DeleteShape';
+import { DeleteShapes } from '../../models/user-actions/DeleteShapes';
 import { ZoomInWhiteboard } from '../../models/user-actions/ZoomInWhiteboard';
 import { ZoomOutWhiteboard } from '../../models/user-actions/ZoomOutWhiteboard';
-import { BringShapeToFront } from '../../models/user-actions/BringShapeToFront';
-import { SendShapeToBack } from '../../models/user-actions/SendShapeToBack';
-import { SvgElement } from '../../models/SvgElement';
+import { BringShapesToFront } from '../../models/user-actions/BringShapesToFront';
+import { SendShapesToBack } from '../../models/user-actions/SendShapesToBack';
+import { SvgShape } from '../../models/SvgShape';
 import { IWhiteboardRulerService } from '../../services/api/IWhiteboardRulerService';
 import { WhiteboardRulerService } from '../../services/impl/WhiteboardRulerService';
+import { SelectAllShapes } from '../../models/user-actions/SelectAllShapes';
 
 export interface IWhiteboardProps {
   appStateService?: IAppStateService;
@@ -99,21 +100,18 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   private handleUserActionEvent(event: CustomEvent<IUserAction>) {
     const userAction: IUserAction = event.detail;
     switch (true) {
-      case userAction instanceof DeleteShape:
-        this.whiteboardDrawingService.delete((userAction as DeleteShape).shape);
-        return;
+      case userAction instanceof DeleteShapes:
+        return this.whiteboardDrawingService.delete((userAction as DeleteShapes).shapes);
       case userAction instanceof ZoomInWhiteboard:
-        this.zoomIn();
-        return;
+        return this.zoomIn();
       case userAction instanceof ZoomOutWhiteboard:
-        this.zoomOut();
-        return;
-      case userAction instanceof BringShapeToFront:
-        this.whiteboardDrawingService.bringToFront((userAction as BringShapeToFront).shape);
-        return;
-      case userAction instanceof SendShapeToBack:
-        this.whiteboardDrawingService.sendToBack((userAction as SendShapeToBack).shape);
-        return;
+        return this.zoomOut();
+      case userAction instanceof BringShapesToFront:
+        return this.whiteboardDrawingService.bringToFront((userAction as BringShapesToFront).shapes);
+      case userAction instanceof SendShapesToBack:
+        return this.whiteboardDrawingService.sendToBack((userAction as SendShapesToBack).shapes);
+      case userAction instanceof SelectAllShapes:
+        return this.whiteboardDrawingService.selectAllShapes();
       default:
       // no thing to do here!
     }
@@ -185,8 +183,8 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     this.whiteboardWindowService.centerOnZoomOut(event);
   }
 
-  private toShape(target): SvgElement<Shape> {
+  private toShape(target): SvgShape<Shape> {
     const shape = SVG(target) as Shape;
-    return new SvgElement(shape.parent() as G, shape);
+    return new SvgShape(shape.parent() as G, shape);
   }
 }

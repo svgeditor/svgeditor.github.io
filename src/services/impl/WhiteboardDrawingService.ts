@@ -1,31 +1,32 @@
 import * as constants from '../../constants/constants';
 import { Circle, Ellipse, G, Line, Rect, Shape } from '@svgdotjs/svg.js';
-import { IShapeDrawingService } from '../api/IShapeDrawingService';
+import { ISvgShapeDrawingService } from '../api/ISvgShapeDrawingService';
 import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
 import { RectangleDrawingService } from './RectangleDrawingService';
 import { AppStateService } from './AppStateService';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { UserActions } from '../../models/user-actions/UserActions';
-import { SvgCircle, SvgEllipse, SvgLine, SvgRectangle, SvgElement } from '../../models/SvgElement';
+import { SvgCircle, SvgEllipse, SvgLine, SvgRectangle, SvgShape } from '../../models/SvgShape';
 import { CircleDrawingService } from './CircleDrawingService';
-import { ESvgElement } from '../../models/SvgElement';
+import { ESvgShape } from '../../models/SvgShape';
 import { EllipseDrawingService } from './EllipseDrawingService';
 import { LineDrawingService } from './LineDrawingService';
+import { SelectShape } from '../../models/user-actions/SelectShape';
 
 export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private static instance: IWhiteboardDrawingService = new WhiteboardDrawingService();
-  private rectangleDrawingService: IShapeDrawingService<Rect>;
-  private circleDrawingService: IShapeDrawingService<Circle>;
-  private ellipseDrawingService: IShapeDrawingService<Ellipse>;
-  private lineDrawingService: IShapeDrawingService<Line>;
+  private rectangleDrawingService: ISvgShapeDrawingService<SvgRectangle>;
+  private circleDrawingService: ISvgShapeDrawingService<SvgCircle>;
+  private ellipseDrawingService: ISvgShapeDrawingService<SvgEllipse>;
+  private lineDrawingService: ISvgShapeDrawingService<SvgLine>;
   private selectedShapeGroup: G = null;
 
   private constructor(
     private appStateService = AppStateService.getInstance(),
-    rectangleDrawingService?: IShapeDrawingService<Rect>,
-    circleDrawingService?: IShapeDrawingService<Circle>,
-    ellipseDrawingService?: IShapeDrawingService<Ellipse>,
-    lineDrawingService?: IShapeDrawingService<Line>
+    rectangleDrawingService?: ISvgShapeDrawingService<SvgRectangle>,
+    circleDrawingService?: ISvgShapeDrawingService<SvgCircle>,
+    ellipseDrawingService?: ISvgShapeDrawingService<SvgEllipse>,
+    lineDrawingService?: ISvgShapeDrawingService<SvgLine>
   ) {
     this.rectangleDrawingService = rectangleDrawingService ? rectangleDrawingService : RectangleDrawingService.getInstance(this);
     this.circleDrawingService = circleDrawingService ? circleDrawingService : CircleDrawingService.getInstance(this);
@@ -37,39 +38,44 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     return WhiteboardDrawingService.instance;
   }
 
-  draw(shape: SvgElement<Shape>): void {
+  draw(shape: SvgShape<Shape>): void {
     this.appStateService.getSvgRootElement().add(shape.container);
   }
 
   drawOnMouseDown(event: MouseEvent): void {
     const shapeToDraw = this.appStateService.getShapeToDraw();
     switch (shapeToDraw) {
-      case ESvgElement.RECTANGLE:
+      case ESvgShape.RECTANGLE:
         return this.rectangleDrawingService.draw(event);
-      case ESvgElement.CIRCLE:
+      case ESvgShape.CIRCLE:
         return this.circleDrawingService.draw(event);
-      case ESvgElement.ELLIPSE:
+      case ESvgShape.ELLIPSE:
         return this.ellipseDrawingService.draw(event);
-      case ESvgElement.LINE:
+      case ESvgShape.LINE:
         return this.lineDrawingService.draw(event);
       default:
       // no thing to do by default
     }
   }
 
-  select(shape: SvgElement<Shape>): void {
+  select(shape: SvgShape<Shape>): void {
     switch (true) {
-      case shape.element instanceof Rect:
-        return this.rectangleDrawingService.select(shape as SvgRectangle);
-      case shape.element instanceof Circle:
-        return this.circleDrawingService.select(shape as SvgCircle);
-      case shape.element instanceof Ellipse:
-        return this.ellipseDrawingService.select(shape as SvgEllipse);
-      case shape.element instanceof Line:
-        return this.lineDrawingService.select(shape as SvgLine);
+      case shape.shape instanceof Rect:
+        this.rectangleDrawingService.select(shape as SvgRectangle);
+        break;
+      case shape.shape instanceof Circle:
+        this.circleDrawingService.select(shape as SvgCircle);
+        break;
+      case shape.shape instanceof Ellipse:
+        this.ellipseDrawingService.select(shape as SvgEllipse);
+        break;
+      case shape.shape instanceof Line:
+        this.lineDrawingService.select(shape as SvgLine);
+        break;
       default:
       // nothing to do by default
     }
+    document.dispatchEvent(UserActions.createCustomEvent(new SelectShape(shape)));
   }
 
   selectOnMouseDown(event: MouseEvent): void {
@@ -98,15 +104,15 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     document.addEventListener('mouseup', onMouseUp);
   }
 
-  move(event: MouseEvent, shape: SvgElement<Shape>): void {
+  move(event: MouseEvent, shape: SvgShape<Shape>): void {
     switch (true) {
-      case shape.element instanceof Rect:
+      case shape.shape instanceof Rect:
         return this.rectangleDrawingService.move(event, shape as SvgRectangle);
-      case shape.element instanceof Circle:
+      case shape.shape instanceof Circle:
         return this.circleDrawingService.move(event, shape as SvgCircle);
-      case shape.element instanceof Ellipse:
+      case shape.shape instanceof Ellipse:
         return this.ellipseDrawingService.move(event, shape as SvgEllipse);
-      case shape.element instanceof Line:
+      case shape.shape instanceof Line:
         return this.lineDrawingService.move(event, shape as SvgLine);
       default:
       // nothing to do by default
@@ -117,20 +123,16 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     const svg = this.appStateService.getSvgRootElement();
     this.unselectAllShapes();
     svg.find('rect').forEach((shape) => {
-      const container = shape.parent() as G;
-      this.rectangleDrawingService.resize(new SvgRectangle(container, shape as Rect));
+      this.rectangleDrawingService.resize(new SvgRectangle(shape.parent() as G, shape as Rect));
     });
     svg.find('circle').forEach((shape) => {
-      const container = shape.parent() as G;
-      this.circleDrawingService.resize(new SvgCircle(container, shape as Circle));
+      this.circleDrawingService.resize(new SvgCircle(shape.parent() as G, shape as Circle));
     });
     svg.find('ellipse').forEach((shape) => {
-      const container = shape.parent() as G;
-      this.ellipseDrawingService.resize(new SvgEllipse(container, shape as Ellipse));
+      this.ellipseDrawingService.resize(new SvgEllipse(shape.parent() as G, shape as Ellipse));
     });
     svg.find('line').forEach((shape) => {
-      const container = shape.parent() as G;
-      this.lineDrawingService.resize(new SvgLine(container, shape as Line));
+      this.lineDrawingService.resize(new SvgLine(shape.parent() as G, shape as Line));
     });
   }
 
@@ -145,16 +147,27 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     document.dispatchEvent(UserActions.createCustomEvent(new UnselectAllShapes()));
   }
 
-  bringToFront(shape: SvgElement<Shape>): void {
-    shape.container.forward();
+  selectAllShapes(): void {
+    this.getAllShapes().forEach((shape) => this.select(shape));
   }
 
-  sendToBack(shape: SvgElement<Shape>): void {
-    shape.container.backward();
+  getAllShapes(): SvgShape<Shape>[] {
+    return this.appStateService
+      .getSvgRootElement()
+      .find(`.${constants.SHAPE_CLASS_NAME}`)
+      .map((shape) => new SvgShape(shape.parent() as G, shape));
   }
 
-  delete(shape: SvgElement<Shape>): void {
-    shape.container.remove();
+  bringToFront(shapes: SvgShape<Shape>[]): void {
+    shapes.forEach((shape) => shape.container.forward());
+  }
+
+  sendToBack(shapes: SvgShape<Shape>[]): void {
+    shapes.forEach((shape) => shape.container.backward());
+  }
+
+  delete(shapes: SvgShape<Shape>[]): void {
+    shapes.forEach((shape) => shape.container.remove());
     this.unselectAllShapes();
   }
 

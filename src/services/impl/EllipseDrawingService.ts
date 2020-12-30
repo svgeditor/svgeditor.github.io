@@ -1,22 +1,22 @@
 import { Ellipse } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
-import { IShapeDrawingService } from '../api/IShapeDrawingService';
+import { ISvgShapeDrawingService } from '../api/ISvgShapeDrawingService';
 import { AppStateService } from './AppStateService';
-import { BaseShapeDrawingService } from './BaseShapeDrawingService';
+import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { SvgEllipse } from '../../models/SvgElement';
+import { SvgEllipse } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Position } from '../../models/Position';
 
-export class EllipseDrawingService extends BaseShapeDrawingService<Ellipse> implements IShapeDrawingService<Ellipse> {
-  private static instance: IShapeDrawingService<Ellipse> = null;
+export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse> implements ISvgShapeDrawingService<SvgEllipse> {
+  private static instance: ISvgShapeDrawingService<SvgEllipse> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
   }
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService<Ellipse> {
+  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgEllipse> {
     if (EllipseDrawingService.instance == null) {
       EllipseDrawingService.instance = new EllipseDrawingService(whiteboardDrawingService);
     }
@@ -59,12 +59,12 @@ export class EllipseDrawingService extends BaseShapeDrawingService<Ellipse> impl
 
   resize(shape: SvgEllipse): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.element.cx());
-    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.element.cy());
-    const newRx = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('rx'));
-    const newRy = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('ry'));
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.element.attr('stroke-width'));
-    shape.element.center(newCx, newCy).attr('rx', newRx).attr('ry', newRy).attr('stroke-width', strokeWidth);
+    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
+    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
+    const newRx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('rx'));
+    const newRy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('ry'));
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
+    shape.shape.center(newCx, newCy).attr('rx', newRx).attr('ry', newRy).attr('stroke-width', strokeWidth);
   }
 
   private createEllipse(position: Position): Ellipse {

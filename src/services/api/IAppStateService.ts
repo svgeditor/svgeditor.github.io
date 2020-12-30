@@ -1,11 +1,11 @@
 import { Svg } from '@svgdotjs/svg.js';
-import { ESvgElement } from '../../models/SvgElement';
+import { ESvgShape } from '../../models/SvgShape';
 import { WhiteboardWindow } from '../../models/WhiteboardLayers';
 import { ZoomLevel } from '../../models/ZoomLevel';
 
 export interface IAppStateService {
-  getShapeToDraw(): ESvgElement;
-  setShapeToDraw(shapeToDraw: ESvgElement): void;
+  getShapeToDraw(): ESvgShape;
+  setShapeToDraw(shapeToDraw: ESvgShape): void;
   getSvgRootElement(): Svg;
   setWhiteboardWindow(whiteboardWindow: WhiteboardWindow): void;
   getWhiteboardWindow(): WhiteboardWindow;
