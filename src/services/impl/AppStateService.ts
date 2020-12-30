@@ -9,7 +9,7 @@ export class AppStateService implements IAppStateService {
   private static instance: IAppStateService = new AppStateService();
   private whiteboardDimensions = new Dimensions(800, 1100);
   private whiteboardZoomLevel = new ZoomLevel();
-  private cursorFunction: ESvgElement = ESvgElement.RECTANGLE;
+  private shapeToDraw: ESvgElement = null;
   private whiteboardLayers: WhiteboardWindow;
 
   static getInstance(): IAppStateService {
@@ -27,10 +27,10 @@ export class AppStateService implements IAppStateService {
   }
 
   getShapeToDraw(): ESvgElement {
-    return this.cursorFunction;
+    return this.shapeToDraw;
   }
   setShapeToDraw(cursorFunction: ESvgElement): void {
-    this.cursorFunction = cursorFunction;
+    this.shapeToDraw = cursorFunction;
   }
 
   getInitialWhiteboardWidth(): number {

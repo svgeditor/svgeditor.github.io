@@ -77,7 +77,7 @@ export class LineDrawingService extends BaseShapeDrawingService<Line> implements
       .line(line.array())
       .move(line.x(), line.y())
       .addClass(constants.SELECTED_SHAPE_BORDER_CLASS_NAME)
-      .stroke({ color: constants.SELECTION_COLOR, width: 1 });
+      .stroke({ color: constants.SELECTION_BORDER_COLOR, width: 1 });
   }
 
   private createLineResizeGuide(shape: SvgLine, xAttributeName: string, yAttributeName: string): Shape {
@@ -99,6 +99,7 @@ export class LineDrawingService extends BaseShapeDrawingService<Line> implements
       };
       const handleMouseUp = () => {
         _this.redrawHoverGuide(shape);
+        _this.unselectAllShapes();
         _this.select(shape);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);

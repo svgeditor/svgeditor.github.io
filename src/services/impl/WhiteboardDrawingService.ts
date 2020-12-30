@@ -1,6 +1,5 @@
 import * as constants from '../../constants/constants';
 import { Circle, Ellipse, G, Line, Rect, Shape } from '@svgdotjs/svg.js';
-import { SELECTED_SHAPE_CLASS_NAME, SELECTED_SHAPE_GROUP_CLASS_NAME } from '../../constants/constants';
 import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
 import { RectangleDrawingService } from './RectangleDrawingService';
@@ -74,7 +73,29 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   }
 
   selectOnMouseDown(event: MouseEvent): void {
-    console.log('selectOnMouseDown');
+    const initialPosition = { x: event.offsetX, y: event.offsetY };
+    const rectangle = this.appStateService.getSvgRootElement().rect();
+    rectangle
+      .addClass(constants.SHAPE_CLASS_NAME)
+      .move(initialPosition.x, initialPosition.y)
+      .size(0, 0)
+      .fill(constants.SELECTION_COLOR)
+      .stroke({ color: constants.SELECTION_BORDER_COLOR, width: 1 });
+    const onMouseMove = (event: MouseEvent) => {
+      event.preventDefault();
+      const x = Math.min(event.offsetX, initialPosition.x);
+      const y = Math.min(event.offsetY, initialPosition.y);
+      const width = Math.abs(event.offsetX - initialPosition.x);
+      const height = Math.abs(event.offsetY - initialPosition.y);
+      rectangle.move(x, y).size(width, height);
+    };
+    const onMouseUp = () => {
+      rectangle.remove();
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   }
 
   move(event: MouseEvent, shape: SvgElement<Shape>): void {
@@ -116,8 +137,8 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   unselectAllShapes(): void {
     this.appStateService
       .getSvgRootElement()
-      .find(`.${SELECTED_SHAPE_CLASS_NAME}`)
-      .forEach((shape) => shape.removeClass(`${SELECTED_SHAPE_CLASS_NAME}`));
+      .find(`.${constants.SELECTED_SHAPE_CLASS_NAME}`)
+      .forEach((shape) => shape.removeClass(`${constants.SELECTED_SHAPE_CLASS_NAME}`));
     this.getSelectedShapesGroup().each(function () {
       this.remove();
     });
@@ -141,8 +162,8 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     let selectedShapeGroup = this.selectedShapeGroup;
     if (selectedShapeGroup) return selectedShapeGroup;
     const svg = this.appStateService.getSvgRootElement();
-    selectedShapeGroup = svg.findOne(`g.${SELECTED_SHAPE_GROUP_CLASS_NAME}`) as G;
-    if (!selectedShapeGroup) selectedShapeGroup = svg.group().addClass(`${SELECTED_SHAPE_GROUP_CLASS_NAME}`);
+    selectedShapeGroup = svg.findOne(`g.${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`) as G;
+    if (!selectedShapeGroup) selectedShapeGroup = svg.group().addClass(`${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`);
     this.selectedShapeGroup = selectedShapeGroup;
     return selectedShapeGroup;
   }
@@ -182,7 +203,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
         }
 
         .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME}:hover {
-          fill: ${constants.SELECTION_COLOR}
+          fill: ${constants.SELECTION_BORDER_COLOR}
         }
       /* ]]> */
     `;

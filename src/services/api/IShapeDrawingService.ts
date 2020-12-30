@@ -8,4 +8,5 @@ export interface IShapeDrawingService<T extends Shape> {
   resize(shape: SvgElement<T>): void;
   drawHoverGuide(shape: SvgElement<T>): void;
   redrawHoverGuide(shape: SvgElement<T>): void;
+  unselectAllShapes(): void;
 }

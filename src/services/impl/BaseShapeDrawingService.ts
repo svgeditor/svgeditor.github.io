@@ -21,7 +21,12 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     this.endMove = this.endMove.bind(this);
   }
 
+  unselectAllShapes(): void {
+    this.whiteboardDrawingService.unselectAllShapes();
+  }
+
   move(event: MouseEvent, shapeToMove: SvgElement<T>): void {
+    this.unselectAllShapes();
     this.select(shapeToMove);
     this.moveInProgressFlag = false;
     this.mousePosition = { x: event.clientX, y: event.clientY };
@@ -60,7 +65,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
         .removeClass(constants.SHAPE_CLASS_NAME)
         .addClass(constants.HOVER_SHAPE_CLASS_NAME)
         .fill('transparent')
-        .stroke({ color: constants.SELECTION_COLOR, width: zoomLevel.getZoomedValueFromInitialValue(1) })
+        .stroke({ color: constants.SELECTION_BORDER_COLOR, width: zoomLevel.getZoomedValueFromInitialValue(1) })
     );
   }
 
@@ -94,7 +99,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
       .move(shape.container.x(), shape.container.y())
       .size(shape.container.width(), shape.container.height())
       .fill('transparent')
-      .stroke({ color: constants.SELECTION_COLOR, width: 1, dasharray: constants.STROKE_DASH_ARRAY });
+      .stroke({ color: constants.SELECTION_BORDER_COLOR, width: 1, dasharray: constants.STROKE_DASH_ARRAY });
   }
 
   private createResizeGuideNW(shape: SvgElement<T>): Shape {
@@ -118,6 +123,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
         });
       };
       const handleMouseUp = () => {
+        _this.unselectAllShapes();
         _this.select(shape);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
@@ -147,6 +153,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
         });
       };
       const handleMouseUp = () => {
+        _this.unselectAllShapes();
         _this.select(shape);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
@@ -179,6 +186,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
         });
       };
       const handleMouseUp = () => {
+        _this.unselectAllShapes();
         _this.select(shape);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
@@ -208,6 +216,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
         });
       };
       const handleMouseUp = () => {
+        _this.unselectAllShapes();
         _this.select(shape);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
@@ -240,6 +249,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
         });
       };
       const handleMouseUp = () => {
+        _this.unselectAllShapes();
         _this.select(shape);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
@@ -269,6 +279,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
         });
       };
       const handleMouseUp = () => {
+        _this.unselectAllShapes();
         _this.select(shape);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
@@ -301,6 +312,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
         });
       };
       const handleMouseUp = () => {
+        _this.unselectAllShapes();
         _this.select(shape);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
@@ -330,6 +342,7 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
         });
       };
       const handleMouseUp = () => {
+        _this.unselectAllShapes();
         _this.select(shape);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
@@ -347,6 +360,6 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
       .circle(Math.min(this.getZoomedValue(8), 14))
       .cx(x).cy(y)
       .fill('white')
-      .stroke({ color: constants.SELECTION_COLOR, width: Math.min(this.getZoomedValue(), 3) });
+      .stroke({ color: constants.SELECTION_BORDER_COLOR, width: Math.min(this.getZoomedValue(), 3) });
   }
 }
