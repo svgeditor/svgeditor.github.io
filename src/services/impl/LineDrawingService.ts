@@ -4,7 +4,7 @@ import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseShapeDrawingService } from './BaseShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { SvgLine, SvgElement } from '../../models/SvgElement';
+import { SvgLine } from '../../models/SvgElement';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
@@ -15,8 +15,6 @@ export class LineDrawingService extends BaseShapeDrawingService<Line> implements
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
-    this.createOnMouseDownInProgress = this.createOnMouseDownInProgress.bind(this);
-    this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
   static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService<Line> {
@@ -26,26 +24,36 @@ export class LineDrawingService extends BaseShapeDrawingService<Line> implements
     return LineDrawingService.instance;
   }
 
-  private initialPosition: Position;
-  private shape: SvgLine;
-
   // prettier-ignore
   draw(event: MouseEvent): void {
-    const svg = this.appStateService.getSvgRootElement();
-    const container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
-    this.initialPosition = { x: event.offsetX, y: event.offsetY };
-    const shape = svg
-      .line(this.initialPosition.x, this.initialPosition.y, this.initialPosition.x, this.initialPosition.y)
-      .move(this.initialPosition.x, this.initialPosition.y);
-    container.add(shape);
-    shape
-      .addClass(constants.SHAPE_CLASS_NAME)
-      .move(event.offsetX, event.offsetY)
-      .fill('white')
-      .stroke({color: '#707070', width: this.getZoomedValue()});
-    document.addEventListener('mousemove', this.createOnMouseDownInProgress);
-    document.addEventListener('mouseup', this.endCreateOnMouseDown);
-    this.shape = new SvgElement(container, shape);
+    const _this = this;
+    const initialPosition = { x: event.offsetX, y: event.offsetY };
+    const container = _this.createContainer();
+    const line = _this.createLine(initialPosition);
+    const shape = new SvgLine(container, line);
+    container.add(line);
+
+    const onMouseMove = (event: MouseEvent) => {
+      event.preventDefault();
+      const x = event.offsetX;
+      const y = event.offsetY;
+      line.plot(initialPosition.x, initialPosition.y, x, y);
+    };
+
+    const onMouseUp = () => {
+      if (line.width() == 0 || line.height() == 0) {
+        container.remove();
+      } else {
+        document.dispatchEvent(UserActions.createCustomEvent(new AddShape(shape)));
+        _this.drawHoverGuide(shape);
+        setTimeout(() => _this.select(shape), 0);
+      }
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+    
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   }
 
   resize(shape: SvgLine): void {
@@ -111,22 +119,12 @@ export class LineDrawingService extends BaseShapeDrawingService<Line> implements
     return circle;
   }
 
-  private createOnMouseDownInProgress(event: MouseEvent): void {
-    event.preventDefault();
-    const x = event.offsetX;
-    const y = event.offsetY;
-    (this.shape.element as Line).plot(this.initialPosition.x, this.initialPosition.y, x, y);
-  }
-
-  private endCreateOnMouseDown(event: MouseEvent) {
-    if (this.shape.element.width() == 0 || this.shape.element.height() == 0) {
-      this.shape.container.remove();
-    } else {
-      document.dispatchEvent(UserActions.createCustomEvent(new AddShape(this.shape)));
-      this.drawHoverGuide(this.shape);
-      setTimeout(() => this.select(this.shape), 0);
-    }
-    document.removeEventListener('mousemove', this.createOnMouseDownInProgress);
-    document.removeEventListener('mouseup', this.endCreateOnMouseDown);
+  private createLine(position: Position): Line {
+    return this.appStateService
+      .getSvgRootElement()
+      .line(position.x, position.y, position.x, position.y)
+      .move(position.x, position.y)
+      .fill('white')
+      .stroke({ color: '#707070', width: this.getZoomedValue() });
   }
 }

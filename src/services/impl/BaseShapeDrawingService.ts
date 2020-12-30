@@ -74,6 +74,10 @@ export abstract class BaseShapeDrawingService<T extends Shape> implements IShape
     this.drawHoverGuide(shape);
   }
 
+  protected createContainer(): G {
+    return this.appStateService.getSvgRootElement().group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
+  }
+
   private moveInProgress(event: MouseEvent): void {
     if (!this.moveInProgressFlag) this.appStateService.getSvgRootElement().addClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
     this.moveInProgressFlag = true;

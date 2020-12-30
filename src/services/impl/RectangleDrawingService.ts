@@ -3,7 +3,7 @@ import { IShapeDrawingService } from '../api/IShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseShapeDrawingService } from './BaseShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { SvgRectangle, SvgElement } from '../../models/SvgElement';
+import { SvgRectangle } from '../../models/SvgElement';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
@@ -14,8 +14,6 @@ export class RectangleDrawingService extends BaseShapeDrawingService<Rect> imple
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
     super(AppStateService.getInstance(), whiteboardDrawingService);
-    this.createOnMouseDownInProgress = this.createOnMouseDownInProgress.bind(this);
-    this.endCreateOnMouseDown = this.endCreateOnMouseDown.bind(this);
   }
 
   static getInstance(whiteboardDrawingService: WhiteboardDrawingService): IShapeDrawingService<Rect> {
@@ -25,8 +23,38 @@ export class RectangleDrawingService extends BaseShapeDrawingService<Rect> imple
     return RectangleDrawingService.instance;
   }
 
-  private initialPosition: Position;
-  private shape: SvgRectangle;
+  draw(event: MouseEvent): void {
+    const _this = this;
+    const initialPosition = { x: event.offsetX, y: event.offsetY };
+    const container = _this.createContainer();
+    const rectangle = this.createRectangle(initialPosition);
+    const shape = new SvgRectangle(container, rectangle);
+    container.add(rectangle);
+
+    const onMouseMove = (event: MouseEvent) => {
+      event.preventDefault();
+      const x = Math.min(event.offsetX, initialPosition.x);
+      const y = Math.min(event.offsetY, initialPosition.y);
+      const width = Math.abs(event.offsetX - initialPosition.x);
+      const height = Math.abs(event.offsetY - initialPosition.y);
+      rectangle.move(x, y).size(width, height);
+    };
+
+    const onMouseUp = () => {
+      if (rectangle.width() == 0 || rectangle.height() == 0) {
+        container.remove();
+      } else {
+        document.dispatchEvent(UserActions.createCustomEvent(new AddShape(shape)));
+        _this.drawHoverGuide(shape);
+        setTimeout(() => _this.select(shape), 0);
+      }
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }
 
   resize(shape: SvgRectangle): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
@@ -38,43 +66,13 @@ export class RectangleDrawingService extends BaseShapeDrawingService<Rect> imple
     shape.element.move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
   }
 
-  // prettier-ignore
-  draw(event: MouseEvent): void {
-    const svg = this.appStateService.getSvgRootElement();
-    const container = svg.group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
-    const shape = svg.rect();
-    this.initialPosition = { x: event.offsetX, y: event.offsetY };
-    container.add(shape);
-    shape
+  private createRectangle(position: Position): Rect {
+    return this.appStateService
+      .getSvgRootElement()
+      .rect(0)
       .addClass(constants.SHAPE_CLASS_NAME)
-      .move(event.offsetX, event.offsetY)
-      .size(0, 0)
+      .move(position.x, position.y)
       .fill('white')
-      .stroke({color: '#707070', width: this.getZoomedValue()});
-    document.addEventListener('mousemove', this.createOnMouseDownInProgress);
-    document.addEventListener('mouseup', this.endCreateOnMouseDown);
-    this.shape = new SvgElement(container, shape);
-  }
-
-  private createOnMouseDownInProgress(event: MouseEvent): void {
-    event.preventDefault();
-    const x = Math.min(event.offsetX, this.initialPosition.x);
-    const y = Math.min(event.offsetY, this.initialPosition.y);
-    const width = Math.abs(event.offsetX - this.initialPosition.x);
-    const height = Math.abs(event.offsetY - this.initialPosition.y);
-    this.shape.element.move(x, y).size(width, height);
-  }
-
-  // prettier-ignore
-  private endCreateOnMouseDown(event: MouseEvent) {
-    if (this.shape.element.width() == 0 || this.shape.element.height() == 0) {
-      this.shape.container.remove();
-    } else {
-      document.dispatchEvent(UserActions.createCustomEvent(new AddShape(this.shape)));
-      this.drawHoverGuide(this.shape);
-      setTimeout(() => this.select(this.shape), 0);
-    }
-    document.removeEventListener('mousemove', this.createOnMouseDownInProgress);
-    document.removeEventListener('mouseup', this.endCreateOnMouseDown);
+      .stroke({ color: '#707070', width: this.getZoomedValue() });
   }
 }
