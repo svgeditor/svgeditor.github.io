@@ -16,7 +16,7 @@ export default class Navbar extends React.Component<INavbarProps, INavbarState> 
     return (
       <div className='navbar-container'>
         <img className='website-logo' src='/logo.png'></img>
-        <span className='website-name'>Draw SVG</span>
+        <span className='website-name'>SVG Editor</span>
         <span className='nav-item'>File</span>
         <span className='nav-item'>Edit</span>
         <span className='nav-item'>View</span>
