@@ -1,7 +1,8 @@
 :root {
   --left-sidebar-container-background-color: var(--color-scale-gray-5);
   --left-sidebar-container-border-color: var(--color-scale-gray-4);
-  --shape-background-color-on-hover-state: var(--color-scale-gray-4);
+  --shape-background-color-on-hover-state: var(--color-scale-gray-3);
+  --shape-background-color-on-selected-state: var(--color-scale-gray-4);
   --shape-icon-color: var(--color-scale-gray-2);
 }
 .left-sidebar-container {
@@ -28,7 +29,10 @@
       color: var(--shape-icon-color);
     }
 
-    &.selected-shape,
+    &.selected-shape {
+      background-color: var(--shape-background-color-on-selected-state);
+    }
+
     &:hover {
       background-color: var(--shape-background-color-on-hover-state);
     }
