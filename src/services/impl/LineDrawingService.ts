@@ -8,7 +8,7 @@ import { SvgLine } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { SelectShape } from '../../models/user-actions/SelectShape';
+import { SelectShapes } from '../../models/user-actions/SelectShapes';
 
 export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> implements ISvgShapeDrawingService<SvgLine> {
   private static instance: ISvgShapeDrawingService<SvgLine> = null;
@@ -75,7 +75,6 @@ export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> impl
     group.add(this.createLineResizeGuide(shape, 'x1', 'y1'));
     group.add(this.createLineResizeGuide(shape, 'x2', 'y2'));
     group.front();
-    document.dispatchEvent(UserActions.createCustomEvent(new SelectShape(shape)));
   }
 
   private createLineBorder(shape: SvgLine): Shape {

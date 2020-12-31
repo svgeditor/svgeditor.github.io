@@ -11,7 +11,7 @@ import { CircleDrawingService } from './CircleDrawingService';
 import { ESvgShape } from '../../models/SvgShape';
 import { EllipseDrawingService } from './EllipseDrawingService';
 import { LineDrawingService } from './LineDrawingService';
-import { SelectShape } from '../../models/user-actions/SelectShape';
+import { SelectShapes } from '../../models/user-actions/SelectShapes';
 
 export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private static instance: IWhiteboardDrawingService = new WhiteboardDrawingService();
@@ -58,29 +58,33 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     }
   }
 
-  select(shape: SvgShape<Shape>): void {
-    switch (true) {
-      case shape.shape instanceof Rect:
-        this.rectangleDrawingService.select(shape as SvgRectangle);
-        break;
-      case shape.shape instanceof Circle:
-        this.circleDrawingService.select(shape as SvgCircle);
-        break;
-      case shape.shape instanceof Ellipse:
-        this.ellipseDrawingService.select(shape as SvgEllipse);
-        break;
-      case shape.shape instanceof Line:
-        this.lineDrawingService.select(shape as SvgLine);
-        break;
-      default:
-      // nothing to do by default
-    }
-    document.dispatchEvent(UserActions.createCustomEvent(new SelectShape(shape)));
+  select(shapes: SvgShape<Shape>[]): void {
+    shapes.forEach((shape) => {
+      switch (true) {
+        case shape.shape instanceof Rect:
+          this.rectangleDrawingService.select(shape as SvgRectangle);
+          break;
+        case shape.shape instanceof Circle:
+          this.circleDrawingService.select(shape as SvgCircle);
+          break;
+        case shape.shape instanceof Ellipse:
+          this.ellipseDrawingService.select(shape as SvgEllipse);
+          break;
+        case shape.shape instanceof Line:
+          this.lineDrawingService.select(shape as SvgLine);
+          break;
+        default:
+        // nothing to do by default
+      }
+    });
+    document.dispatchEvent(UserActions.createCustomEvent(new SelectShapes(shapes)));
   }
 
   selectOnMouseDown(event: MouseEvent): void {
+    const _this = this;
     const initialPosition = { x: event.offsetX, y: event.offsetY };
     const rectangle = this.appStateService.getSvgRootElement().rect();
+    const allShapes = this.getAllShapes();
     rectangle
       .addClass(constants.SHAPE_CLASS_NAME)
       .move(initialPosition.x, initialPosition.y)
@@ -96,6 +100,9 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
       rectangle.move(x, y).size(width, height);
     };
     const onMouseUp = () => {
+      _this.unselectAllShapes();
+      const selectedShapes = [];
+      _this.select(allShapes.filter((shape) => shape.inside(rectangle)));
       rectangle.remove();
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
@@ -148,7 +155,9 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   }
 
   selectAllShapes(): void {
-    this.getAllShapes().forEach((shape) => this.select(shape));
+    const shapes = this.getAllShapes();
+    shapes.forEach((shape) => this.select([shape]));
+    document.dispatchEvent(UserActions.createCustomEvent(new SelectShapes(shapes)));
   }
 
   getAllShapes(): SvgShape<Shape>[] {

@@ -147,7 +147,7 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
     this.whiteboardDrawingService.unselectAllShapes();
     const target = event.target as HTMLElement;
     if (target.classList.contains(SHAPE_CLASS_NAME)) {
-      return this.whiteboardDrawingService.select(this.toShape(target));
+      return this.whiteboardDrawingService.select([this.toShape(target)]);
     }
   }
 

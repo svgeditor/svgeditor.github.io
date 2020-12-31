@@ -4,7 +4,7 @@ import { IAppStateService } from '../api/IAppStateService';
 import { SvgShape } from '../../models/SvgShape';
 import { G, Shape } from '@svgdotjs/svg.js';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { SelectShape } from '../../models/user-actions/SelectShape';
+import { SelectShapes } from '../../models/user-actions/SelectShapes';
 import { UserActions } from '../../models/user-actions/UserActions';
 
 export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> implements ISvgShapeDrawingService<T> {

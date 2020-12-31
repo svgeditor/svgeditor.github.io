@@ -14,7 +14,7 @@ import { SvgShape } from '../../models/SvgShape';
 import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { DeleteShapes } from '../../models/user-actions/DeleteShapes';
 import { IUserAction } from '../../models/user-actions/IUserAction';
-import { SelectShape } from '../../models/user-actions/SelectShape';
+import { SelectShapes } from '../../models/user-actions/SelectShapes';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { Shape } from '@svgdotjs/svg.js';
 import { SelectAllShapes } from '../../models/user-actions/SelectAllShapes';
@@ -198,8 +198,8 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
       case userAction instanceof UndoableUserAction:
         this.setState({ undoableUserActions: [...this.state.undoableUserActions, userAction as UndoableUserAction] });
         return;
-      case userAction instanceof SelectShape:
-        this.setState({ selectedShapes: [(userAction as SelectShape).shape] });
+      case userAction instanceof SelectShapes:
+        this.setState({ selectedShapes: [...(userAction as SelectShapes).shapes] });
         return;
       case userAction instanceof UnselectAllShapes:
         this.setState({ selectedShapes: [] });
