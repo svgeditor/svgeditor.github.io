@@ -103,7 +103,7 @@ export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> impl
       const handleMouseUp = () => {
         _this.redrawHoverGuide(line);
         _this.unselectAllShapes();
-        _this.select(line);
+        _this.whiteboardDrawingService.select([line]);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);

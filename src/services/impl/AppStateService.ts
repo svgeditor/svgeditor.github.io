@@ -9,7 +9,7 @@ export class AppStateService implements IAppStateService {
   private static instance: IAppStateService = new AppStateService();
   private whiteboardDimensions = new Dimensions(800, 1100);
   private whiteboardZoomLevel = new ZoomLevel();
-  private shapeToDraw: ESvgShape = null;
+  private shapeToDraw: ESvgShape = ESvgShape.RECTANGLE;
   private whiteboardLayers: WhiteboardWindow;
 
   static getInstance(): IAppStateService {

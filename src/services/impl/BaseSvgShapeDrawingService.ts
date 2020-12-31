@@ -132,7 +132,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       };
       const handleMouseUp = () => {
         _this.unselectAllShapes();
-        _this.select(shape);
+        _this.whiteboardDrawingService.select([shape]);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -162,7 +162,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       };
       const handleMouseUp = () => {
         _this.unselectAllShapes();
-        _this.select(shape);
+        _this.whiteboardDrawingService.select([shape]);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -195,7 +195,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       };
       const handleMouseUp = () => {
         _this.unselectAllShapes();
-        _this.select(shape);
+        _this.whiteboardDrawingService.select([shape]);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -228,7 +228,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       };
       const handleMouseUp = () => {
         _this.unselectAllShapes();
-        _this.select(shape);
+        _this.whiteboardDrawingService.select([shape]);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -264,7 +264,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       };
       const handleMouseUp = () => {
         _this.unselectAllShapes();
-        _this.select(shape);
+        _this.whiteboardDrawingService.select([shape]);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -297,7 +297,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       };
       const handleMouseUp = () => {
         _this.unselectAllShapes();
-        _this.select(shape);
+        _this.whiteboardDrawingService.select([shape]);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -330,7 +330,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       };
       const handleMouseUp = () => {
         _this.unselectAllShapes();
-        _this.select(shape);
+        _this.whiteboardDrawingService.select([shape]);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -360,7 +360,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       };
       const handleMouseUp = () => {
         _this.unselectAllShapes();
-        _this.select(shape);
+        _this.whiteboardDrawingService.select([shape]);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
