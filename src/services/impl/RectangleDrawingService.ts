@@ -8,12 +8,13 @@ import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Rect } from '@svgdotjs/svg.js';
+import { RandomIdService } from './RandomIdService';
 
 export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRectangle> implements ISvgShapeDrawingService<SvgRectangle> {
   private static instance: ISvgShapeDrawingService<SvgRectangle> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
-    super(AppStateService.getInstance(), whiteboardDrawingService);
+    super(AppStateService.getInstance(), whiteboardDrawingService, RandomIdService.getInstance());
   }
 
   static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgRectangle> {
@@ -56,14 +57,14 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     document.addEventListener('mouseup', onMouseUp);
   }
 
-  resize(shape: SvgRectangle): void {
+  resize(rectangle: SvgRectangle): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newX = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.x());
-    const newY = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.y());
-    const newW = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.width());
-    const newH = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.height());
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
-    shape.shape.move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
+    const newX = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().x());
+    const newY = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().y());
+    const newW = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().width());
+    const newH = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().height());
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().attr('stroke-width'));
+    rectangle.getShape().move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
   }
 
   private createRectangle(position: Position): Rect {

@@ -8,13 +8,13 @@ import { SvgLine } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { SelectShapes } from '../../models/user-actions/SelectShapes';
+import { RandomIdService } from './RandomIdService';
 
 export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> implements ISvgShapeDrawingService<SvgLine> {
   private static instance: ISvgShapeDrawingService<SvgLine> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
-    super(AppStateService.getInstance(), whiteboardDrawingService);
+    super(AppStateService.getInstance(), whiteboardDrawingService, RandomIdService.getInstance());
   }
 
   static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgLine> {
@@ -56,42 +56,39 @@ export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> impl
     document.addEventListener('mouseup', onMouseUp);
   }
 
-  resize(shape: SvgLine): void {
+  resize(line: SvgLine): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const line = shape.shape;
-    const newX1 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('x1'));
-    const newY1 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('y1'));
-    const newX2 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('x2'));
-    const newY2 = zoomLevel.getZoomedValueFromPreviousValue(line.attr('y2'));
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(line.attr('stroke-width'));
-    line.attr('x1', newX1).attr('y1', newY1).attr('x2', newX2).attr('y2', newY2).attr('stroke-width', strokeWidth);
+    const newX1 = zoomLevel.getZoomedValueFromPreviousValue(line.getShape().attr('x1'));
+    const newY1 = zoomLevel.getZoomedValueFromPreviousValue(line.getShape().attr('y1'));
+    const newX2 = zoomLevel.getZoomedValueFromPreviousValue(line.getShape().attr('x2'));
+    const newY2 = zoomLevel.getZoomedValueFromPreviousValue(line.getShape().attr('y2'));
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(line.getShape().attr('stroke-width'));
+    line.getShape().attr('x1', newX1).attr('y1', newY1).attr('x2', newX2).attr('y2', newY2).attr('stroke-width', strokeWidth);
   }
 
-  select(shape: SvgLine): void {
+  select(line: SvgLine): void {
     this.whiteboardDrawingService.unselectAllShapes();
-    shape.container.addClass(constants.SELECTED_SHAPE_CLASS_NAME);
+    line.getContainer().addClass(constants.SELECTED_SHAPE_CLASS_NAME);
     const group = this.whiteboardDrawingService.getSelectedShapesGroup();
-    group.add(this.createLineBorder(shape));
-    group.add(this.createLineResizeGuide(shape, 'x1', 'y1'));
-    group.add(this.createLineResizeGuide(shape, 'x2', 'y2'));
+    group.add(this.createLineBorder(line));
+    group.add(this.createLineResizeGuide(line, 'x1', 'y1'));
+    group.add(this.createLineResizeGuide(line, 'x2', 'y2'));
     group.front();
   }
 
-  private createLineBorder(shape: SvgLine): Shape {
-    const line = shape.shape;
+  private createLineBorder(line: SvgLine): Shape {
     return this.appStateService
       .getSvgRootElement()
-      .line(line.array())
-      .move(line.x(), line.y())
+      .line(line.getShape().array())
+      .move(line.getShape().x(), line.getShape().y())
       .addClass(constants.SELECTED_SHAPE_BORDER_CLASS_NAME)
       .stroke({ color: constants.SELECTION_BORDER_COLOR, width: 1 });
   }
 
-  private createLineResizeGuide(shape: SvgLine, xAttributeName: string, yAttributeName: string): Shape {
+  private createLineResizeGuide(line: SvgLine, xAttributeName: string, yAttributeName: string): Shape {
     const svg = this.appStateService.getSvgRootElement();
-    const line = shape.shape as Line;
-    const x = line.attr(xAttributeName);
-    const y = line.attr(yAttributeName);
+    const x = line.getShape().attr(xAttributeName);
+    const y = line.getShape().attr(yAttributeName);
     const circle = this.createResizeGuide(x, y);
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
@@ -102,12 +99,12 @@ export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> impl
         event.preventDefault();
         const newX = event.offsetX;
         const newY = event.offsetY;
-        line.attr(xAttributeName, newX).attr(yAttributeName, newY);
+        line.getShape().attr(xAttributeName, newX).attr(yAttributeName, newY);
       };
       const handleMouseUp = () => {
-        _this.redrawHoverGuide(shape);
+        _this.redrawHoverGuide(line);
         _this.unselectAllShapes();
-        _this.select(shape);
+        _this.select(line);
         svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);

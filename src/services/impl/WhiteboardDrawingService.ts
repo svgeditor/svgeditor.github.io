@@ -39,7 +39,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   }
 
   draw(shape: SvgShape<Shape>): void {
-    this.appStateService.getSvgRootElement().add(shape.container);
+    this.appStateService.getSvgRootElement().add(shape.getContainer());
   }
 
   drawOnMouseDown(event: MouseEvent): void {
@@ -61,16 +61,16 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   select(shapes: SvgShape<Shape>[]): void {
     shapes.forEach((shape) => {
       switch (true) {
-        case shape.shape instanceof Rect:
+        case shape.getShape() instanceof Rect:
           this.rectangleDrawingService.select(shape as SvgRectangle);
           break;
-        case shape.shape instanceof Circle:
+        case shape.getShape() instanceof Circle:
           this.circleDrawingService.select(shape as SvgCircle);
           break;
-        case shape.shape instanceof Ellipse:
+        case shape.getShape() instanceof Ellipse:
           this.ellipseDrawingService.select(shape as SvgEllipse);
           break;
-        case shape.shape instanceof Line:
+        case shape.getShape() instanceof Line:
           this.lineDrawingService.select(shape as SvgLine);
           break;
         default:
@@ -113,13 +113,13 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
 
   move(event: MouseEvent, shape: SvgShape<Shape>): void {
     switch (true) {
-      case shape.shape instanceof Rect:
+      case shape.getShape() instanceof Rect:
         return this.rectangleDrawingService.move(event, shape as SvgRectangle);
-      case shape.shape instanceof Circle:
+      case shape.getShape() instanceof Circle:
         return this.circleDrawingService.move(event, shape as SvgCircle);
-      case shape.shape instanceof Ellipse:
+      case shape.getShape() instanceof Ellipse:
         return this.ellipseDrawingService.move(event, shape as SvgEllipse);
-      case shape.shape instanceof Line:
+      case shape.getShape() instanceof Line:
         return this.lineDrawingService.move(event, shape as SvgLine);
       default:
       // nothing to do by default
@@ -168,15 +168,15 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   }
 
   bringToFront(shapes: SvgShape<Shape>[]): void {
-    shapes.forEach((shape) => shape.container.forward());
+    shapes.forEach((shape) => shape.getContainer().forward());
   }
 
   sendToBack(shapes: SvgShape<Shape>[]): void {
-    shapes.forEach((shape) => shape.container.backward());
+    shapes.forEach((shape) => shape.getContainer().backward());
   }
 
   delete(shapes: SvgShape<Shape>[]): void {
-    shapes.forEach((shape) => shape.container.remove());
+    shapes.forEach((shape) => shape.getContainer().remove());
     this.unselectAllShapes();
   }
 

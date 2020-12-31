@@ -11,7 +11,7 @@ export class AddShape extends UndoableUserAction {
 
   undo(): void {
     this.whiteboardDrawingService.unselectAllShapes();
-    this.shape.container.remove();
+    this.shape.getContainer().remove();
   }
 
   redo(): void {

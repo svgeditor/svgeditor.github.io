@@ -18,6 +18,6 @@ export class DeleteShapes extends UndoableUserAction {
   }
 
   redo(): void {
-    this.shapes.forEach((shape) => shape.container.remove());
+    this.shapes.forEach((shape) => shape.getContainer().remove());
   }
 }

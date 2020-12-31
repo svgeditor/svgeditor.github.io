@@ -8,12 +8,13 @@ import { SvgCircle } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Position } from '../../models/Position';
+import { RandomIdService } from './RandomIdService';
 
 export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> implements ISvgShapeDrawingService<SvgCircle> {
   private static instance: ISvgShapeDrawingService<SvgCircle> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
-    super(AppStateService.getInstance(), whiteboardDrawingService);
+    super(AppStateService.getInstance(), whiteboardDrawingService, RandomIdService.getInstance());
   }
 
   static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgCircle> {
@@ -56,13 +57,13 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
     document.addEventListener('mouseup', onMouseUp);
   }
 
-  resize(shape: SvgCircle): void {
+  resize(circle: SvgCircle): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
-    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
-    const newRadius = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('r'));
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
-    shape.shape.center(newCx, newCy).attr('r', newRadius).attr('stroke-width', strokeWidth);
+    const newCx = zoomLevel.getZoomedValueFromPreviousValue(circle.getShape().cx());
+    const newCy = zoomLevel.getZoomedValueFromPreviousValue(circle.getShape().cy());
+    const newRadius = zoomLevel.getZoomedValueFromPreviousValue(circle.getShape().attr('r'));
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(circle.getShape().attr('stroke-width'));
+    circle.getShape().center(newCx, newCy).attr('r', newRadius).attr('stroke-width', strokeWidth);
   }
 
   private createCircle(position: Position): Circle {

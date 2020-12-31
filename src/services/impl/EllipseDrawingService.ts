@@ -8,12 +8,13 @@ import { SvgEllipse } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Position } from '../../models/Position';
+import { RandomIdService } from './RandomIdService';
 
 export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse> implements ISvgShapeDrawingService<SvgEllipse> {
   private static instance: ISvgShapeDrawingService<SvgEllipse> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
-    super(AppStateService.getInstance(), whiteboardDrawingService);
+    super(AppStateService.getInstance(), whiteboardDrawingService, RandomIdService.getInstance());
   }
 
   static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgEllipse> {
@@ -57,14 +58,14 @@ export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse
     document.addEventListener('mouseup', onMouseUp);
   }
 
-  resize(shape: SvgEllipse): void {
+  resize(ellipse: SvgEllipse): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    const newCx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cx());
-    const newCy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.cy());
-    const newRx = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('rx'));
-    const newRy = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('ry'));
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(shape.shape.attr('stroke-width'));
-    shape.shape.center(newCx, newCy).attr('rx', newRx).attr('ry', newRy).attr('stroke-width', strokeWidth);
+    const newCx = zoomLevel.getZoomedValueFromPreviousValue(ellipse.getShape().cx());
+    const newCy = zoomLevel.getZoomedValueFromPreviousValue(ellipse.getShape().cy());
+    const newRx = zoomLevel.getZoomedValueFromPreviousValue(ellipse.getShape().attr('rx'));
+    const newRy = zoomLevel.getZoomedValueFromPreviousValue(ellipse.getShape().attr('ry'));
+    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(ellipse.getShape().attr('stroke-width'));
+    ellipse.getShape().center(newCx, newCy).attr('rx', newRx).attr('ry', newRy).attr('stroke-width', strokeWidth);
   }
 
   private createEllipse(position: Position): Ellipse {

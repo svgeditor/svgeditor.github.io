@@ -4,14 +4,17 @@ import { IAppStateService } from '../api/IAppStateService';
 import { SvgShape } from '../../models/SvgShape';
 import { G, Shape } from '@svgdotjs/svg.js';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { SelectShapes } from '../../models/user-actions/SelectShapes';
-import { UserActions } from '../../models/user-actions/UserActions';
+import { IRandomIdService } from '../api/IRandomIdService';
 
 export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> implements ISvgShapeDrawingService<T> {
   abstract draw(event: MouseEvent): void;
   abstract resize(shape: T): void;
 
-  constructor(protected appStateService: IAppStateService, protected whiteboardDrawingService: WhiteboardDrawingService) {}
+  constructor(
+    protected appStateService: IAppStateService,
+    protected whiteboardDrawingService: WhiteboardDrawingService,
+    protected randomIdService: IRandomIdService
+  ) {}
 
   unselectAllShapes(): void {
     this.whiteboardDrawingService.unselectAllShapes();
@@ -21,7 +24,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
     const _this = this;
     let moveInProgressFlag = false;
     let mousePosition = { x: event.clientX, y: event.clientY };
-    const shapeToMoveContainer = shapeToMove.container;
+    const shapeToMoveContainer = shapeToMove.getContainer();
     _this.unselectAllShapes();
     _this.select(shapeToMove);
 
@@ -48,7 +51,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   // prettier-ignore
   select(shape: T): void {
-    shape.container.addClass(constants.SELECTED_SHAPE_CLASS_NAME);
+    shape.getContainer().addClass(constants.SELECTED_SHAPE_CLASS_NAME);
     const group = this.whiteboardDrawingService.getSelectedShapesGroup();
     group.add(this.createBorder(shape));
     group.add(this.createResizeGuideNW(shape));
@@ -69,8 +72,9 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   drawHoverGuide(shape: T): void {
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
-    shape.container.add(
-      shape.shape
+    shape.getContainer().add(
+      shape
+        .getShape()
         .clone()
         .removeClass(constants.SHAPE_CLASS_NAME)
         .addClass(constants.HOVER_SHAPE_CLASS_NAME)
@@ -80,12 +84,19 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   }
 
   redrawHoverGuide(shape: T): void {
-    shape.container.find(`.${constants.HOVER_SHAPE_CLASS_NAME}`).forEach((shape) => shape.remove());
+    shape
+      .getContainer()
+      .find(`.${constants.HOVER_SHAPE_CLASS_NAME}`)
+      .forEach((shape) => shape.remove());
     this.drawHoverGuide(shape);
   }
 
+  // prettier-ignore
   protected createContainer(): G {
-    return this.appStateService.getSvgRootElement().group().addClass(constants.SHAPE_GROUP_CLASS_NAME);
+    return this.appStateService.getSvgRootElement()
+      .group()
+      .id(this.randomIdService.generate())
+      .addClass(constants.SHAPE_GROUP_CLASS_NAME);
   }
 
   private createBorder(shape: T): Shape {
@@ -93,29 +104,29 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       .getSvgRootElement()
       .rect()
       .addClass(constants.SELECTED_SHAPE_BORDER_CLASS_NAME)
-      .move(shape.container.x(), shape.container.y())
-      .size(shape.container.width(), shape.container.height())
+      .move(shape.getContainer().x(), shape.getContainer().y())
+      .size(shape.getContainer().width(), shape.getContainer().height())
       .fill('transparent')
       .stroke({ color: constants.SELECTION_BORDER_COLOR, width: 1, dasharray: constants.STROKE_DASH_ARRAY });
   }
 
   private createResizeGuideNW(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
-    const circle = this.createResizeGuide(shape.container.x(), shape.container.y());
+    const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
     circle.on('mousedown', () => {
       const _this = this;
       svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.container.x() + shape.container.width();
-      const shapeInitialY = shape.container.y() + shape.container.height();
+      const shapeInitialX = shape.getContainer().x() + shape.getContainer().width();
+      const shapeInitialY = shape.getContainer().y() + shape.getContainer().height();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.container.each(function () {
+        shape.getContainer().each(function () {
           this.move(x, y).size(width, height);
         });
       };
@@ -134,18 +145,18 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   private createResizeGuideN(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
-    const circle = this.createResizeGuide(shape.container.x() + shape.container.width() / 2, shape.container.y());
+    const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width() / 2, shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
     circle.on('mousedown', () => {
       const _this = this;
       svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialY = shape.container.y() + shape.container.height();
+      const shapeInitialY = shape.getContainer().y() + shape.getContainer().height();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const y = Math.min(event.offsetY, shapeInitialY);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.container.each(function () {
+        shape.getContainer().each(function () {
           this.y(y).height(height);
         });
       };
@@ -164,21 +175,21 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   private createResizeGuideNE(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
-    const circle = this.createResizeGuide(shape.container.x() + shape.container.width(), shape.container.y());
+    const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width(), shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
     circle.on('mousedown', () => {
       const _this = this;
       svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.container.x();
-      const shapeInitialY = shape.container.y() + shape.container.height();
+      const shapeInitialX = shape.getContainer().x();
+      const shapeInitialY = shape.getContainer().y() + shape.getContainer().height();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.container.each(function () {
+        shape.getContainer().each(function () {
           this.move(x, y).size(width, height);
         });
       };
@@ -197,18 +208,21 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   private createResizeGuideE(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
-    const circle = this.createResizeGuide(shape.container.x() + shape.container.width(), shape.container.y() + shape.container.height() / 2);
+    const circle = this.createResizeGuide(
+      shape.getContainer().x() + shape.getContainer().width(),
+      shape.getContainer().y() + shape.getContainer().height() / 2
+    );
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
     circle.on('mousedown', () => {
       const _this = this;
       svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.container.x();
+      const shapeInitialX = shape.getContainer().x();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const width = Math.abs(event.offsetX - shapeInitialX);
-        shape.container.each(function () {
+        shape.getContainer().each(function () {
           this.x(x).width(width);
         });
       };
@@ -227,21 +241,24 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   private createResizeGuideSE(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
-    const circle = this.createResizeGuide(shape.container.x() + shape.container.width(), shape.container.y() + shape.container.height());
+    const circle = this.createResizeGuide(
+      shape.getContainer().x() + shape.getContainer().width(),
+      shape.getContainer().y() + shape.getContainer().height()
+    );
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
     circle.on('mousedown', () => {
       const _this = this;
       svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.container.x();
-      const shapeInitialY = shape.container.y();
+      const shapeInitialX = shape.getContainer().x();
+      const shapeInitialY = shape.getContainer().y();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.container.each(function () {
+        shape.getContainer().each(function () {
           this.move(x, y).size(width, height);
         });
       };
@@ -260,18 +277,21 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   private createResizeGuideS(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
-    const circle = this.createResizeGuide(shape.container.x() + shape.container.width() / 2, shape.container.y() + shape.container.height());
+    const circle = this.createResizeGuide(
+      shape.getContainer().x() + shape.getContainer().width() / 2,
+      shape.getContainer().y() + shape.getContainer().height()
+    );
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
     circle.on('mousedown', () => {
       const _this = this;
       svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialY = shape.container.y();
+      const shapeInitialY = shape.getContainer().y();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const y = Math.min(event.offsetY, shapeInitialY);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.container.each(function () {
+        shape.getContainer().each(function () {
           this.y(y).height(height);
         });
       };
@@ -290,21 +310,21 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   private createResizeGuideSW(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
-    const circle = this.createResizeGuide(shape.container.x(), shape.container.y() + shape.container.height());
+    const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
     circle.on('mousedown', () => {
       const _this = this;
       svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.container.x() + shape.container.width();
-      const shapeInitialY = shape.container.y();
+      const shapeInitialX = shape.getContainer().x() + shape.getContainer().width();
+      const shapeInitialY = shape.getContainer().y();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        shape.container.each(function () {
+        shape.getContainer().each(function () {
           this.move(x, y).size(width, height);
         });
       };
@@ -323,18 +343,18 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   private createResizeGuideW(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
-    const circle = this.createResizeGuide(shape.container.x(), shape.container.y() + shape.container.height() / 2);
+    const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height() / 2);
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
     circle.on('mousedown', () => {
       const _this = this;
       svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      const shapeInitialX = shape.container.x() + shape.container.width();
+      const shapeInitialX = shape.getContainer().x() + shape.getContainer().width();
       const handleMouseMove = (event) => {
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const width = Math.abs(event.offsetX - shapeInitialX);
-        shape.container.each(function () {
+        shape.getContainer().each(function () {
           this.x(x).width(width);
         });
       };

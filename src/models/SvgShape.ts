@@ -1,7 +1,7 @@
 import { Circle, Ellipse, G, Line, Rect, Shape } from '@svgdotjs/svg.js';
 
 export class SvgShape<T extends Shape> {
-  constructor(public container: G, public shape: T) {}
+  constructor(private container: G, private shape: T) {}
 
   inside(rectangle: Rect): boolean {
     return (
@@ -10,6 +10,18 @@ export class SvgShape<T extends Shape> {
       this.shape.x() + this.shape.width() <= rectangle.x() + rectangle.width() &&
       this.shape.y() + this.shape.height() <= rectangle.y() + rectangle.height()
     );
+  }
+
+  getContainer(): G {
+    return this.container;
+  }
+
+  getShape(): T {
+    return this.shape;
+  }
+
+  getId(): string {
+    return this.container.id();
   }
 }
 
