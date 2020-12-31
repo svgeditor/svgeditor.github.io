@@ -23,6 +23,36 @@ export class SvgShape<T extends Shape> {
   getId(): string {
     return this.container.id();
   }
+
+  getName(): string {
+    switch (true) {
+      case this.shape instanceof Rect:
+        return 'Rectangle';
+      case this.shape instanceof Circle:
+        return 'Circle';
+      case this.shape instanceof Ellipse:
+        return 'Ellipse';
+      case this.shape instanceof Line:
+        return 'Line';
+      default:
+        return 'Shape';
+    }
+  }
+
+  getIconName(): string {
+    switch (true) {
+      case this.shape instanceof Rect:
+        return 'ph:rectangle-fill';
+      case this.shape instanceof Circle:
+        return 'clarity:circle-solid';
+      case this.shape instanceof Ellipse:
+        return 'mdi:ellipse';
+      case this.shape instanceof Line:
+        return 'la:slash';
+      default:
+        return 'Shape';
+    }
+  }
 }
 
 export class SvgRectangle extends SvgShape<Rect> {}

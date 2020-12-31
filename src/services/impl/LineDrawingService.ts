@@ -67,7 +67,6 @@ export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> impl
   }
 
   select(line: SvgLine): void {
-    this.whiteboardDrawingService.unselectAllShapes();
     line.getContainer().addClass(constants.SELECTED_SHAPE_CLASS_NAME);
     const group = this.whiteboardDrawingService.getSelectedShapesGroup();
     group.add(this.createLineBorder(line));

@@ -101,7 +101,6 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     };
     const onMouseUp = () => {
       _this.unselectAllShapes();
-      const selectedShapes = [];
       _this.select(allShapes.filter((shape) => shape.inside(rectangle)));
       rectangle.remove();
       document.removeEventListener('mousemove', onMouseMove);

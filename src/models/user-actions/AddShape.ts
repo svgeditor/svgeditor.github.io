@@ -5,7 +5,7 @@ import { SvgShape } from '../SvgShape';
 import { UndoableUserAction } from './IUndoableUserAction';
 
 export class AddShape extends UndoableUserAction {
-  constructor(private shape: SvgShape<Shape>, private whiteboardDrawingService: IWhiteboardDrawingService = WhiteboardDrawingService.getInstance()) {
+  constructor(public shape: SvgShape<Shape>, private whiteboardDrawingService: IWhiteboardDrawingService = WhiteboardDrawingService.getInstance()) {
     super();
   }
 
