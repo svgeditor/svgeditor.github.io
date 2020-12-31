@@ -47,7 +47,7 @@ export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse
       } else {
         document.dispatchEvent(UserActions.createCustomEvent(new AddShape(shape)));
         _this.drawHoverGuide(shape);
-        setTimeout(() => _this.select(shape), 0);
+        setTimeout(() => _this.whiteboardDrawingService.select([shape]), 0);
       }
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
