@@ -110,19 +110,33 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     document.addEventListener('mouseup', onMouseUp);
   }
 
-  move(event: MouseEvent, shape: SvgShape<Shape>): void {
-    switch (true) {
-      case shape.getShape() instanceof Rect:
-        return this.rectangleDrawingService.move(event, shape as SvgRectangle);
-      case shape.getShape() instanceof Circle:
-        return this.circleDrawingService.move(event, shape as SvgCircle);
-      case shape.getShape() instanceof Ellipse:
-        return this.ellipseDrawingService.move(event, shape as SvgEllipse);
-      case shape.getShape() instanceof Line:
-        return this.lineDrawingService.move(event, shape as SvgLine);
-      default:
-      // nothing to do by default
-    }
+  move(event: MouseEvent, shapes: SvgShape<Shape>[]): void {
+    const _this = this;
+    let moveInProgressFlag = false;
+    let mousePosition = { x: event.clientX, y: event.clientY };
+
+    const onMouseMove = (event: MouseEvent) => {
+      if (!moveInProgressFlag) _this.appStateService.getSvgRootElement().addClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      moveInProgressFlag = true;
+      event.preventDefault();
+      let previousMousePosition = { ...mousePosition };
+      mousePosition = { x: event.clientX, y: event.clientY };
+      shapes.forEach((shape) => {
+        const x = shape.getContainer().x() + (mousePosition.x - previousMousePosition.x);
+        const y = shape.getContainer().y() + (mousePosition.y - previousMousePosition.y);
+        shape.getContainer().move(x, y);
+      });
+    };
+
+    const onMouseUp = () => {
+      _this.appStateService.getSvgRootElement().removeClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      setTimeout(() => _this.select(shapes), 0);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   }
 
   resizeAllShapes(): void {
@@ -145,8 +159,8 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   unselectAllShapes(): void {
     this.appStateService
       .getSvgRootElement()
-      .find(`.${constants.SELECTED_SHAPE_CLASS_NAME}`)
-      .forEach((shape) => shape.removeClass(`${constants.SELECTED_SHAPE_CLASS_NAME}`));
+      .find(`.${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`)
+      .forEach((shape) => shape.removeClass(`${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`));
     this.getSelectedShapesGroup().each(function () {
       this.remove();
     });
@@ -166,6 +180,13 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
       .map((shape) => new SvgShape(shape.parent() as G, shape));
   }
 
+  getAllSelectedShapes(): SvgShape<Shape>[] {
+    return this.appStateService
+      .getSvgRootElement()
+      .find(`.${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`)
+      .map((group) => new SvgShape(group as G, group.findOne(`.${constants.SHAPE_CLASS_NAME}`) as Shape));
+  }
+
   bringToFront(shapes: SvgShape<Shape>[]): void {
     shapes.forEach((shape) => shape.getContainer().forward());
   }
@@ -183,8 +204,8 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     let selectedShapeGroup = this.selectedShapeGroup;
     if (selectedShapeGroup) return selectedShapeGroup;
     const svg = this.appStateService.getSvgRootElement();
-    selectedShapeGroup = svg.findOne(`g.${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`) as G;
-    if (!selectedShapeGroup) selectedShapeGroup = svg.group().addClass(`${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`);
+    selectedShapeGroup = svg.findOne(`g.${constants.SELECTED_SHAPES_GROUP_CLASS_NAME}`) as G;
+    if (!selectedShapeGroup) selectedShapeGroup = svg.group().addClass(`${constants.SELECTED_SHAPES_GROUP_CLASS_NAME}`);
     this.selectedShapeGroup = selectedShapeGroup;
     return selectedShapeGroup;
   }
@@ -204,7 +225,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
           opacity: 1;
         }
 
-        .${constants.SELECTED_SHAPE_GROUP_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
+        .${constants.SELECTED_SHAPES_GROUP_CLASS_NAME} .${constants.SELECTED_SHAPE_BORDER_CLASS_NAME} {
           pointer-events: none;
         }
 

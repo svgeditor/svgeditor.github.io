@@ -20,35 +20,9 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
     this.whiteboardDrawingService.unselectAllShapes();
   }
 
-  move(event: MouseEvent, shape: T): void {
-    const _this = this;
-    let moveInProgressFlag = false;
-    let mousePosition = { x: event.clientX, y: event.clientY };
-
-    const onMouseMove = (event: MouseEvent) => {
-      if (!moveInProgressFlag) _this.appStateService.getSvgRootElement().addClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      moveInProgressFlag = true;
-      event.preventDefault();
-      let previousMousePosition = { ...mousePosition };
-      mousePosition = { x: event.clientX, y: event.clientY };
-      const x = shape.getContainer().x() + (mousePosition.x - previousMousePosition.x);
-      const y = shape.getContainer().y() + (mousePosition.y - previousMousePosition.y);
-      shape.getContainer().move(x, y);
-    };
-
-    const onMouseUp = () => {
-      _this.appStateService.getSvgRootElement().removeClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  }
-
   // prettier-ignore
   select(shape: T): void {
-    shape.getContainer().addClass(constants.SELECTED_SHAPE_CLASS_NAME);
+    shape.getContainer().addClass(constants.SELECTED_SHAPE_GROUP_CLASS_NAME);
     const group = this.whiteboardDrawingService.getSelectedShapesGroup();
     group.add(this.createBorder(shape));
     group.add(this.createResizeGuideNW(shape));

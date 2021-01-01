@@ -1,8 +1,8 @@
 export const SHAPE_CLASS_NAME = 'svg-shape';
 export const SHAPE_GROUP_CLASS_NAME = 'svg-shape-group';
-export const SELECTED_SHAPE_CLASS_NAME = 'selected-svg-shape';
-export const SELECTED_SHAPE_BORDER_CLASS_NAME = 'selected-svg-shape-border';
 export const SELECTED_SHAPE_GROUP_CLASS_NAME = 'selected-svg-shape-group';
+export const SELECTED_SHAPE_BORDER_CLASS_NAME = 'selected-svg-shape-border';
+export const SELECTED_SHAPES_GROUP_CLASS_NAME = 'selected-svg-shapes-group';
 export const RESIZE_SHAPE_GUIDE_CLASS_NAME = 'resize-svg-shape-guide';
 export const MOVE_SHAPE_IN_PROGRESS_CLASS_NAME = 'move-svg-shape-in-progress';
 export const RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME = 'resize-svg-shape-in-progress';
