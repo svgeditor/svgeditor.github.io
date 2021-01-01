@@ -20,13 +20,10 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
     this.whiteboardDrawingService.unselectAllShapes();
   }
 
-  move(event: MouseEvent, shapeToMove: T): void {
+  move(event: MouseEvent, shape: T): void {
     const _this = this;
     let moveInProgressFlag = false;
     let mousePosition = { x: event.clientX, y: event.clientY };
-    const shapeToMoveContainer = shapeToMove.getContainer();
-    _this.unselectAllShapes();
-    _this.select(shapeToMove);
 
     const onMouseMove = (event: MouseEvent) => {
       if (!moveInProgressFlag) _this.appStateService.getSvgRootElement().addClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
@@ -34,9 +31,9 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       event.preventDefault();
       let previousMousePosition = { ...mousePosition };
       mousePosition = { x: event.clientX, y: event.clientY };
-      const x = shapeToMoveContainer.x() + (mousePosition.x - previousMousePosition.x);
-      const y = shapeToMoveContainer.y() + (mousePosition.y - previousMousePosition.y);
-      shapeToMoveContainer.move(x, y);
+      const x = shape.getContainer().x() + (mousePosition.x - previousMousePosition.x);
+      const y = shape.getContainer().y() + (mousePosition.y - previousMousePosition.y);
+      shape.getContainer().move(x, y);
     };
 
     const onMouseUp = () => {
