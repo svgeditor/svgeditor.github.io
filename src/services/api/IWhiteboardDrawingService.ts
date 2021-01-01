@@ -12,6 +12,7 @@ export interface IWhiteboardDrawingService {
   sendToBack(shapes: SvgShape<Shape>[]): void;
   resizeAllShapes(): void;
   unselectAllShapes(): void;
+  unselectAllShapesToSelectNewShape(): void;
   selectAllShapes(): void;
   getAllShapes(): SvgShape<Shape>[];
   getAllSelectedShapes(): SvgShape<Shape>[];

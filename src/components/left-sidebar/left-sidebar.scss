@@ -8,6 +8,7 @@
 .left-sidebar-container {
   background-color: var(--left-sidebar-container-background-color);
   border-right: var(--container-border-width) solid var(--left-sidebar-container-border-color);
+  overflow: auto;
 
   & .shapes-container {
     display: flex;

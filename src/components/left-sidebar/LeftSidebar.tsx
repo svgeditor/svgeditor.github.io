@@ -49,7 +49,7 @@ export default class LeftSidebar extends React.Component<ILeftSidebarProps, ILef
 
   private renderShapes() {
     return (
-      <div className='shapes-container'>
+      <div className='sidebar-body shapes-container'>
         {this.state.shapes.map((shape) => {
           return (
             <div className={this.getShapeClassNames(shape)} onClick={() => this.handleShapeClick(shape)} key={shape.getId()}>
@@ -63,7 +63,7 @@ export default class LeftSidebar extends React.Component<ILeftSidebarProps, ILef
   }
 
   private handleShapeClick(shape: SvgShape<Shape>) {
-    this.whiteboardDrawingService.unselectAllShapes();
+    this.whiteboardDrawingService.unselectAllShapesToSelectNewShape();
     this.whiteboardDrawingService.select([shape]);
   }
 

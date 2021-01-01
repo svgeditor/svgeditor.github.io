@@ -100,7 +100,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
       rectangle.move(x, y).size(width, height);
     };
     const onMouseUp = () => {
-      _this.unselectAllShapes();
+      _this.unselectAllShapesToSelectNewShape();
       _this.select(allShapes.filter((shape) => shape.inside(rectangle)));
       rectangle.remove();
       document.removeEventListener('mousemove', onMouseMove);
@@ -157,6 +157,11 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   }
 
   unselectAllShapes(): void {
+    this.unselectAllShapesToSelectNewShape();
+    document.dispatchEvent(UserActions.createCustomEvent(new UnselectAllShapes()));
+  }
+
+  unselectAllShapesToSelectNewShape(): void {
     this.appStateService
       .getSvgRootElement()
       .find(`.${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`)
@@ -164,7 +169,6 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     this.getSelectedShapesGroup().each(function () {
       this.remove();
     });
-    document.dispatchEvent(UserActions.createCustomEvent(new UnselectAllShapes()));
   }
 
   selectAllShapes(): void {
