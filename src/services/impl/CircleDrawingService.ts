@@ -1,4 +1,4 @@
-import { Circle } from '@svgdotjs/svg.js';
+import { Circle, Shape } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
 import { ISvgShapeDrawingService } from '../api/ISvgShapeDrawingService';
 import { AppStateService } from './AppStateService';
@@ -67,6 +67,146 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
     const newRadius = zoomLevel.getZoomedValueFromPreviousValue(circle.getShape().attr('r'));
     const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(circle.getShape().attr('stroke-width'));
     circle.getShape().center(newCx, newCy).attr('r', newRadius).attr('stroke-width', strokeWidth);
+  }
+
+  // prettier-ignore
+  protected createResizeGuideNW(shape: SvgCircle): Shape {
+    const svg = this.appStateService.getSvgRootElement();
+    const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y());
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
+    circle.css('cursor', 'nwse-resize');
+    circle.on('mousedown', () => {
+      const _this = this;
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialX = shape.getContainer().x() + shape.getContainer().width();
+      const shapeInitialY = shape.getContainer().y() + shape.getContainer().height();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const width = Math.abs(event.offsetX - shapeInitialX);
+        const height = Math.abs(event.offsetY - shapeInitialY);
+        const radius = Math.max(width / 2, height / 2);
+        const cx = event.offsetX < shapeInitialX  ? shapeInitialX - radius : shapeInitialX + radius;
+        const cy = event.offsetY < shapeInitialY ? shapeInitialY - radius : shapeInitialY + radius;
+        shape.getContainer().each(function () {
+          this.radius(radius).center(cx, cy);
+        });
+      };
+      const handleMouseUp = () => {
+        _this.unselectAllShapes();
+        _this.whiteboardDrawingService.select([shape]);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
+    return circle;
+  }
+
+  protected createResizeGuideNE(shape: SvgCircle): Shape {
+    const svg = this.appStateService.getSvgRootElement();
+    const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width(), shape.getContainer().y());
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
+    circle.css('cursor', 'nesw-resize');
+    circle.on('mousedown', () => {
+      const _this = this;
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialX = shape.getContainer().x();
+      const shapeInitialY = shape.getContainer().y() + shape.getContainer().height();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const width = Math.abs(event.offsetX - shapeInitialX);
+        const height = Math.abs(event.offsetY - shapeInitialY);
+        const radius = Math.max(width / 2, height / 2);
+        const cx = event.offsetX < shapeInitialX ? shapeInitialX - radius : shapeInitialX + radius;
+        const cy = event.offsetY < shapeInitialY ? shapeInitialY - radius : shapeInitialY + radius;
+        shape.getContainer().each(function () {
+          this.radius(radius).center(cx, cy);
+        });
+      };
+      const handleMouseUp = () => {
+        _this.unselectAllShapes();
+        _this.whiteboardDrawingService.select([shape]);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
+    return circle;
+  }
+
+  protected createResizeGuideSE(shape: SvgCircle): Shape {
+    const svg = this.appStateService.getSvgRootElement();
+    const circle = this.createResizeGuide(
+      shape.getContainer().x() + shape.getContainer().width(),
+      shape.getContainer().y() + shape.getContainer().height()
+    );
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
+    circle.css('cursor', 'nwse-resize');
+    circle.on('mousedown', () => {
+      const _this = this;
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialX = shape.getContainer().x();
+      const shapeInitialY = shape.getContainer().y();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const width = Math.abs(event.offsetX - shapeInitialX);
+        const height = Math.abs(event.offsetY - shapeInitialY);
+        const radius = Math.max(width / 2, height / 2);
+        const cx = event.offsetX < shapeInitialX ? shapeInitialX - radius : shapeInitialX + radius;
+        const cy = event.offsetY < shapeInitialY ? shapeInitialY - radius : shapeInitialY + radius;
+        shape.getContainer().each(function () {
+          this.radius(radius).center(cx, cy);
+        });
+      };
+      const handleMouseUp = () => {
+        _this.unselectAllShapes();
+        _this.whiteboardDrawingService.select([shape]);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
+    return circle;
+  }
+
+  protected createResizeGuideSW(shape: SvgCircle): Shape {
+    const svg = this.appStateService.getSvgRootElement();
+    const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height());
+    circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
+    circle.css('cursor', 'nesw-resize');
+    circle.on('mousedown', () => {
+      const _this = this;
+      svg.addClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      const shapeInitialX = shape.getContainer().x() + shape.getContainer().width();
+      const shapeInitialY = shape.getContainer().y();
+      const handleMouseMove = (event) => {
+        event.preventDefault();
+        const width = Math.abs(event.offsetX - shapeInitialX);
+        const height = Math.abs(event.offsetY - shapeInitialY);
+        const radius = Math.max(width / 2, height / 2);
+        const cx = event.offsetX < shapeInitialX ? shapeInitialX - radius : shapeInitialX + radius;
+        const cy = event.offsetY < shapeInitialY ? shapeInitialY - radius : shapeInitialY + radius;
+        shape.getContainer().each(function () {
+          this.radius(radius).center(cx, cy);
+        });
+      };
+      const handleMouseUp = () => {
+        _this.unselectAllShapes();
+        _this.whiteboardDrawingService.select([shape]);
+        svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    });
+    return circle;
   }
 
   private createCircle(position: Position): Circle {
