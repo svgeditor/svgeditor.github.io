@@ -27,6 +27,7 @@ export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> impl
   // prettier-ignore
   draw(event: MouseEvent): void {
     const _this = this;
+    this.whiteboardDrawingService.unselectAllShapes();
     const initialPosition = { x: event.offsetX, y: event.offsetY };
     const container = _this.createContainer();
     const line = _this.createLine(initialPosition);
@@ -47,7 +48,6 @@ export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> impl
         document.dispatchEvent(UserActions.createCustomEvent(new AddShape(shape)));
         _this.drawHoverGuide(shape);
         setTimeout(() => {
-          _this.whiteboardDrawingService.unselectAllShapesToSelectNewShape();
           _this.whiteboardDrawingService.select([shape]);
         }, 0);
       }
@@ -72,13 +72,13 @@ export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> impl
   select(line: SvgLine): void {
     line.getContainer().addClass(constants.SELECTED_SHAPE_GROUP_CLASS_NAME);
     const group = this.whiteboardDrawingService.getSelectedShapesGroup();
-    group.add(this.createLineBorder(line));
+    group.add(this.createBorder(line));
     group.add(this.createLineResizeGuide(line, 'x1', 'y1'));
     group.add(this.createLineResizeGuide(line, 'x2', 'y2'));
     group.front();
   }
 
-  private createLineBorder(line: SvgLine): Shape {
+  createBorder(line: SvgLine): Shape {
     return this.appStateService
       .getSvgRootElement()
       .line(line.getShape().array())

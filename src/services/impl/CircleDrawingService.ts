@@ -26,6 +26,7 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
 
   draw(event: MouseEvent): void {
     const _this = this;
+    this.whiteboardDrawingService.unselectAllShapes();
     const initialPosition = { x: event.offsetX, y: event.offsetY };
     const container = _this.createContainer();
     const circle = _this.createCircle(initialPosition);
@@ -49,7 +50,6 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
         document.dispatchEvent(UserActions.createCustomEvent(new AddShape(shape)));
         _this.drawHoverGuide(shape);
         setTimeout(() => {
-          _this.whiteboardDrawingService.unselectAllShapesToSelectNewShape();
           _this.whiteboardDrawingService.select([shape]);
         }, 0);
       }

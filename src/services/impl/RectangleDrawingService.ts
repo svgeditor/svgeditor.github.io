@@ -26,6 +26,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
 
   draw(event: MouseEvent): void {
     const _this = this;
+    this.whiteboardDrawingService.unselectAllShapes();
     const initialPosition = { x: event.offsetX, y: event.offsetY };
     const container = _this.createContainer();
     const rectangle = this.createRectangle(initialPosition);
@@ -48,7 +49,6 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
         document.dispatchEvent(UserActions.createCustomEvent(new AddShape(shape)));
         _this.drawHoverGuide(shape);
         setTimeout(() => {
-          _this.whiteboardDrawingService.unselectAllShapesToSelectNewShape();
           _this.whiteboardDrawingService.select([shape]);
         }, 0);
       }

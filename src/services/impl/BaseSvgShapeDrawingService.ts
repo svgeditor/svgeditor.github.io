@@ -70,7 +70,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       .addClass(constants.SHAPE_GROUP_CLASS_NAME);
   }
 
-  private createBorder(shape: T): Shape {
+  protected createBorder(shape: T): Shape {
     return this.appStateService
       .getSvgRootElement()
       .rect()
@@ -81,7 +81,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
       .stroke({ color: constants.SELECTION_BORDER_COLOR, width: 1, dasharray: constants.STROKE_DASH_ARRAY });
   }
 
-  private createResizeGuideNW(shape: T): Shape {
+  protected createResizeGuideNW(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -114,7 +114,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
     return circle;
   }
 
-  private createResizeGuideN(shape: T): Shape {
+  protected createResizeGuideN(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width() / 2, shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -144,7 +144,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
     return circle;
   }
 
-  private createResizeGuideNE(shape: T): Shape {
+  protected createResizeGuideNE(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width(), shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -177,7 +177,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
     return circle;
   }
 
-  private createResizeGuideE(shape: T): Shape {
+  protected createResizeGuideE(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width(),
@@ -210,7 +210,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
     return circle;
   }
 
-  private createResizeGuideSE(shape: T): Shape {
+  protected createResizeGuideSE(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width(),
@@ -246,7 +246,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
     return circle;
   }
 
-  private createResizeGuideS(shape: T): Shape {
+  protected createResizeGuideS(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width() / 2,
@@ -279,7 +279,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
     return circle;
   }
 
-  private createResizeGuideSW(shape: T): Shape {
+  protected createResizeGuideSW(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -312,7 +312,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
     return circle;
   }
 
-  private createResizeGuideW(shape: T): Shape {
+  protected createResizeGuideW(shape: T): Shape {
     const svg = this.appStateService.getSvgRootElement();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height() / 2);
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);

@@ -27,6 +27,7 @@ export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse
   // prettier-ignore
   draw(event: MouseEvent): void {
     const _this = this;
+    this.whiteboardDrawingService.unselectAllShapes();
     const initialPosition = { x: event.offsetX, y: event.offsetY };
     const container = _this.createContainer();
     const ellipse = _this.createEllipse(initialPosition);
@@ -49,7 +50,6 @@ export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse
         document.dispatchEvent(UserActions.createCustomEvent(new AddShape(shape)));
         _this.drawHoverGuide(shape);
         setTimeout(() => {
-          _this.whiteboardDrawingService.unselectAllShapesToSelectNewShape();
           _this.whiteboardDrawingService.select([shape]);
         }, 0);
       }
