@@ -1,6 +1,6 @@
 import './right-sidebar.scss';
 import * as React from 'react';
-import { SvgShape } from '../../models/SvgShape';
+import { ESvgShape, SvgShape } from '../../models/SvgShape';
 import { Circle, Ellipse, Line, Rect, Shape } from '@svgdotjs/svg.js';
 import WhiteboardProperties from './whiteboard-properties/WhiteboardProperties';
 import ShapesProperties from './shapes-properties/ShapesProperties';
@@ -12,16 +12,23 @@ import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
 import { SelectShapes } from '../../models/user-actions/SelectShapes';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
+import { IAppStateService } from '../../services/api/IAppStateService';
+import { AppStateService } from '../../services/impl/AppStateService';
 
-export interface IRightSidebarProps {}
+export interface IRightSidebarProps {
+  appStateService?: IAppStateService;
+}
 
 export interface IRightSidebarState {
   selectedShapes: SvgShape<Shape>[];
 }
 
 export default class RightSidebar extends React.Component<IRightSidebarProps, IRightSidebarState> {
+  private appStateService: IAppStateService;
+
   constructor(props: IRightSidebarProps) {
     super(props);
+    this.appStateService = this.props.appStateService ? this.props.appStateService : AppStateService.getInstance();
 
     this.state = {
       selectedShapes: [],
@@ -29,7 +36,12 @@ export default class RightSidebar extends React.Component<IRightSidebarProps, IR
   }
 
   public render() {
-    return <div className='right-sidebar-container'>{this.getComponentToRender()}</div>;
+    return (
+      <div className='right-sidebar-container'>
+        <WhiteboardProperties></WhiteboardProperties>
+        {this.getShapePropertiesComponent()}
+      </div>
+    );
   }
 
   public componentDidMount() {
@@ -48,9 +60,20 @@ export default class RightSidebar extends React.Component<IRightSidebarProps, IR
     }
   }
 
-  private getComponentToRender() {
+  private getShapePropertiesComponent() {
     if (this.state.selectedShapes.length == 0) {
-      return <WhiteboardProperties></WhiteboardProperties>;
+      switch (this.appStateService.getShapeToDraw()) {
+        case ESvgShape.RECTANGLE:
+          return <RectangleProperties></RectangleProperties>;
+        case ESvgShape.CIRCLE:
+          return <CircleProperties></CircleProperties>;
+        case ESvgShape.ELLIPSE:
+          return <EllipseProperties></EllipseProperties>;
+        case ESvgShape.LINE:
+          return <LineProperties></LineProperties>;
+        default:
+          return null;
+      }
     }
     if (this.state.selectedShapes.length > 1) {
       return <ShapesProperties></ShapesProperties>;
@@ -66,7 +89,7 @@ export default class RightSidebar extends React.Component<IRightSidebarProps, IR
       case selectedShape.getShape() instanceof Line:
         return <LineProperties></LineProperties>;
       default:
-        return <WhiteboardProperties></WhiteboardProperties>;
+        return null;
     }
   }
 }

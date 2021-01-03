@@ -1,5 +1,6 @@
 import './whiteboard-properties.scss';
 import * as React from 'react';
+import SidebarSection from '../../sidebar-section/SidebarSection';
 
 export interface IWhiteboardPropertiesProps {}
 
@@ -13,11 +14,6 @@ export default class WhiteboardProperties extends React.Component<IWhiteboardPro
   }
 
   public render() {
-    return (
-      <div>
-        <h2 className='sidebar-title'>Whiteboard Properties</h2>
-        <div className='sidebar-body'></div>
-      </div>
-    );
+    return <SidebarSection title='Whiteboard Properties' isOpen={false}></SidebarSection>;
   }
 }

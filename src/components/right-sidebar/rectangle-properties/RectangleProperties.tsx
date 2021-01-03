@@ -1,5 +1,6 @@
 import './rectangle-properties.scss';
 import * as React from 'react';
+import SidebarSection from '../../sidebar-section/SidebarSection';
 
 export interface IRectanglePropertiesProps {}
 
@@ -13,11 +14,6 @@ export default class RectangleProperties extends React.Component<IRectanglePrope
   }
 
   public render() {
-    return (
-      <div>
-        <h2 className='sidebar-title'>Rectangle Properties</h2>
-        <div className='sidebar-body'></div>
-      </div>
-    );
+    return <SidebarSection title='Rectangle Properties' withBorderTop={true}></SidebarSection>;
   }
 }

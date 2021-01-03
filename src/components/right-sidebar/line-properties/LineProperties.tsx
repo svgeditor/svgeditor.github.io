@@ -1,5 +1,6 @@
 import './line-properties.scss';
 import * as React from 'react';
+import SidebarSection from '../../sidebar-section/SidebarSection';
 
 export interface ILinePropertiesProps {}
 
@@ -13,11 +14,6 @@ export default class LineProperties extends React.Component<ILinePropertiesProps
   }
 
   public render() {
-    return (
-      <div>
-        <h2 className='sidebar-title'>Line Properties</h2>
-        <div className='sidebar-body'></div>
-      </div>
-    );
+    return <SidebarSection title='Line Properties' withBorderTop={true}></SidebarSection>;
   }
 }

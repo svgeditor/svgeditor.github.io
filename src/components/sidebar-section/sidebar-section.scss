@@ -10,6 +10,18 @@
 
   & .sidebar-title-container {
     position: relative;
+    border-bottom: 1px solid var(--section-title-border-color);
+
+    &.with-border-top {
+      border-bottom: 1px solid var(--section-title-border-color);
+    }
+  }
+
+  & .sidebar-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.8rem 0;
   }
 
   & .sidebar-title-icon {

@@ -1,9 +1,11 @@
 import './sidebar-section.scss';
 import * as React from 'react';
+import classNames from 'classnames';
 
 export interface ISidebarSectionProps {
   title: string;
   isOpen?: boolean;
+  withBorderTop?: boolean;
 }
 
 export interface ISidebarSectionState {
@@ -14,14 +16,15 @@ export default class SidebarSection extends React.Component<ISidebarSectionProps
   constructor(props: ISidebarSectionProps) {
     super(props);
     this.state = {
-      isOpen: this.props.isOpen || true,
+      isOpen: this.props.isOpen !== undefined ? this.props.isOpen : true,
     };
   }
 
   public render() {
+    const titleClassNames = classNames('sidebar-title-container', { 'with-border-top': this.props.withBorderTop });
     return (
       <div className='sidebar-section-container'>
-        <div className='sidebar-title-container'>
+        <div className={titleClassNames}>
           {this.state.isOpen && (
             <span className='sidebar-title-icon' onClick={() => this.setState({ isOpen: false })}>
               <span className='iconify' data-icon='fe:arrow-down' data-inline='false'></span>

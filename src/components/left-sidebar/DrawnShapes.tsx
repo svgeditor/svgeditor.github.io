@@ -37,7 +37,7 @@ export default class DrawnShapes extends React.Component<IDrawnShapesProps, IDra
 
   public render() {
     return (
-      <SidebarSection title='Shapes'>
+      <SidebarSection title='Drawn Shapes' withBorderTop={true}>
         <div className='drawn-shapes-container'>
           {this.state.shapes.map((shape) => {
             return (

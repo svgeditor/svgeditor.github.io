@@ -1,5 +1,6 @@
 import './shapes-properties.scss';
 import * as React from 'react';
+import SidebarSection from '../../sidebar-section/SidebarSection';
 
 export interface IShapesPropertiesProps {}
 
@@ -13,11 +14,6 @@ export default class ShapesProperties extends React.Component<IShapesPropertiesP
   }
 
   public render() {
-    return (
-      <div>
-        <h2 className='sidebar-title'>Shapes Properties</h2>
-        <div className='sidebar-body'></div>
-      </div>
-    );
+    return <SidebarSection title='Shapes Properties' withBorderTop={true}></SidebarSection>;
   }
 }

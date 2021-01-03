@@ -1,6 +1,7 @@
 import './left-sidebar.scss';
 import * as React from 'react';
 import DrawnShapes from './DrawnShapes';
+import ShapesToDraw from './ShapesToDraw';
 
 export interface ILeftSidebarProps {}
 
@@ -15,6 +16,7 @@ export default class LeftSidebar extends React.Component<ILeftSidebarProps, ILef
   public render() {
     return (
       <div className='left-sidebar-container'>
+        <ShapesToDraw></ShapesToDraw>
         <DrawnShapes></DrawnShapes>
       </div>
     );
