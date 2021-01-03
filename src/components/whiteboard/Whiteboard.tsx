@@ -167,7 +167,9 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
       if (allSelectedShapes.length > 1) {
         this.whiteboardDrawingService.move(event, allSelectedShapes);
       } else {
-        this.whiteboardDrawingService.move(event, [this.toShape(target)]);
+        const shapeToMove = this.toShape(target);
+        this.whiteboardDrawingService.select([shapeToMove]);
+        this.whiteboardDrawingService.move(event, [shapeToMove]);
       }
     }
   }
