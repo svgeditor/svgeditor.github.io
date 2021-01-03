@@ -1,0 +1,23 @@
+:root {
+  --shape-background-color-on-hover-state: var(--color-scale-gray-3);
+  --shape-background-color-on-selected-state: var(--color-scale-gray-4);
+  --shape-icon-color: var(--color-scale-gray-2);
+  --sidebar-title-icon-color: var(--color-scale-gray-1);
+}
+.sidebar-section-container {
+  display: flex;
+  flex-direction: column;
+
+  & .sidebar-title-container {
+    position: relative;
+  }
+
+  & .sidebar-title-icon {
+    font-size: 2rem;
+    position: absolute;
+    top: 0.75rem;
+    left: 1rem;
+    color: var(--sidebar-title-icon-color);
+    cursor: pointer;
+  }
+}
