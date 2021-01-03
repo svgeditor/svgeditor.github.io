@@ -233,7 +233,9 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
           pointer-events: none;
         }
 
+        .${constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_SHAPE_BORDER_RADIUS_GUIDE_CLASS_NAME},
         .${constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME},
+        .${constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_SHAPE_BORDER_RADIUS_GUIDE_CLASS_NAME},
         .${constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME} .${constants.RESIZE_SHAPE_GUIDE_CLASS_NAME} {
           opacity: 0;
         }
