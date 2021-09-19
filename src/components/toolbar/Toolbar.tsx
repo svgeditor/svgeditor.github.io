@@ -1,6 +1,6 @@
 import './toolbar.scss';
 import * as React from 'react';
-import { IAppStateService } from '../../services/api/IAppStateService';
+import { IAppStateService } from '../../services/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
 import UserActionIcon from '../user-action-icon/UserActionIcon';
 import { UndoableUserAction } from '../../models/user-actions/IUndoableUserAction';

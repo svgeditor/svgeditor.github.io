@@ -61,3 +61,10 @@
   top: 2rem;
   left: 0;
 }
+
+.whiteboard-svg,
+.whiteboard-grid {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}

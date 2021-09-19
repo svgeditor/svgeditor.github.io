@@ -1,12 +1,16 @@
 .whiteboard-properties-container {
   border-bottom: 1px solid var(--sidebar-body-border-color);
-  padding: 0 1rem;
+  padding: 1rem 2rem 1rem 1.5rem;
 
   & .property {
-    padding: 0.8rem 0;
+    padding-bottom: 0.8rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    &:last-child {
+      padding-bottom: 0;
+    }
 
     & .label {
       font-size: 1.3rem;

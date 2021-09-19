@@ -8,7 +8,7 @@ import { AddShape } from '../../models/user-actions/AddShape';
 import { DeleteShapes } from '../../models/user-actions/DeleteShapes';
 import { SelectShapes } from '../../models/user-actions/SelectShapes';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
-import { IWhiteboardDrawingService } from '../../services/api/IWhiteboardDrawingService';
+import { IWhiteboardDrawingService } from '../../services/IWhiteboardDrawingService';
 import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingService';
 import SidebarSection from '../sidebar-section/SidebarSection';
 

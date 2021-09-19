@@ -1,6 +1,6 @@
 import { Circle, Shape } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
-import { ISvgShapeDrawingService } from '../api/ISvgShapeDrawingService';
+import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';

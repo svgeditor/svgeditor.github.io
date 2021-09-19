@@ -1,5 +1,5 @@
 import { Shape } from '@svgdotjs/svg.js';
-import { SvgShape } from '../../models/SvgShape';
+import { SvgShape } from '../models/SvgShape';
 
 export interface ISvgShapeDrawingService<T extends SvgShape<Shape>> {
   draw(event: MouseEvent): void;

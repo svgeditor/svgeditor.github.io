@@ -1,10 +1,10 @@
 import * as constants from '../../constants/constants';
-import { ISvgShapeDrawingService } from '../api/ISvgShapeDrawingService';
-import { IAppStateService } from '../api/IAppStateService';
+import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
+import { IAppStateService } from '../IAppStateService';
 import { SvgShape } from '../../models/SvgShape';
 import { G, Shape } from '@svgdotjs/svg.js';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { IRandomIdService } from '../api/IRandomIdService';
+import { IRandomIdService } from '../IRandomIdService';
 
 export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> implements ISvgShapeDrawingService<T> {
   abstract draw(event: MouseEvent): void;

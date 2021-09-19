@@ -1,5 +1,5 @@
 import { Shape } from '@svgdotjs/svg.js';
-import { IWhiteboardDrawingService } from '../../services/api/IWhiteboardDrawingService';
+import { IWhiteboardDrawingService } from '../../services/IWhiteboardDrawingService';
 import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingService';
 import { SvgShape } from '../SvgShape';
 import { UndoableUserAction } from './IUndoableUserAction';

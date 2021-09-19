@@ -2,7 +2,7 @@ import { Svg } from '@svgdotjs/svg.js';
 import { Dimensions } from '../../models/Dimensions';
 import { ESvgShape } from '../../models/SvgShape';
 import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZoomLevel, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
-import { IAppStateService } from '../api/IAppStateService';
+import { IAppStateService } from '../IAppStateService';
 import { WhiteboardWindow } from '../../models/WhiteboardLayers';
 
 export class AppStateService implements IAppStateService {

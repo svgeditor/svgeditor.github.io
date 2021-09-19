@@ -1,4 +1,4 @@
-import { IRandomIdService } from '../api/IRandomIdService';
+import { IRandomIdService } from '../IRandomIdService';
 
 export class RandomIdService implements IRandomIdService {
   private static instance: IRandomIdService = new RandomIdService();

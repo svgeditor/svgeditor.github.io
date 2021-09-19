@@ -1,14 +1,14 @@
 import './whiteboard.scss';
 import * as React from 'react';
-import { IAppStateService } from '../../services/api/IAppStateService';
+import { IAppStateService } from '../../services/IAppStateService';
 import { G, Shape, SVG } from '@svgdotjs/svg.js';
-import { IWhiteboardDrawingService } from '../../services/api/IWhiteboardDrawingService';
+import { IWhiteboardDrawingService } from '../../services/IWhiteboardDrawingService';
 import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingService';
 import { AppStateService } from '../../services/impl/AppStateService';
-import { IWhiteboardGridService } from '../../services/api/IWhiteboardGridService';
+import { IWhiteboardGridService } from '../../services/IWhiteboardGridService';
 import { WhiteboardGridService } from '../../services/impl/WhiteboardGridService';
 import { WhiteboardWindow } from '../../models/WhiteboardLayers';
-import { IWhiteboardWindowService } from '../../services/api/IWhiteboardWindowService';
+import { IWhiteboardWindowService } from '../../services/IWhiteboardWindowService';
 import { WhiteboardWindowService } from '../../services/impl/WhiteboardWindowService';
 import { SHAPE_CLASS_NAME, USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
@@ -18,7 +18,7 @@ import { ZoomOutWhiteboard } from '../../models/user-actions/ZoomOutWhiteboard';
 import { BringShapesToFront } from '../../models/user-actions/BringShapesToFront';
 import { SendShapesToBack } from '../../models/user-actions/SendShapesToBack';
 import { SvgShape } from '../../models/SvgShape';
-import { IWhiteboardRulerService } from '../../services/api/IWhiteboardRulerService';
+import { IWhiteboardRulerService } from '../../services/IWhiteboardRulerService';
 import { WhiteboardRulerService } from '../../services/impl/WhiteboardRulerService';
 import { SelectAllShapes } from '../../models/user-actions/SelectAllShapes';
 import { AddWhiteboardGrid } from '../../models/user-actions/AddWhiteboardGrid';
@@ -36,6 +36,8 @@ export interface IWhiteboardState {}
 
 export default class Whiteboard extends React.Component<IWhiteboardProps, IWhiteboardState> {
   private whiteboard: HTMLElement;
+  private whiteboardGrid: HTMLElement;
+  private whiteboardSvg: HTMLElement;
   private whiteboardWindow: HTMLElement;
   private whiteboardBackground: HTMLElement;
   private whiteboardVerticalRuler: HTMLElement;
@@ -75,7 +77,10 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
               <div className='ruler' ref={(ref) => (this.whiteboardVerticalRuler = ref)}></div>
             </div>
           </div>
-          <div ref={(ref) => (this.whiteboard = ref)} className='whiteboard-container'></div>
+          <div ref={(ref) => (this.whiteboard = ref)} className='whiteboard-container'>
+            <div ref={(ref) => (this.whiteboardGrid = ref)} className='whiteboard-grid'></div>
+            <div ref={(ref) => (this.whiteboardSvg = ref)} className='whiteboard-svg'></div>
+          </div>
         </div>
       </div>
     );
@@ -124,11 +129,12 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
   }
 
   private initWhiteboardWindow(): void {
-    const svgRootElement = SVG().addTo(this.whiteboard).size('100%', '100%');
+    const svgRootElement = SVG().addTo(this.whiteboardSvg).size('100%', '100%');
     svgRootElement.element('style').words(this.whiteboardDrawingService.getStyles());
     this.appStateService.setWhiteboardWindow(
       new WhiteboardWindow(
         this.whiteboard,
+        this.whiteboardGrid,
         this.whiteboardWindow,
         this.whiteboardBackground,
         this.whiteboardVerticalRuler,

@@ -1,7 +1,7 @@
 import * as constants from '../../constants/constants';
 import { Circle, Ellipse, G, Line, Rect, Shape } from '@svgdotjs/svg.js';
-import { ISvgShapeDrawingService } from '../api/ISvgShapeDrawingService';
-import { IWhiteboardDrawingService } from '../api/IWhiteboardDrawingService';
+import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
+import { IWhiteboardDrawingService } from '../IWhiteboardDrawingService';
 import { RectangleDrawingService } from './RectangleDrawingService';
 import { AppStateService } from './AppStateService';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';

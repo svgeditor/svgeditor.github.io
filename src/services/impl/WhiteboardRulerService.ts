@@ -1,4 +1,4 @@
-import { IWhiteboardRulerService } from '../api/IWhiteboardRulerService';
+import { IWhiteboardRulerService } from '../IWhiteboardRulerService';
 import { AppStateService } from './AppStateService';
 import { GRID_SIZE, RULER_COLOR, RULER_WIDTH, WHITEBOARD_MARGIN } from '../../constants/constants';
 

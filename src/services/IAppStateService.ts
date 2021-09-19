@@ -1,7 +1,7 @@
 import { Svg } from '@svgdotjs/svg.js';
-import { ESvgShape } from '../../models/SvgShape';
-import { WhiteboardWindow } from '../../models/WhiteboardLayers';
-import { ZoomLevel } from '../../models/ZoomLevel';
+import { ESvgShape } from '../models/SvgShape';
+import { WhiteboardWindow } from '../models/WhiteboardLayers';
+import { ZoomLevel } from '../models/ZoomLevel';
 
 export interface IAppStateService {
   getShapeToDraw(): ESvgShape;
