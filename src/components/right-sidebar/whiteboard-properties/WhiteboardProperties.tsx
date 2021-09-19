@@ -4,11 +4,12 @@ import SidebarSection from '../../sidebar-section/SidebarSection';
 import { UserActions } from '../../../models/user-actions/UserActions';
 import { AddWhiteboardGrid } from '../../../models/user-actions/AddWhiteboardGrid';
 import { RemoveWhiteboardGrid } from '../../../models/user-actions/RemoveWhiteboardGrid';
+import { Switch } from '@mui/material';
 
 export interface IWhiteboardPropertiesProps {}
 
 export interface IWhiteboardPropertiesState {
-  grid: boolean;
+  withGrid: boolean;
 }
 
 export default class WhiteboardProperties extends React.Component<IWhiteboardPropertiesProps, IWhiteboardPropertiesState> {
@@ -16,7 +17,7 @@ export default class WhiteboardProperties extends React.Component<IWhiteboardPro
     super(props);
 
     this.state = {
-      grid: true,
+      withGrid: true,
     };
   }
 
@@ -26,20 +27,20 @@ export default class WhiteboardProperties extends React.Component<IWhiteboardPro
         <div className='whiteboard-properties-container'>
           <div className='property'>
             <p className='label'>Grid</p>
-            <input checked={this.state.grid} onChange={this.handleGridInputChange.bind(this)} type='checkbox' />
+            <Switch size='small' checked={this.state.withGrid} onChange={this.handleGridSwitchChangeEvent.bind(this)} />
           </div>
         </div>
       </SidebarSection>
     );
   }
 
-  private handleGridInputChange(event) {
+  private handleGridSwitchChangeEvent(event) {
     if (event?.nativeEvent?.target?.checked) {
       document.dispatchEvent(UserActions.createCustomEvent(new AddWhiteboardGrid()));
-      this.setState({ grid: true });
+      this.setState({ withGrid: true });
     } else {
       document.dispatchEvent(UserActions.createCustomEvent(new RemoveWhiteboardGrid()));
-      this.setState({ grid: false });
+      this.setState({ withGrid: false });
     }
   }
 }
