@@ -54,14 +54,20 @@ export class AppStateService implements IAppStateService {
   }
 
   increaseWhiteboardZoomLevel() {
-    if (this.whiteboardZoomLevel.currentPercentageZoom >= MAX_ZOOM_PERCENTAGE) return;
+    if (this.whiteboardZoomLevel.currentPercentageZoom == MAX_ZOOM_PERCENTAGE) {
+      this.whiteboardZoomLevel.previousPercentageZoom = MAX_ZOOM_PERCENTAGE;
+      return;
+    }
     const currentPercentageZoom = this.whiteboardZoomLevel.currentPercentageZoom;
     this.whiteboardZoomLevel.previousPercentageZoom = currentPercentageZoom;
     this.whiteboardZoomLevel.currentPercentageZoom = currentPercentageZoom + ZOOM_PERCENTAGE_STEP;
   }
 
   decreaseWhiteboardZoomLevel() {
-    if (this.whiteboardZoomLevel.currentPercentageZoom <= MIN_ZOOM_PERCENTAGE) return;
+    if (this.whiteboardZoomLevel.currentPercentageZoom == MIN_ZOOM_PERCENTAGE) {
+      this.whiteboardZoomLevel.previousPercentageZoom = MIN_ZOOM_PERCENTAGE;
+      return;
+    }
     const currentPercentageZoom = this.whiteboardZoomLevel.currentPercentageZoom;
     this.whiteboardZoomLevel.previousPercentageZoom = currentPercentageZoom;
     this.whiteboardZoomLevel.currentPercentageZoom = currentPercentageZoom - ZOOM_PERCENTAGE_STEP;

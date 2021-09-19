@@ -73,7 +73,9 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     const newW = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().width());
     const newH = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().height());
     const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().attr('stroke-width'));
-    rectangle.getShape().move(newX, newY).size(newW, newH).attr('stroke-width', strokeWidth);
+    const rx = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().attr('rx'));
+    const ry = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().attr('ry'));
+    rectangle.getShape().move(newX, newY).size(newW, newH).attr('rx', rx).attr('ry', ry).attr('stroke-width', strokeWidth);
   }
 
   protected createResizeGuideNW(shape: SvgRectangle): Shape {

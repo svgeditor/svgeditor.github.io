@@ -45,10 +45,18 @@ export class WhiteboardWindowService implements IWhiteboardWindowService {
   }
 
   centerOnZoomIn(event?: MouseEvent): void {
+    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    if (zoomLevel.currentPercentageZoom == zoomLevel.previousPercentageZoom) {
+      return;
+    }
     this.continueScrollToSouthEast(this.getWhiteboardZoomScroll(event));
   }
 
   centerOnZoomOut(event?: MouseEvent): void {
+    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    if (zoomLevel.currentPercentageZoom == zoomLevel.previousPercentageZoom) {
+      return;
+    }
     this.continueScrollToNorthWest(this.getWhiteboardZoomScroll(event));
   }
 
