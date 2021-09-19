@@ -21,6 +21,8 @@ import { SvgShape } from '../../models/SvgShape';
 import { IWhiteboardRulerService } from '../../services/api/IWhiteboardRulerService';
 import { WhiteboardRulerService } from '../../services/impl/WhiteboardRulerService';
 import { SelectAllShapes } from '../../models/user-actions/SelectAllShapes';
+import { AddWhiteboardGrid } from '../../models/user-actions/AddWhiteboardGrid';
+import { RemoveWhiteboardGrid } from '../../models/user-actions/RemoveWhiteboardGrid';
 
 export interface IWhiteboardProps {
   appStateService?: IAppStateService;
@@ -112,6 +114,10 @@ export default class Whiteboard extends React.Component<IWhiteboardProps, IWhite
         return this.whiteboardDrawingService.sendToBack((userAction as SendShapesToBack).shapes);
       case userAction instanceof SelectAllShapes:
         return this.whiteboardDrawingService.selectAllShapes();
+      case userAction instanceof AddWhiteboardGrid:
+        return this.whiteboardGridService.add();
+      case userAction instanceof RemoveWhiteboardGrid:
+        return this.whiteboardGridService.remove();
       default:
       // no thing to do here!
     }

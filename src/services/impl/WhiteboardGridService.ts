@@ -12,11 +12,24 @@ export class WhiteboardGridService implements IWhiteboardGridService {
     return WhiteboardGridService.instance;
   }
 
-  resize(): void {
+  init(): void {
     const whiteboardWindow = this.appStateService.getWhiteboardWindow();
     const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
     const gridSize = zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE);
     whiteboardWindow.whiteboard.style.backgroundImage = `url(data:image/svg+xml;base64,${this.getGridBase64(gridSize)})`;
+  }
+
+  resize(): void {
+    this.init();
+  }
+
+  add(): void {
+    this.init();
+  }
+
+  remove(): void {
+    const whiteboardWindow = this.appStateService.getWhiteboardWindow();
+    whiteboardWindow.whiteboard.style.backgroundImage = 'none';
   }
 
   private getGridBase64(gridSize: number) {
