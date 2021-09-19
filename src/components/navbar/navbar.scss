@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: space-between;
 
-  & .navbar-left-container {
+  & .navbar-left {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -54,22 +54,8 @@
     }
   }
 
-  & .navbar-right-container {
-    padding-right: 1.5rem;
-    font-style: italic;
-    font-weight: 600;
-    font-size: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    color: magenta;
-
-    & a {
-      color: var(--primary-color);
-    }
-
-    & a:hover {
-      color: var(--primary-color);
-    }
+  & .navbar-left,
+  & .navbar-right {
+    flex: 1;
   }
 }

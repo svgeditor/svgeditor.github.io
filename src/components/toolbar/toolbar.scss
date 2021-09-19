@@ -8,7 +8,6 @@
 }
 .toolbar-container {
   background-color: var(--toolbar-container-background-color);
-  border-bottom: var(--container-border-width) solid var(--toolbar-container-border-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -19,7 +18,7 @@
 
   & .icons-separator {
     margin: 0 1rem;
-    height: 70%;
+    height: 2rem;
     width: 0.2rem;
     border-radius: 100rem;
     background-color: var(--icons-separator-background-color);

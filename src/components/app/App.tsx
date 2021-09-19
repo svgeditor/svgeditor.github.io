@@ -21,7 +21,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
     return (
       <div className='app-container'>
         <Navbar></Navbar>
-        <Toolbar></Toolbar>
         <RightSidebar></RightSidebar>
         <Whiteboard></Whiteboard>
         <LeftSidebar></LeftSidebar>

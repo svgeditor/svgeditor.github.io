@@ -4,7 +4,7 @@
     width: 100vw;
     display: grid;
     grid-template-columns: 27rem 1fr 27rem;
-    grid-template-rows: 5.5rem 3.8rem 1fr;
+    grid-template-rows: 5rem 1fr;
   }
 
   .navbar-container {
@@ -12,24 +12,19 @@
     grid-row: 1;
   }
 
-  .toolbar-container {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-
   .left-sidebar-container {
     grid-column: 1;
-    grid-row: 3;
+    grid-row: 2;
   }
 
   .whiteboard-window-container {
     grid-column: 2;
-    grid-row: 3;
+    grid-row: 2;
   }
 
   .right-sidebar-container {
     grid-column: 3;
-    grid-row: 3;
+    grid-row: 2;
   }
 }
 
@@ -39,7 +34,7 @@
     width: 100vw;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 4.5rem 3.8rem 1fr;
+    grid-template-rows: 4.5rem 1fr;
   }
 
   .navbar-container {
@@ -47,13 +42,8 @@
     grid-row: 1;
   }
 
-  .toolbar-container {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
   .whiteboard-window-container {
     grid-column: 1;
-    grid-row: 3;
+    grid-row: 2;
   }
 }
