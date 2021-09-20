@@ -3,8 +3,8 @@
     height: 100vh;
     width: 100vw;
     display: grid;
-    grid-template-columns: 27rem 1fr 27rem;
-    grid-template-rows: 5rem 1fr;
+    grid-template-columns: 32rem 1fr 32rem;
+    grid-template-rows: 5rem 1fr 27rem;
   }
 
   .navbar-container {
@@ -17,14 +17,24 @@
     grid-row: 2;
   }
 
+  .left-ads-container {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
   .whiteboard-window-container {
     grid-column: 2;
-    grid-row: 2;
+    grid-row: 2 / -1;
   }
 
   .right-sidebar-container {
     grid-column: 3;
     grid-row: 2;
+  }
+
+  .right-ads-container {
+    grid-column: 3;
+    grid-row: 3;
   }
 }
 

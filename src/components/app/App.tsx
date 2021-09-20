@@ -1,10 +1,11 @@
 import './app.scss';
 import * as React from 'react';
-import Toolbar from '../toolbar/Toolbar';
 import Whiteboard from '../whiteboard/Whiteboard';
 import LeftSidebar from '../left-sidebar/LeftSidebar';
 import RightSidebar from '../right-sidebar/RightSidebar';
 import Navbar from '../navbar/Navbar';
+import LeftAds from '../ads/LeftAds';
+import RightAds from '../ads/RightAds';
 
 export interface IAppProps {}
 
@@ -21,9 +22,11 @@ export default class App extends React.Component<IAppProps, IAppState> {
     return (
       <div className='app-container'>
         <Navbar></Navbar>
-        <RightSidebar></RightSidebar>
-        <Whiteboard></Whiteboard>
         <LeftSidebar></LeftSidebar>
+        <LeftAds></LeftAds>
+        <Whiteboard></Whiteboard>
+        <RightSidebar></RightSidebar>
+        <RightAds></RightAds>
       </div>
     );
   }
