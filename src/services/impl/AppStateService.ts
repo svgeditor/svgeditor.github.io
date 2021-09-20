@@ -1,5 +1,5 @@
 import { Svg } from '@svgdotjs/svg.js';
-import { Dimensions } from '../../models/Dimensions';
+import { Size } from '../../models/Size';
 import { ESvgShape } from '../../models/SvgShape';
 import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZoomLevel, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
 import { IAppStateService } from '../IAppStateService';
@@ -7,16 +7,29 @@ import { WhiteboardWindow } from '../../models/WhiteboardLayers';
 
 export class AppStateService implements IAppStateService {
   private static instance: IAppStateService = new AppStateService();
-  private whiteboardDimensions = new Dimensions(800, 1100);
+  private whiteboardDimensions = new Size(800, 1100);
   private whiteboardZoomLevel = new ZoomLevel();
   private shapeToDraw: ESvgShape = ESvgShape.RECTANGLE;
   private whiteboardLayers: WhiteboardWindow;
+  private zoomLevel = new ZoomLevel();
 
   static getInstance(): IAppStateService {
     return AppStateService.instance;
   }
 
   private constructor() {}
+
+  getGridSize(): number {
+    return 10;
+  }
+
+  getGridBackgroundColor(): string {
+    return '#fff';
+  }
+
+  getGridColor(): string {
+    return '#00000022';
+  }
 
   setWhiteboardWindow(layers: WhiteboardWindow): void {
     this.whiteboardLayers = layers;
@@ -71,5 +84,44 @@ export class AppStateService implements IAppStateService {
     const currentPercentageZoom = this.whiteboardZoomLevel.currentPercentageZoom;
     this.whiteboardZoomLevel.previousPercentageZoom = currentPercentageZoom;
     this.whiteboardZoomLevel.currentPercentageZoom = currentPercentageZoom - ZOOM_PERCENTAGE_STEP;
+  }
+
+  getWhiteboardSize(zoomedValue = false): Size {
+    if (zoomedValue) {
+      return this.zoomLevel.getZoomedSize(new Size(800, 1100));
+    }
+    return new Size(800, 1100);
+  }
+
+  getZoomLevel(): ZoomLevel {
+    return this.zoomLevel;
+  }
+
+  increaseZoomLevel() {
+    if (this.zoomLevel.currentPercentageZoom == MAX_ZOOM_PERCENTAGE) {
+      this.zoomLevel.previousPercentageZoom = MAX_ZOOM_PERCENTAGE;
+      return;
+    }
+    const currentPercentageZoom = this.zoomLevel.currentPercentageZoom;
+    this.zoomLevel.previousPercentageZoom = currentPercentageZoom;
+    this.zoomLevel.currentPercentageZoom = currentPercentageZoom + ZOOM_PERCENTAGE_STEP;
+  }
+
+  decreaseZoomLevel() {
+    if (this.zoomLevel.currentPercentageZoom == MIN_ZOOM_PERCENTAGE) {
+      this.zoomLevel.previousPercentageZoom = MIN_ZOOM_PERCENTAGE;
+      return;
+    }
+    const currentPercentageZoom = this.zoomLevel.currentPercentageZoom;
+    this.zoomLevel.previousPercentageZoom = currentPercentageZoom;
+    this.zoomLevel.currentPercentageZoom = currentPercentageZoom - ZOOM_PERCENTAGE_STEP;
+  }
+
+  getRulerWidth(): number {
+    return 20;
+  }
+
+  getRulerColor(): string {
+    return '#00000044';
   }
 }

@@ -6,6 +6,7 @@ import RightSidebar from '../right-sidebar/RightSidebar';
 import Navbar from '../navbar/Navbar';
 import LeftAds from '../ads/LeftAds';
 import RightAds from '../ads/RightAds';
+import Workspace from '../workspace/Workspace';
 
 export interface IAppProps {}
 
@@ -24,7 +25,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
         <Navbar></Navbar>
         <LeftSidebar></LeftSidebar>
         <LeftAds></LeftAds>
-        <Whiteboard></Whiteboard>
+        <Workspace></Workspace>
         <RightSidebar></RightSidebar>
         <RightAds></RightAds>
       </div>

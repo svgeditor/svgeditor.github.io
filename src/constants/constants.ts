@@ -17,3 +17,4 @@ export const RULER_WIDTH = 20;
 export const RULER_COLOR = '#00000044';
 export const USER_ACTION_EVENT_NAME = 'USER_ACTION_EVENT_NAME';
 export const STROKE_DASH_ARRAY = '3,3';
+export const WORKSPACE_MARGIN = 100;

@@ -179,10 +179,12 @@ export default class Toolbar extends React.Component<IToolbarProps, IToolbarStat
   }
 
   private handleZoomIn() {
+    this.appStateService.increaseZoomLevel();
     document.dispatchEvent(UserActions.createCustomEvent(new ZoomInWhiteboard()));
   }
 
   private handleZoomOut() {
+    this.appStateService.decreaseZoomLevel();
     document.dispatchEvent(UserActions.createCustomEvent(new ZoomOutWhiteboard()));
   }
 
