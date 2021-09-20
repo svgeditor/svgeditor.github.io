@@ -43,7 +43,7 @@ export default class DrawnShapes extends React.Component<IDrawnShapesProps, IDra
             return (
               <div className={this.getShapeClassNames(shape)} onClick={() => this.handleShapeClick(shape)} key={shape.getId()}>
                 <span className='iconify' data-icon={shape.getIconName()} data-inline='false'></span>
-                <span>{shape.getName()}</span>
+                <input value={shape.getName()} onChange={this.handleInputChange(shape)} />
               </div>
             );
           })}
@@ -59,6 +59,18 @@ export default class DrawnShapes extends React.Component<IDrawnShapesProps, IDra
   private handleShapeClick(shape: SvgShape<Shape>) {
     this.whiteboardDrawingService.unselectAllShapesToSelectNewShape();
     this.whiteboardDrawingService.select([shape]);
+  }
+
+  private handleInputChange(shape: SvgShape<Shape>) {
+    return (event) => {
+      console.log(shape.getId());
+      shape.setName(event.target.value);
+      const indexInShapesArray = this.state.shapes.map((s) => s.getId()).indexOf(shape.getId());
+      const indexInSelectedShapesArray = this.state.selectedShapes.map((s) => s.getId()).indexOf(shape.getId());
+      this.state.shapes.splice(indexInShapesArray, 1, shape);
+      this.state.selectedShapes.splice(indexInSelectedShapesArray, 1, shape);
+      this.setState({ shapes: this.state.shapes, selectedShapes: this.state.selectedShapes });
+    };
   }
 
   private getShapeClassNames(shape: SvgShape<Shape>): string {

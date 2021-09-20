@@ -1,6 +1,7 @@
 import { Circle, Ellipse, G, Line, Rect, Shape } from '@svgdotjs/svg.js';
 
 export class SvgShape<T extends Shape> {
+  private name: string;
   constructor(private container: G, private shape: T) {}
 
   inside(rectangle: Rect): boolean {
@@ -25,6 +26,9 @@ export class SvgShape<T extends Shape> {
   }
 
   getName(): string {
+    if (this.name !== undefined) {
+      return this.name;
+    }
     switch (true) {
       case this.shape instanceof Rect:
         return 'Rectangle';
@@ -37,6 +41,10 @@ export class SvgShape<T extends Shape> {
       default:
         return 'Shape';
     }
+  }
+
+  setName(name: string) {
+    this.name = name;
   }
 
   getIconName(): string {

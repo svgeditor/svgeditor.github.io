@@ -44,4 +44,12 @@
       background-color: var(--shape-background-color-on-hover-state);
     }
   }
+
+  & input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-family: var(--font-family);
+    color: var(--body-color);
+  }
 }
