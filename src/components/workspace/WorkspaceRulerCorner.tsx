@@ -1,5 +1,6 @@
 import './workspace.scss';
 import * as React from 'react';
+import { Size } from '../../models/Size';
 
 export interface IWorkspaceRulerCornerProps {}
 
@@ -20,8 +21,8 @@ export default class WorkspaceRulerCorner extends React.Component<IWorkspaceRule
     );
   }
 
-  public containerSize(width: number, height: number) {
-    this.container.style.width = width + 'px';
-    this.container.style.height = height + 'px';
+  public containerSize(size: Size) {
+    this.container.style.width = size.width + 'px';
+    this.container.style.height = size.height + 'px';
   }
 }

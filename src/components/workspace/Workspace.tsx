@@ -91,6 +91,6 @@ export default class Workspace extends React.Component<IWorkspaceProps, IWorkspa
     this.grid.x(whiteboardX).y(whiteboardY).size(whiteboardSize);
     this.hRuler.containerSize(backgroundSize).width(whiteboardSize.width).marginLeft(whiteboardX).zoomLevel(zoomLevel);
     this.vRuler.containerSize(backgroundSize).height(whiteboardSize.height).marginTop(whiteboardY).zoomLevel(zoomLevel);
-    this.rulerCorner.containerSize(backgroundWidth, backgroundHeight);
+    this.rulerCorner.containerSize(backgroundSize);
   }
 }
