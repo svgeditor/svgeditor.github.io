@@ -4,6 +4,7 @@ import { IAppStateService } from '../../services/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
 import { MathUtils } from '../../utils/MathUtils';
 import { ZoomLevel } from '../../models/ZoomLevel';
+import { Size } from '../../models/Size';
 
 export interface IWorkspaceHRulerProps {
   appStateService?: IAppStateService;
@@ -82,9 +83,9 @@ export default class WorkspaceHRuler extends React.Component<IWorkspaceHRulerPro
     );
   }
 
-  public containerSize(width: number, height: number): WorkspaceHRuler {
-    this.container.style.width = width + 'px';
-    this.container.style.height = height + 'px';
+  public containerSize(size: Size): WorkspaceHRuler {
+    this.container.style.width = size.width + 'px';
+    this.container.style.height = size.height + 'px';
     return this;
   }
 
@@ -95,6 +96,11 @@ export default class WorkspaceHRuler extends React.Component<IWorkspaceHRulerPro
 
   public marginLeft(x: number): WorkspaceHRuler {
     this.ruler.style.marginLeft = x + 'px';
+    return this;
+  }
+
+  public zoomLevel(zoomLevel: ZoomLevel): WorkspaceHRuler {
+    this.setState({ zoomLevel });
     return this;
   }
 

@@ -13,6 +13,7 @@ import WorkspaceWindow from './WorkspaceWindow';
 import WorkspaceHRuler from './WorkspaceHRuler';
 import WorkspaceVRuler from './WorkspaceVRuler';
 import WorkspaceRulerCorner from './WorkspaceRulerCorner';
+import { Size } from '../../models/Size';
 
 export interface IWorkspaceProps {
   appStateService?: IAppStateService;
@@ -77,17 +78,19 @@ export default class Workspace extends React.Component<IWorkspaceProps, IWorkspa
 
   private resize() {
     const windowSize = this.window.getSize();
+    const zoomLevel = this.appStateService.getZoomLevel();
     const whiteboardSize = this.appStateService.getWhiteboardSize(true);
     const backgroundWidth = windowSize.width * 2 + whiteboardSize.width - WORKSPACE_MARGIN;
     const backgroundHeight = windowSize.height * 2 + whiteboardSize.height - WORKSPACE_MARGIN;
+    const backgroundSize = new Size(backgroundWidth, backgroundHeight);
     const whiteboardX = (backgroundWidth - whiteboardSize.width) / 2;
     const whiteboardY = (backgroundHeight - whiteboardSize.height) / 2;
 
     this.background.size(backgroundWidth, backgroundHeight);
     this.whiteboard.x(whiteboardX).y(whiteboardY).size(whiteboardSize);
     this.grid.x(whiteboardX).y(whiteboardY).size(whiteboardSize);
-    this.hRuler.containerSize(backgroundWidth, backgroundHeight).width(whiteboardSize.width).marginLeft(whiteboardX);
-    this.vRuler.containerSize(backgroundWidth, backgroundHeight).height(whiteboardSize.height).marginTop(whiteboardY);
+    this.hRuler.containerSize(backgroundSize).width(whiteboardSize.width).marginLeft(whiteboardX).zoomLevel(zoomLevel);
+    this.vRuler.containerSize(backgroundSize).height(whiteboardSize.height).marginTop(whiteboardY).zoomLevel(zoomLevel);
     this.rulerCorner.containerSize(backgroundWidth, backgroundHeight);
   }
 }
