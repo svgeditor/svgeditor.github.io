@@ -1,7 +1,5 @@
 import './workspace.scss';
 import * as React from 'react';
-import { IAppStateService } from '../../services/IAppStateService';
-import { AppStateService } from '../../services/impl/AppStateService';
 import { USER_ACTION_EVENT_NAME, WORKSPACE_MARGIN } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
 import { ZoomInWhiteboard } from '../../models/user-actions/ZoomInWhiteboard';
@@ -14,15 +12,16 @@ import WorkspaceHRuler from './WorkspaceHRuler';
 import WorkspaceVRuler from './WorkspaceVRuler';
 import WorkspaceRulerCorner from './WorkspaceRulerCorner';
 import { Size } from '../../models/Size';
+import { AppState } from '../../models/AppState';
 
 export interface IWorkspaceProps {
-  appStateService?: IAppStateService;
+  appState?: AppState;
 }
 
 export interface IWorkspaceState {}
 
 export default class Workspace extends React.Component<IWorkspaceProps, IWorkspaceState> {
-  private appStateService: IAppStateService;
+  private appState: AppState;
   private window: WorkspaceWindow;
   private background: WorkspaceBackground;
   private grid: WorkspaceGrid;
@@ -33,7 +32,7 @@ export default class Workspace extends React.Component<IWorkspaceProps, IWorkspa
 
   constructor(props: IWorkspaceProps) {
     super(props);
-    this.appStateService = props.appStateService ? props.appStateService : AppStateService.getInstance();
+    this.appState = props.appState ? props.appState : AppState.getInstance();
   }
 
   public render() {
@@ -61,10 +60,10 @@ export default class Workspace extends React.Component<IWorkspaceProps, IWorkspa
     if (event.ctrlKey) {
       event.preventDefault();
       if (event.deltaY < 0) {
-        this.appStateService.increaseZoomLevel();
+        this.appState.increaseZoomLevel();
         this.zoomIn(event);
       } else {
-        this.appStateService.decreaseZoomLevel();
+        this.appState.decreaseZoomLevel();
         this.zoomOut(event);
       }
     }
@@ -94,8 +93,8 @@ export default class Workspace extends React.Component<IWorkspaceProps, IWorkspa
 
   private resize() {
     const windowBoundingRectangle = this.window.getBoundingRectangle();
-    const zoomLevel = this.appStateService.getZoomLevel();
-    const whiteboardSize = this.appStateService.getWhiteboardSize(true);
+    const zoomLevel = this.appState.getZoomLevel();
+    const whiteboardSize = this.appState.getWhiteboardSize(true);
     const backgroundWidth = windowBoundingRectangle.width * 2 + whiteboardSize.width - WORKSPACE_MARGIN;
     const backgroundHeight = windowBoundingRectangle.height * 2 + whiteboardSize.height - WORKSPACE_MARGIN;
     const backgroundSize = new Size(backgroundWidth, backgroundHeight);

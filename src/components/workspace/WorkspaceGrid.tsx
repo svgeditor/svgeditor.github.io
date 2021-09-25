@@ -1,14 +1,13 @@
 import './workspace.scss';
 import * as React from 'react';
-import { IAppStateService } from '../../services/IAppStateService';
-import { AppStateService } from '../../services/impl/AppStateService';
 import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
 import { Size } from '../../models/Size';
 import { ZoomLevel } from '../../models/ZoomLevel';
+import { AppState } from '../../models/AppState';
 
 export interface IWorkspaceGridProps {
-  appStateService?: IAppStateService;
+  appState?: AppState;
 }
 
 export interface IWorkspaceGridState {
@@ -25,14 +24,14 @@ export default class WorkspaceGrid extends React.Component<IWorkspaceGridProps, 
 
   constructor(props: IWorkspaceGridProps) {
     super(props);
-    const appStateService = props.appStateService ? props.appStateService : AppStateService.getInstance();
+    const appState = props.appState ? props.appState : AppState.getInstance();
     this.state = {
       width: 100,
       height: 100,
-      size: appStateService.getGridSize(),
-      color: appStateService.getGridColor(),
-      backgroundColor: appStateService.getGridBackgroundColor(),
-      zoomLevel: appStateService.getZoomLevel(),
+      size: appState.getGridProps().size,
+      color: appState.getGridProps().color,
+      backgroundColor: appState.getGridProps().backgroundColor,
+      zoomLevel: appState.getZoomLevel(),
     };
   }
 

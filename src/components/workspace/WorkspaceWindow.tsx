@@ -3,28 +3,27 @@ import * as React from 'react';
 import { ScrollInfo } from '../../models/ScrollInfo';
 import WorkspaceWhiteboard from './WorkspaceWhiteboard';
 import { WORKSPACE_MARGIN } from '../../constants/constants';
-import { IAppStateService } from '../../services/IAppStateService';
-import { AppStateService } from '../../services/impl/AppStateService';
 import { ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
 import WorkspaceBackground from './WorkspaceBackground';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
+import { AppState } from '../../models/AppState';
 
 export interface IWorkspaceWindowProps {
   className?: string;
-  appStateService?: IAppStateService;
+  appState?: AppState;
 }
 
 export interface IWorkspaceWindowState {}
 
 export default class WorkspaceWindow extends React.Component<IWorkspaceWindowProps, IWorkspaceWindowState> {
+  private appState: AppState;
   private container: HTMLElement;
-  private appStateService: IAppStateService;
   private whiteboard: WorkspaceWhiteboard;
   private background: WorkspaceBackground;
 
   constructor(props: IWorkspaceWindowProps) {
     super(props);
-    this.appStateService = props.appStateService ? props.appStateService : AppStateService.getInstance();
+    this.appState = props.appState ? props.appState : AppState.getInstance();
   }
 
   public render() {
@@ -88,7 +87,7 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
   }
 
   centerOnZoomIn(event?: MouseEvent): void {
-    const zoomLevel = this.appStateService.getZoomLevel();
+    const zoomLevel = this.appState.getZoomLevel();
     if (zoomLevel.currentPercentageZoom == zoomLevel.previousPercentageZoom) {
       return;
     }
@@ -96,7 +95,7 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
   }
 
   centerOnZoomOut(event?: MouseEvent): void {
-    const zoomLevel = this.appStateService.getZoomLevel();
+    const zoomLevel = this.appState.getZoomLevel();
     if (zoomLevel.currentPercentageZoom == zoomLevel.previousPercentageZoom) {
       return;
     }
@@ -112,7 +111,7 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
   }
 
   private getScrollInfoOnZoom(event?: MouseEvent): ScrollInfo {
-    const zoomPercentage = this.appStateService.getZoomLevel().previousPercentageZoom;
+    const zoomPercentage = this.appState.getZoomLevel().previousPercentageZoom;
     const mousePositionRelatedToWhiteboard = this.getMousePositionRelatedToWhiteboard(event);
     const scrollX = (mousePositionRelatedToWhiteboard.x * ZOOM_PERCENTAGE_STEP) / zoomPercentage;
     const scrollY = (mousePositionRelatedToWhiteboard.y * ZOOM_PERCENTAGE_STEP) / zoomPercentage;

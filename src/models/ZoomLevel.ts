@@ -23,4 +23,24 @@ export class ZoomLevel {
   getZoomedValueFromPreviousValue(previousValue: number): number {
     return (previousValue * this.currentPercentageZoom) / this.previousPercentageZoom;
   }
+
+  increase() {
+    if (this.currentPercentageZoom == MAX_ZOOM_PERCENTAGE) {
+      this.previousPercentageZoom = MAX_ZOOM_PERCENTAGE;
+      return;
+    }
+    const currentPercentageZoom = this.currentPercentageZoom;
+    this.previousPercentageZoom = currentPercentageZoom;
+    this.currentPercentageZoom = currentPercentageZoom + ZOOM_PERCENTAGE_STEP;
+  }
+
+  decrease() {
+    if (this.currentPercentageZoom == MIN_ZOOM_PERCENTAGE) {
+      this.previousPercentageZoom = MIN_ZOOM_PERCENTAGE;
+      return;
+    }
+    const currentPercentageZoom = this.currentPercentageZoom;
+    this.previousPercentageZoom = currentPercentageZoom;
+    this.currentPercentageZoom = currentPercentageZoom - ZOOM_PERCENTAGE_STEP;
+  }
 }

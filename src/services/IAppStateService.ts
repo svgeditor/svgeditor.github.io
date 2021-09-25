@@ -8,11 +8,13 @@ export interface IAppStateService {
   getGridBackgroundColor(): string;
   getGridColor(): string;
   getGridSize(): number;
+
   getShapeToDraw(): ESvgShape;
   setShapeToDraw(shapeToDraw: ESvgShape): void;
   getSvgRootElement(): Svg;
   setWhiteboardWindow(whiteboardWindow: WhiteboardWindow): void;
   getWhiteboardWindow(): WhiteboardWindow;
+
   getInitialWhiteboardWidth(): number;
   getInitialWhiteboardHeight(): number;
   setWhiteboardZoomLevel(zoomLevel: ZoomLevel): void;

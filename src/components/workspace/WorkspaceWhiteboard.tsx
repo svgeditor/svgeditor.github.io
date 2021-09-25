@@ -1,12 +1,11 @@
 import './workspace.scss';
 import * as React from 'react';
 import { Size } from '../../models/Size';
-import { IAppStateService } from '../../services/IAppStateService';
-import { AppStateService } from '../../services/impl/AppStateService';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
+import { AppState } from '../../models/AppState';
 
 export interface IWorkspaceWhiteboardProps {
-  appStateService?: IAppStateService;
+  appState?: AppState;
 }
 
 export interface IWorkspaceWhiteboardState {
@@ -20,12 +19,12 @@ export default class WorkspaceWhiteboard extends React.Component<IWorkspaceWhite
 
   constructor(props: IWorkspaceWhiteboardProps) {
     super(props);
-    const appStateService = props.appStateService ? props.appStateService : AppStateService.getInstance();
-    const zoomedWhiteboardSize = appStateService.getWhiteboardSize(true);
+    const appState = props.appState ? props.appState : AppState.getInstance();
+    const zoomedWhiteboardSize = appState.getWhiteboardSize(true);
     this.state = {
       width: zoomedWhiteboardSize.width,
       height: zoomedWhiteboardSize.height,
-      viewBox: `0 0 ${appStateService.getInitialWhiteboardWidth()} ${appStateService.getInitialWhiteboardHeight()}`,
+      viewBox: `0 0 ${appState.getWhiteboardProps().width} ${appState.getWhiteboardProps().height}`,
     };
   }
 

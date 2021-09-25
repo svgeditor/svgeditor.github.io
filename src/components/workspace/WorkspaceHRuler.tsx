@@ -1,14 +1,13 @@
 import './workspace.scss';
 import * as React from 'react';
-import { IAppStateService } from '../../services/IAppStateService';
-import { AppStateService } from '../../services/impl/AppStateService';
 import { ZoomLevel } from '../../models/ZoomLevel';
 import { Size } from '../../models/Size';
 import { IRandomIdGenerator } from '../../services/IRandomIdGenerator';
 import { RandomIdGenerator } from '../../services/impl/RandomIdGenerator';
+import { AppState } from '../../models/AppState';
 
 export interface IWorkspaceHRulerProps {
-  appStateService?: IAppStateService;
+  appState?: AppState;
   randomIdGenerator?: IRandomIdGenerator;
 }
 
@@ -27,14 +26,14 @@ export default class WorkspaceHRuler extends React.Component<IWorkspaceHRulerPro
 
   constructor(props: IWorkspaceHRulerProps) {
     super(props);
-    const appStateService = props.appStateService ? props.appStateService : AppStateService.getInstance();
+    const appState = props.appState ? props.appState : AppState.getInstance();
     this.randomIdGenerator = props.randomIdGenerator ? props.randomIdGenerator : RandomIdGenerator.getInstance();
     this.state = {
-      color: appStateService.getRulerColor(),
-      gridSize: appStateService.getGridSize(),
-      rulerWidth: 20,
-      whiteboardWidth: appStateService.getWhiteboardSize().width,
-      zoomLevel: appStateService.getZoomLevel(),
+      color: appState.getRulerProps().color,
+      gridSize: appState.getGridProps().size,
+      rulerWidth: appState.getRulerProps().size,
+      whiteboardWidth: appState.getWhiteboardSize().width,
+      zoomLevel: appState.getZoomLevel(),
     };
   }
 
