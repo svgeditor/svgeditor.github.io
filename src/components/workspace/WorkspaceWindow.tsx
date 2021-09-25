@@ -5,7 +5,7 @@ import WorkspaceWhiteboard from './WorkspaceWhiteboard';
 import { WORKSPACE_MARGIN } from '../../constants/constants';
 import { IAppStateService } from '../../services/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
-import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
+import { ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
 import WorkspaceBackground from './WorkspaceBackground';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
 
@@ -89,7 +89,7 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
 
   centerOnZoomIn(event?: MouseEvent): void {
     const zoomLevel = this.appStateService.getZoomLevel();
-    if (zoomLevel.currentPercentageZoom == MAX_ZOOM_PERCENTAGE) {
+    if (zoomLevel.currentPercentageZoom == zoomLevel.previousPercentageZoom) {
       return;
     }
     this.continueScrollToSouthEast(this.getScrollInfoOnZoom(event));
@@ -97,7 +97,7 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
 
   centerOnZoomOut(event?: MouseEvent): void {
     const zoomLevel = this.appStateService.getZoomLevel();
-    if (zoomLevel.currentPercentageZoom == MIN_ZOOM_PERCENTAGE) {
+    if (zoomLevel.currentPercentageZoom == zoomLevel.previousPercentageZoom) {
       return;
     }
     this.continueScrollToNorthWest(this.getScrollInfoOnZoom(event));
