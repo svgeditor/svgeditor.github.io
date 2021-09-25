@@ -5,6 +5,7 @@ import { AppStateService } from '../../services/impl/AppStateService';
 import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
 import { Size } from '../../models/Size';
+import { ZoomLevel } from '../../models/ZoomLevel';
 
 export interface IWorkspaceGridProps {
   appStateService?: IAppStateService;
@@ -16,7 +17,7 @@ export interface IWorkspaceGridState {
   size: number;
   color: string;
   backgroundColor: string;
-  whiteboardSize: Size;
+  zoomLevel: ZoomLevel;
 }
 
 export default class WorkspaceGrid extends React.Component<IWorkspaceGridProps, IWorkspaceGridState> {
@@ -31,7 +32,7 @@ export default class WorkspaceGrid extends React.Component<IWorkspaceGridProps, 
       size: appStateService.getGridSize(),
       color: appStateService.getGridColor(),
       backgroundColor: appStateService.getGridBackgroundColor(),
-      whiteboardSize: appStateService.getWhiteboardSize(),
+      zoomLevel: appStateService.getZoomLevel(),
     };
   }
 
@@ -40,17 +41,16 @@ export default class WorkspaceGrid extends React.Component<IWorkspaceGridProps, 
       <svg
         ref={(ref) => (this.svg = ref)}
         className='workspace-grid'
-        viewBox={this.getViewBox()}
         width={this.state.width}
         height={this.state.height}
         xmlns='http://www.w3.org/2000/svg'
       >
         <defs>
-          <pattern id='smallGrid' width={this.state.size} height={this.state.size} patternUnits='userSpaceOnUse'>
-            <path d={this.getSmallPath()} fill='none' stroke={this.state.color} strokeWidth='0.25' />
+          <pattern id='smallGrid' width={this.getZoomedGridSize()} height={this.getZoomedGridSize()} patternUnits='userSpaceOnUse'>
+            <path d={this.getSmallPath()} fill='none' stroke={this.state.color} strokeWidth='0.5' />
           </pattern>
-          <pattern id='grid' width={this.state.size * 5} height={this.state.size * 5} patternUnits='userSpaceOnUse'>
-            <rect width={this.state.size * 5} height={this.state.size * 5} fill='url(#smallGrid)' />
+          <pattern id='grid' width={this.getZoomedGridSize() * 5} height={this.getZoomedGridSize() * 5} patternUnits='userSpaceOnUse'>
+            <rect width={this.getZoomedGridSize() * 5} height={this.getZoomedGridSize() * 5} fill='url(#smallGrid)' />
             <path d={this.getBigPath()} fill='none' stroke={this.state.color} strokeWidth='1' />
           </pattern>
         </defs>
@@ -76,11 +76,11 @@ export default class WorkspaceGrid extends React.Component<IWorkspaceGridProps, 
   }
 
   private getSmallPath() {
-    return `M ${this.state.size} 0 L 0 0 0 ${this.state.size}`;
+    return `M ${this.getZoomedGridSize()} 0 L 0 0 0 ${this.getZoomedGridSize()}`;
   }
 
   private getBigPath() {
-    return `M ${this.state.size * 5} 0 L 0 0 0 ${this.state.size * 5}`;
+    return `M ${this.getZoomedGridSize() * 5} 0 L 0 0 0 ${this.getZoomedGridSize() * 5}`;
   }
 
   componentDidMount() {
@@ -95,7 +95,7 @@ export default class WorkspaceGrid extends React.Component<IWorkspaceGridProps, 
     }
   }
 
-  private getViewBox() {
-    return `0 0 ${this.state.whiteboardSize.width} ${this.state.whiteboardSize.height}`;
+  private getZoomedGridSize(): number {
+    return this.state.zoomLevel.getZoomedValue(this.state.size);
   }
 }
