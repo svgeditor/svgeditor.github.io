@@ -28,7 +28,11 @@ export default class WorkspaceBackground extends React.Component<IWorkspaceBackg
     this.container.style.height = height + 'px';
   }
 
-  public getDimensions(): Size {
+  public getSize(): Size {
     return Size.fromDOMRect(this.container.getBoundingClientRect());
+  }
+
+  getBoundingClientRect(): DOMRect {
+    return this.container.getBoundingClientRect();
   }
 }

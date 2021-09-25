@@ -47,7 +47,7 @@ export default class WorkspaceGrid extends React.Component<IWorkspaceGridProps, 
       >
         <defs>
           <pattern id='smallGrid' width={this.state.size} height={this.state.size} patternUnits='userSpaceOnUse'>
-            <path d={this.getSmallPath()} fill='none' stroke={this.state.color} strokeWidth='0.5' />
+            <path d={this.getSmallPath()} fill='none' stroke={this.state.color} strokeWidth='0.25' />
           </pattern>
           <pattern id='grid' width={this.state.size * 5} height={this.state.size * 5} patternUnits='userSpaceOnUse'>
             <rect width={this.state.size * 5} height={this.state.size * 5} fill='url(#smallGrid)' />

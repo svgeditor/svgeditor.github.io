@@ -57,7 +57,15 @@ export default class WorkspaceWhiteboard extends React.Component<IWorkspaceWhite
     return this;
   }
 
-  public getDimensions(): Size {
+  public getSize(): Size {
     return new Size(parseInt(this.svg.getAttribute('width')), parseInt(this.svg.getAttribute('height')));
+  }
+
+  public getX(): number {
+    return parseInt(this.svg.getAttribute('x'));
+  }
+
+  public getY(): number {
+    return parseInt(this.svg.getAttribute('y'));
   }
 }

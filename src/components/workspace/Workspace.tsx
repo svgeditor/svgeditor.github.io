@@ -52,8 +52,22 @@ export default class Workspace extends React.Component<IWorkspaceProps, IWorkspa
 
   componentDidMount() {
     this.resize();
-    this.window.center(this.whiteboard);
+    this.window.whiteboard(this.whiteboard).background(this.background).center();
+    this.window.addMouseWheelEventListener(this.handleMouseWheelEvent.bind(this));
     document.addEventListener(USER_ACTION_EVENT_NAME, this.handleUserActionEvent.bind(this));
+  }
+
+  private handleMouseWheelEvent(event: WheelEvent): void {
+    if (event.ctrlKey) {
+      event.preventDefault();
+      if (event.deltaY < 0) {
+        this.appStateService.increaseZoomLevel();
+        this.zoomIn(event);
+      } else {
+        this.appStateService.decreaseZoomLevel();
+        this.zoomOut(event);
+      }
+    }
   }
 
   private handleUserActionEvent(event: CustomEvent<IUserAction>) {
@@ -68,12 +82,14 @@ export default class Workspace extends React.Component<IWorkspaceProps, IWorkspa
     }
   }
 
-  private zoomIn(): void {
+  private zoomIn(event?: MouseEvent): void {
     this.resize();
+    this.window.centerOnZoomIn(event);
   }
 
-  private zoomOut(): void {
+  private zoomOut(event?: MouseEvent): void {
     this.resize();
+    this.window.centerOnZoomOut(event);
   }
 
   private resize() {
