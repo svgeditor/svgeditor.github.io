@@ -7,7 +7,6 @@ import { BringShapesToFront } from '../../models/user-actions/BringShapesToFront
 import { SendShapesToBack } from '../../models/user-actions/SendShapesToBack';
 import { ZoomInWhiteboard } from '../../models/user-actions/ZoomInWhiteboard';
 import { ZoomOutWhiteboard } from '../../models/user-actions/ZoomOutWhiteboard';
-import { SvgShape } from '../../models/SvgShape';
 import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { DeleteShapes } from '../../models/user-actions/DeleteShapes';
 import { IUserAction } from '../../models/user-actions/IUserAction';
@@ -16,7 +15,8 @@ import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { Shape } from '@svgdotjs/svg.js';
 import { SelectAllShapes } from '../../models/user-actions/SelectAllShapes';
 import { AppState } from '../../models/AppState';
-import { ESvgElement } from '../../models/ESvgElement';
+import { ESvgElement } from '../../models/svg-elements/ESvgElement';
+import { SvgShape } from '../../models/svg-elements/SvgShape';
 
 export interface IToolbarProps {
   appState?: AppState;

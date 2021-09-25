@@ -1,9 +1,9 @@
 import { Svg } from '@svgdotjs/svg.js';
 import { Size } from '../../models/Size';
-import { ESvgShape } from '../../models/SvgShape';
 import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZoomLevel, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
 import { IAppStateService } from '../IAppStateService';
 import { WhiteboardWindow } from '../../models/WhiteboardLayers';
+import { ESvgShape } from '../../models/svg-elements/SvgShape';
 
 export class AppStateService implements IAppStateService {
   private static instance: IAppStateService = new AppStateService();

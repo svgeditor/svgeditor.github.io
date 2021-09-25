@@ -3,12 +3,12 @@ import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { SvgRectangle } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Rect, Shape } from '@svgdotjs/svg.js';
 import { RandomIdGenerator } from './RandomIdGenerator';
+import { SvgRectangle } from '../../models/svg-elements/SvgShape';
 
 export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRectangle> implements ISvgShapeDrawingService<SvgRectangle> {
   private static instance: ISvgShapeDrawingService<SvgRectangle> = null;

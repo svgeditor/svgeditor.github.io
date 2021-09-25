@@ -6,12 +6,11 @@ import { RectangleDrawingService } from './RectangleDrawingService';
 import { AppStateService } from './AppStateService';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { UserActions } from '../../models/user-actions/UserActions';
-import { SvgCircle, SvgEllipse, SvgLine, SvgRectangle, SvgShape } from '../../models/SvgShape';
 import { CircleDrawingService } from './CircleDrawingService';
-import { ESvgShape } from '../../models/SvgShape';
 import { EllipseDrawingService } from './EllipseDrawingService';
 import { LineDrawingService } from './LineDrawingService';
 import { SelectShapes } from '../../models/user-actions/SelectShapes';
+import { ESvgShape, SvgCircle, SvgEllipse, SvgLine, SvgRectangle, SvgShape } from '../../models/svg-elements/SvgShape';
 
 export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private static instance: IWhiteboardDrawingService = new WhiteboardDrawingService();

@@ -17,12 +17,12 @@ import { ZoomInWhiteboard } from '../../models/user-actions/ZoomInWhiteboard';
 import { ZoomOutWhiteboard } from '../../models/user-actions/ZoomOutWhiteboard';
 import { BringShapesToFront } from '../../models/user-actions/BringShapesToFront';
 import { SendShapesToBack } from '../../models/user-actions/SendShapesToBack';
-import { SvgShape } from '../../models/SvgShape';
 import { IWhiteboardRulerService } from '../../services/IWhiteboardRulerService';
 import { WhiteboardRulerService } from '../../services/impl/WhiteboardRulerService';
 import { SelectAllShapes } from '../../models/user-actions/SelectAllShapes';
 import { AddWhiteboardGrid } from '../../models/user-actions/AddWhiteboardGrid';
 import { RemoveWhiteboardGrid } from '../../models/user-actions/RemoveWhiteboardGrid';
+import { SvgShape } from '../../models/svg-elements/SvgShape';
 
 export interface IWhiteboardProps {
   appStateService?: IAppStateService;

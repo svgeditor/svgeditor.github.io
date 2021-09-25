@@ -1,8 +1,8 @@
 import { Shape } from '@svgdotjs/svg.js';
 import { IWhiteboardDrawingService } from '../../services/IWhiteboardDrawingService';
 import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingService';
-import { SvgShape } from '../SvgShape';
 import { UndoableUserAction } from './IUndoableUserAction';
+import { SvgShape } from '../svg-elements/SvgShape';
 
 export class DeleteShapes extends UndoableUserAction {
   constructor(

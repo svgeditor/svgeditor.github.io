@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Size } from '../../models/Size';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
 import { AppState } from '../../models/AppState';
+import { SvgRootElement } from '../../models/svg-elements/SvgRootElement';
 
 export interface IWorkspaceWhiteboardProps {
   appState?: AppState;
@@ -15,16 +16,17 @@ export interface IWorkspaceWhiteboardState {
 }
 
 export default class WorkspaceWhiteboard extends React.Component<IWorkspaceWhiteboardProps, IWorkspaceWhiteboardState> {
+  private appState: AppState;
   private svg: SVGSVGElement;
 
   constructor(props: IWorkspaceWhiteboardProps) {
     super(props);
-    const appState = props.appState ? props.appState : AppState.getInstance();
-    const zoomedWhiteboardSize = appState.getWhiteboardSize(true);
+    this.appState = props.appState ? props.appState : AppState.getInstance();
+    const zoomedWhiteboardSize = this.appState.getWhiteboardSize(true);
     this.state = {
       width: zoomedWhiteboardSize.width,
       height: zoomedWhiteboardSize.height,
-      viewBox: `0 0 ${appState.getWhiteboardProps().width} ${appState.getWhiteboardProps().height}`,
+      viewBox: `0 0 ${this.appState.getWhiteboardProps().width} ${this.appState.getWhiteboardProps().height}`,
     };
   }
 
@@ -40,6 +42,10 @@ export default class WorkspaceWhiteboard extends React.Component<IWorkspaceWhite
         {this.props.children}
       </svg>
     );
+  }
+
+  componentDidMount() {
+    this.appState.setSvgRootElement(SvgRootElement.from(this.svg));
   }
 
   public x(x: number): WorkspaceWhiteboard {

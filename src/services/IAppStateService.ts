@@ -1,6 +1,6 @@
 import { Svg } from '@svgdotjs/svg.js';
 import { Size } from '../models/Size';
-import { ESvgShape } from '../models/SvgShape';
+import { ESvgShape } from '../models/svg-elements/SvgShape';
 import { WhiteboardWindow } from '../models/WhiteboardLayers';
 import { ZoomLevel } from '../models/ZoomLevel';
 

@@ -1,5 +1,5 @@
 import { Size } from './Size';
-import { SvgRootElement } from './SvgRootElement';
+import { SvgRootElement } from './svg-elements/SvgRootElement';
 
 export class WhiteboardProps {
   constructor(public width: number, public height: number, public svgRootElement: SvgRootElement) {}
@@ -12,7 +12,7 @@ export class WhiteboardProps {
 export class WhiteboardPropsBuilder {
   private _width: number;
   private _height: number;
-  private _svgRootElement: number;
+  private _svgRootElement: SvgRootElement;
 
   width(width: number): WhiteboardPropsBuilder {
     this._width = width;
@@ -24,7 +24,7 @@ export class WhiteboardPropsBuilder {
     return this;
   }
 
-  svgRootElement(svgRootElement: number): WhiteboardPropsBuilder {
+  svgRootElement(svgRootElement: SvgRootElement): WhiteboardPropsBuilder {
     this._svgRootElement = svgRootElement;
     return this;
   }

@@ -1,15 +1,18 @@
-import { ESvgElement } from './ESvgElement';
+import { ESvgElement } from './svg-elements/ESvgElement';
 import { GridProps, GridPropsBuilder } from './GridProps';
 import { RulerProps, RulerPropsBuilder } from './RulerProps';
 import { Size } from './Size';
 import { WhiteboardProps, WhiteboardPropsBuilder } from './WhiteboardProps';
 import { ZoomLevel } from './ZoomLevel';
+import { SvgRectangleProps, SvgRectanglePropsBuilder } from './svg-elements/SvgRectangleProps';
+import { SvgRootElement } from './svg-elements/SvgRootElement';
 
 export class AppState {
   private zoomLevel: ZoomLevel = this.getZoomLevelInitValue();
   private gridProps: GridProps = this.getGridPropsInitValue();
   private rulerProps: RulerProps = this.getRulerPropsInitValue();
   private whiteboardProps: WhiteboardProps = this.getWhiteboardPropsInitValue();
+  private newSvgRectangleProps: SvgRectangleProps = this.getNewSvgRectanglePropsInitValue();
   private selectedSvgElement: ESvgElement = ESvgElement.RECTANGLE;
   private static instance: AppState = new AppState();
 
@@ -58,6 +61,18 @@ export class AppState {
     return this.whiteboardProps.getSize();
   }
 
+  getSvgRootElement(): SvgRootElement {
+    return this.whiteboardProps.svgRootElement;
+  }
+
+  setSvgRootElement(svgRootElement: SvgRootElement) {
+    this.whiteboardProps.svgRootElement = svgRootElement;
+  }
+
+  getNewSvgRectangleProps() {
+    return this.newSvgRectangleProps;
+  }
+
   private getWhiteboardPropsInitValue(): WhiteboardProps {
     return new WhiteboardPropsBuilder().width(800).height(1100).build();
   }
@@ -72,5 +87,9 @@ export class AppState {
 
   private getZoomLevelInitValue(): ZoomLevel {
     return new ZoomLevel();
+  }
+
+  private getNewSvgRectanglePropsInitValue(): SvgRectangleProps {
+    return new SvgRectanglePropsBuilder().fill('#fff').strokeColor('#000').strokeWidth(1).build();
   }
 }

@@ -1,6 +1,5 @@
 import './drawn-shapes.scss';
 import * as React from 'react';
-import { SvgShape } from '../../models/SvgShape';
 import { Shape } from '@svgdotjs/svg.js';
 import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
@@ -11,6 +10,7 @@ import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { IWhiteboardDrawingService } from '../../services/IWhiteboardDrawingService';
 import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingService';
 import SidebarSection from '../sidebar-section/SidebarSection';
+import { SvgShape } from '../../models/svg-elements/SvgShape';
 
 export interface IDrawnShapesProps {
   whiteboardDrawingService?: IWhiteboardDrawingService;

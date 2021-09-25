@@ -1,5 +1,5 @@
 import { Shape } from '@svgdotjs/svg.js';
-import { SvgShape } from '../SvgShape';
+import { SvgShape } from '../svg-elements/SvgShape';
 import { IUserAction } from './IUserAction';
 
 export class BringShapesToFront implements IUserAction {

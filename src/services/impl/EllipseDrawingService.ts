@@ -4,11 +4,11 @@ import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { SvgEllipse } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Position } from '../../models/Position';
 import { RandomIdGenerator } from './RandomIdGenerator';
+import { SvgEllipse } from '../../models/svg-elements/SvgShape';
 
 export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse> implements ISvgShapeDrawingService<SvgEllipse> {
   private static instance: ISvgShapeDrawingService<SvgEllipse> = null;

@@ -1,5 +1,5 @@
 import { Shape } from '@svgdotjs/svg.js';
-import { SvgShape } from '../models/SvgShape';
+import { SvgShape } from '../models/svg-elements/SvgShape';
 
 export interface IWhiteboardDrawingService {
   draw(shape: SvgShape<Shape>): void;

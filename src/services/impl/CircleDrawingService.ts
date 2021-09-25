@@ -4,11 +4,11 @@ import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { SvgCircle } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Position } from '../../models/Position';
 import { RandomIdGenerator } from './RandomIdGenerator';
+import { SvgCircle } from '../../models/svg-elements/SvgShape';
 
 export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> implements ISvgShapeDrawingService<SvgCircle> {
   private static instance: ISvgShapeDrawingService<SvgCircle> = null;

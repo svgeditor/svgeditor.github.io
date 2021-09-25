@@ -1,6 +1,5 @@
 import './right-sidebar.scss';
 import * as React from 'react';
-import { ESvgShape, SvgShape } from '../../models/SvgShape';
 import { Circle, Ellipse, Line, Rect, Shape } from '@svgdotjs/svg.js';
 import WhiteboardProperties from './whiteboard-properties/WhiteboardProperties';
 import ShapesProperties from './shapes-properties/ShapesProperties';
@@ -14,6 +13,7 @@ import { SelectShapes } from '../../models/user-actions/SelectShapes';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { IAppStateService } from '../../services/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
+import { ESvgShape, SvgShape } from '../../models/svg-elements/SvgShape';
 
 export interface IRightSidebarProps {
   appStateService?: IAppStateService;

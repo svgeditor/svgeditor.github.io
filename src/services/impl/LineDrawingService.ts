@@ -4,11 +4,11 @@ import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
 import { AppStateService } from './AppStateService';
 import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
-import { SvgLine } from '../../models/SvgShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { RandomIdGenerator } from './RandomIdGenerator';
+import { SvgLine } from '../../models/svg-elements/SvgShape';
 
 export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> implements ISvgShapeDrawingService<SvgLine> {
   private static instance: ISvgShapeDrawingService<SvgLine> = null;
