@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Size } from '../../models/Size';
 import { ScrollInfo } from '../../models/ScrollInfo';
 import WorkspaceWhiteboard from './WorkspaceWhiteboard';
-import { WHITEBOARD_MARGIN, WORKSPACE_MARGIN } from '../../constants/constants';
+import { WORKSPACE_MARGIN } from '../../constants/constants';
 import { IAppStateService } from '../../services/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
 import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
@@ -45,6 +45,10 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
 
   public scrollTo(x: number, y: number): void {
     this._container.scrollTo(x, y);
+  }
+
+  public scrollBy(x: number, y: number): void {
+    this._container.scrollBy(x, y);
   }
 
   public getScrollTop(): number {
@@ -100,19 +104,11 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
   }
 
   private continueScrollToSouthEast(scrollInfo: ScrollInfo): void {
-    if (scrollInfo.continueScroll) {
-      this.scrollTo(this.getScrollLeft() + scrollInfo.scrollX, this.getScrollTop() + scrollInfo.scrollY);
-    } else {
-      this.scrollTo(scrollInfo.scrollX, scrollInfo.scrollY);
-    }
+    this.scrollBy(scrollInfo.scrollX, scrollInfo.scrollY);
   }
 
   private continueScrollToNorthWest(scrollInfo: ScrollInfo): void {
-    if (scrollInfo.continueScroll) {
-      this.scrollTo(this.getScrollLeft() - scrollInfo.scrollX, this.getScrollTop() - scrollInfo.scrollY);
-    } else {
-      this.scrollTo(scrollInfo.scrollX, scrollInfo.scrollY);
-    }
+    this.scrollBy(-scrollInfo.scrollX, -scrollInfo.scrollY);
   }
 
   private getScrollInfoOnZoom(event?: MouseEvent): ScrollInfo {
@@ -123,7 +119,6 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
     return {
       scrollX,
       scrollY,
-      continueScroll: true,
     };
   }
 
