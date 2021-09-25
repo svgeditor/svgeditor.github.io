@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Size } from '../../models/Size';
 import { IAppStateService } from '../../services/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
+import { BoundingRectangle } from '../../models/BoundingRectangle';
 
 export interface IWorkspaceWhiteboardProps {
   appStateService?: IAppStateService;
@@ -57,15 +58,7 @@ export default class WorkspaceWhiteboard extends React.Component<IWorkspaceWhite
     return this;
   }
 
-  public getSize(): Size {
-    return new Size(parseInt(this.svg.getAttribute('width')), parseInt(this.svg.getAttribute('height')));
-  }
-
-  public getX(): number {
-    return parseInt(this.svg.getAttribute('x'));
-  }
-
-  public getY(): number {
-    return parseInt(this.svg.getAttribute('y'));
+  public getBoundingRectangle(): BoundingRectangle {
+    return BoundingRectangle.fromSvgElement(this.svg);
   }
 }

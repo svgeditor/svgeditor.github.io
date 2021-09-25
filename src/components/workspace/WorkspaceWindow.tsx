@@ -8,6 +8,7 @@ import { IAppStateService } from '../../services/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
 import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
 import WorkspaceBackground from './WorkspaceBackground';
+import { BoundingRectangle } from '../../models/BoundingRectangle';
 
 export interface IWorkspaceWindowProps {
   className?: string;
@@ -35,8 +36,8 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
     );
   }
 
-  public getSize(): Size {
-    return Size.fromDOMRect(this._container.getBoundingClientRect());
+  public getBoundingRectangle(): BoundingRectangle {
+    return BoundingRectangle.fromHTMLElement(this._container);
   }
 
   public getScrollInfo(): ScrollInfo {
@@ -74,16 +75,16 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
   }
 
   public center(): void {
-    const whiteboardDimensions = this._whiteboard.getSize();
-    const windowDimensions = this.getSize();
+    const whiteboardBoundingRectangle = this._whiteboard.getBoundingRectangle();
+    const windowBoundingRectangle = this.getBoundingRectangle();
     const scrollX =
-      whiteboardDimensions.width < windowDimensions.width
-        ? windowDimensions.width - (windowDimensions.width - whiteboardDimensions.width) / 2 - WORKSPACE_MARGIN / 2
-        : windowDimensions.width - WORKSPACE_MARGIN;
+      whiteboardBoundingRectangle.width < windowBoundingRectangle.width
+        ? windowBoundingRectangle.width - (windowBoundingRectangle.width - whiteboardBoundingRectangle.width) / 2 - WORKSPACE_MARGIN / 2
+        : windowBoundingRectangle.width - WORKSPACE_MARGIN;
     const scrollY =
-      whiteboardDimensions.height < windowDimensions.height
-        ? windowDimensions.height - (windowDimensions.height - whiteboardDimensions.height) / 2 - WORKSPACE_MARGIN / 2
-        : windowDimensions.height - WORKSPACE_MARGIN;
+      whiteboardBoundingRectangle.height < windowBoundingRectangle.height
+        ? windowBoundingRectangle.height - (windowBoundingRectangle.height - whiteboardBoundingRectangle.height) / 2 - WORKSPACE_MARGIN / 2
+        : windowBoundingRectangle.height - WORKSPACE_MARGIN;
     this.scrollTo(scrollX, scrollY);
   }
 
@@ -124,16 +125,17 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
 
   private getMousePositionRelatedToWhiteboard(event?: MouseEvent) {
     if (event) {
-      const backgroundBoundingRect = this._background.getBoundingClientRect();
+      const backgroundBoundingRectangle = this._background.getBoundingRectangle();
+      const whiteboardBoundingRectangle = this._whiteboard.getBoundingRectangle();
       return {
-        x: event.clientX - backgroundBoundingRect.x - this._whiteboard.getX(),
-        y: event.clientY - backgroundBoundingRect.y - this._whiteboard.getY(),
+        x: event.clientX - backgroundBoundingRectangle.x - whiteboardBoundingRectangle.x,
+        y: event.clientY - backgroundBoundingRectangle.y - whiteboardBoundingRectangle.y,
       };
     } else {
-      const whiteboardSize = this._whiteboard.getSize();
+      const whiteboardBoundingRectangle = this._whiteboard.getBoundingRectangle();
       return {
-        x: whiteboardSize.width / 2,
-        y: whiteboardSize.height / 2,
+        x: whiteboardBoundingRectangle.width / 2,
+        y: whiteboardBoundingRectangle.height / 2,
       };
     }
   }

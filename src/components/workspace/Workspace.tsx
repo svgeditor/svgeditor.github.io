@@ -93,11 +93,11 @@ export default class Workspace extends React.Component<IWorkspaceProps, IWorkspa
   }
 
   private resize() {
-    const windowSize = this.window.getSize();
+    const windowBoundingRectangle = this.window.getBoundingRectangle();
     const zoomLevel = this.appStateService.getZoomLevel();
     const whiteboardSize = this.appStateService.getWhiteboardSize(true);
-    const backgroundWidth = windowSize.width * 2 + whiteboardSize.width - WORKSPACE_MARGIN;
-    const backgroundHeight = windowSize.height * 2 + whiteboardSize.height - WORKSPACE_MARGIN;
+    const backgroundWidth = windowBoundingRectangle.width * 2 + whiteboardSize.width - WORKSPACE_MARGIN;
+    const backgroundHeight = windowBoundingRectangle.height * 2 + whiteboardSize.height - WORKSPACE_MARGIN;
     const backgroundSize = new Size(backgroundWidth, backgroundHeight);
     const whiteboardX = (backgroundWidth - whiteboardSize.width) / 2;
     const whiteboardY = (backgroundHeight - whiteboardSize.height) / 2;

@@ -1,6 +1,7 @@
 import './workspace.scss';
 import * as React from 'react';
 import { Size } from '../../models/Size';
+import { BoundingRectangle } from '../../models/BoundingRectangle';
 
 export interface IWorkspaceBackgroundProps {}
 
@@ -28,11 +29,7 @@ export default class WorkspaceBackground extends React.Component<IWorkspaceBackg
     this.container.style.height = height + 'px';
   }
 
-  public getSize(): Size {
-    return Size.fromDOMRect(this.container.getBoundingClientRect());
-  }
-
-  getBoundingClientRect(): DOMRect {
-    return this.container.getBoundingClientRect();
+  public getBoundingRectangle(): BoundingRectangle {
+    return BoundingRectangle.fromHTMLElement(this.container);
   }
 }
