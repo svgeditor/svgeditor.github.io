@@ -4,7 +4,7 @@ import { IAppStateService } from '../IAppStateService';
 import { SvgShape } from '../../models/SvgShape';
 import { G, Shape } from '@svgdotjs/svg.js';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { IRandomIdService } from '../IRandomIdService';
+import { IRandomIdGenerator } from '../IRandomIdGenerator';
 
 export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> implements ISvgShapeDrawingService<T> {
   abstract draw(event: MouseEvent): void;
@@ -13,7 +13,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   constructor(
     protected appStateService: IAppStateService,
     protected whiteboardDrawingService: WhiteboardDrawingService,
-    protected randomIdService: IRandomIdService
+    protected randomIdService: IRandomIdGenerator
   ) {}
 
   unselectAllShapes(): void {

@@ -2,12 +2,14 @@ import './workspace.scss';
 import * as React from 'react';
 import { IAppStateService } from '../../services/IAppStateService';
 import { AppStateService } from '../../services/impl/AppStateService';
-import { MathUtils } from '../../utils/MathUtils';
 import { ZoomLevel } from '../../models/ZoomLevel';
 import { Size } from '../../models/Size';
+import { IRandomIdGenerator } from '../../services/IRandomIdGenerator';
+import { RandomIdGenerator } from '../../services/impl/RandomIdGenerator';
 
 export interface IWorkspaceHRulerProps {
   appStateService?: IAppStateService;
+  randomIdGenerator?: IRandomIdGenerator;
 }
 
 export interface IWorkspaceHRulerState {
@@ -21,10 +23,12 @@ export interface IWorkspaceHRulerState {
 export default class WorkspaceHRuler extends React.Component<IWorkspaceHRulerProps, IWorkspaceHRulerState> {
   private container: HTMLElement;
   private ruler: HTMLElement;
+  private randomIdGenerator: IRandomIdGenerator;
 
   constructor(props: IWorkspaceHRulerProps) {
     super(props);
     const appStateService = props.appStateService ? props.appStateService : AppStateService.getInstance();
+    this.randomIdGenerator = props.randomIdGenerator ? props.randomIdGenerator : RandomIdGenerator.getInstance();
     this.state = {
       color: appStateService.getRulerColor(),
       gridSize: appStateService.getGridSize(),
@@ -43,11 +47,15 @@ export default class WorkspaceHRuler extends React.Component<IWorkspaceHRulerPro
       if (i % 5 == 0) {
         if (i % 10 == 0) {
           components.push(
-            <path key={MathUtils.random()} d={this.getVerticalLinePath(i, 12, zoomedGridSize, this.state.rulerWidth)} stroke={this.state.color} />
+            <path
+              key={this.randomIdGenerator.generate()}
+              d={this.getVerticalLinePath(i, 12, zoomedGridSize, this.state.rulerWidth)}
+              stroke={this.state.color}
+            />
           );
           components.push(
             <text
-              key={MathUtils.random()}
+              key={this.randomIdGenerator.generate()}
               x={i * zoomedGridSize - this.getRulerTextMargin(i * this.state.gridSize)}
               y='10'
               fontSize='9'
@@ -59,12 +67,20 @@ export default class WorkspaceHRuler extends React.Component<IWorkspaceHRulerPro
           );
         } else {
           components.push(
-            <path key={MathUtils.random()} d={this.getVerticalLinePath(i, 10, zoomedGridSize, this.state.rulerWidth)} stroke={this.state.color} />
+            <path
+              key={this.randomIdGenerator.generate()}
+              d={this.getVerticalLinePath(i, 10, zoomedGridSize, this.state.rulerWidth)}
+              stroke={this.state.color}
+            />
           );
         }
       } else {
         components.push(
-          <path key={MathUtils.random()} d={this.getVerticalLinePath(i, 15, zoomedGridSize, this.state.rulerWidth)} stroke={this.state.color} />
+          <path
+            key={this.randomIdGenerator.generate()}
+            d={this.getVerticalLinePath(i, 15, zoomedGridSize, this.state.rulerWidth)}
+            stroke={this.state.color}
+          />
         );
       }
     }

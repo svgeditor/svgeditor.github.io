@@ -1,12 +1,12 @@
-import { IRandomIdService } from '../IRandomIdService';
+import { IRandomIdGenerator } from '../IRandomIdGenerator';
 
-export class RandomIdService implements IRandomIdService {
-  private static instance: IRandomIdService = new RandomIdService();
+export class RandomIdGenerator implements IRandomIdGenerator {
+  private static instance: IRandomIdGenerator = new RandomIdGenerator();
 
   private constructor() {}
 
-  static getInstance(): IRandomIdService {
-    return RandomIdService.instance;
+  static getInstance(): IRandomIdGenerator {
+    return RandomIdGenerator.instance;
   }
 
   generate(): string {
