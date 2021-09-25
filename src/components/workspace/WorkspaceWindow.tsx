@@ -1,6 +1,5 @@
 import './workspace.scss';
 import * as React from 'react';
-import { Size } from '../../models/Size';
 import { ScrollInfo } from '../../models/ScrollInfo';
 import WorkspaceWhiteboard from './WorkspaceWhiteboard';
 import { WORKSPACE_MARGIN } from '../../constants/constants';
@@ -18,64 +17,64 @@ export interface IWorkspaceWindowProps {
 export interface IWorkspaceWindowState {}
 
 export default class WorkspaceWindow extends React.Component<IWorkspaceWindowProps, IWorkspaceWindowState> {
-  private _container: HTMLElement;
-  private _appStateService: IAppStateService;
-  private _whiteboard: WorkspaceWhiteboard;
-  private _background: WorkspaceBackground;
+  private container: HTMLElement;
+  private appStateService: IAppStateService;
+  private whiteboard: WorkspaceWhiteboard;
+  private background: WorkspaceBackground;
 
   constructor(props: IWorkspaceWindowProps) {
     super(props);
-    this._appStateService = props.appStateService ? props.appStateService : AppStateService.getInstance();
+    this.appStateService = props.appStateService ? props.appStateService : AppStateService.getInstance();
   }
 
   public render() {
     return (
-      <div ref={(ref) => (this._container = ref)} className={this.getClassName()}>
+      <div ref={(ref) => (this.container = ref)} className={this.getClassName()}>
         {this.props.children}
       </div>
     );
   }
 
   public getBoundingRectangle(): BoundingRectangle {
-    return BoundingRectangle.fromHTMLElement(this._container);
+    return BoundingRectangle.fromHTMLElement(this.container);
   }
 
   public getScrollInfo(): ScrollInfo {
-    return ScrollInfo.form(this._container);
+    return ScrollInfo.form(this.container);
   }
 
   public scrollTo(x: number, y: number): void {
-    this._container.scrollTo(x, y);
+    this.container.scrollTo(x, y);
   }
 
   public scrollBy(x: number, y: number): void {
-    this._container.scrollBy(x, y);
+    this.container.scrollBy(x, y);
   }
 
   public getScrollTop(): number {
-    return this._container.scrollTop;
+    return this.container.scrollTop;
   }
 
   public getScrollLeft(): number {
-    return this._container.scrollLeft;
+    return this.container.scrollLeft;
   }
 
-  public whiteboard(whiteboard: WorkspaceWhiteboard): WorkspaceWindow {
-    this._whiteboard = whiteboard;
+  public setWhiteboard(whiteboard: WorkspaceWhiteboard): WorkspaceWindow {
+    this.whiteboard = whiteboard;
     return this;
   }
 
-  public background(background: WorkspaceBackground): WorkspaceWindow {
-    this._background = background;
+  public setBackground(background: WorkspaceBackground): WorkspaceWindow {
+    this.background = background;
     return this;
   }
 
   public addMouseWheelEventListener(listener: (this: HTMLElement, ev: WheelEvent) => any) {
-    this._container.addEventListener('wheel', listener);
+    this.container.addEventListener('wheel', listener);
   }
 
   public center(): void {
-    const whiteboardBoundingRectangle = this._whiteboard.getBoundingRectangle();
+    const whiteboardBoundingRectangle = this.whiteboard.getBoundingRectangle();
     const windowBoundingRectangle = this.getBoundingRectangle();
     const scrollX =
       whiteboardBoundingRectangle.width < windowBoundingRectangle.width
@@ -89,7 +88,7 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
   }
 
   centerOnZoomIn(event?: MouseEvent): void {
-    const zoomLevel = this._appStateService.getZoomLevel();
+    const zoomLevel = this.appStateService.getZoomLevel();
     if (zoomLevel.currentPercentageZoom == MAX_ZOOM_PERCENTAGE) {
       return;
     }
@@ -97,7 +96,7 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
   }
 
   centerOnZoomOut(event?: MouseEvent): void {
-    const zoomLevel = this._appStateService.getZoomLevel();
+    const zoomLevel = this.appStateService.getZoomLevel();
     if (zoomLevel.currentPercentageZoom == MIN_ZOOM_PERCENTAGE) {
       return;
     }
@@ -113,7 +112,7 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
   }
 
   private getScrollInfoOnZoom(event?: MouseEvent): ScrollInfo {
-    const zoomPercentage = this._appStateService.getZoomLevel().previousPercentageZoom;
+    const zoomPercentage = this.appStateService.getZoomLevel().previousPercentageZoom;
     const mousePositionRelatedToWhiteboard = this.getMousePositionRelatedToWhiteboard(event);
     const scrollX = Math.floor((mousePositionRelatedToWhiteboard.x * ZOOM_PERCENTAGE_STEP) / zoomPercentage);
     const scrollY = Math.floor((mousePositionRelatedToWhiteboard.y * ZOOM_PERCENTAGE_STEP) / zoomPercentage);
@@ -125,14 +124,14 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
 
   private getMousePositionRelatedToWhiteboard(event?: MouseEvent) {
     if (event) {
-      const backgroundBoundingRectangle = this._background.getBoundingRectangle();
-      const whiteboardBoundingRectangle = this._whiteboard.getBoundingRectangle();
+      const backgroundBoundingRectangle = this.background.getBoundingRectangle();
+      const whiteboardBoundingRectangle = this.whiteboard.getBoundingRectangle();
       return {
         x: event.clientX - backgroundBoundingRectangle.x - whiteboardBoundingRectangle.x,
         y: event.clientY - backgroundBoundingRectangle.y - whiteboardBoundingRectangle.y,
       };
     } else {
-      const whiteboardBoundingRectangle = this._whiteboard.getBoundingRectangle();
+      const whiteboardBoundingRectangle = this.whiteboard.getBoundingRectangle();
       return {
         x: whiteboardBoundingRectangle.width / 2,
         y: whiteboardBoundingRectangle.height / 2,

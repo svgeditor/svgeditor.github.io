@@ -52,7 +52,7 @@ export default class Workspace extends React.Component<IWorkspaceProps, IWorkspa
 
   componentDidMount() {
     this.resize();
-    this.window.whiteboard(this.whiteboard).background(this.background).center();
+    this.window.setWhiteboard(this.whiteboard).setBackground(this.background).center();
     this.window.addMouseWheelEventListener(this.handleMouseWheelEvent.bind(this));
     document.addEventListener(USER_ACTION_EVENT_NAME, this.handleUserActionEvent.bind(this));
   }
