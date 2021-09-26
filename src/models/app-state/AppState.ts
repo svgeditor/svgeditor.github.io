@@ -56,7 +56,7 @@ export class AppState {
 
   getWhiteboardSize(zoomedValue = false): Size {
     if (zoomedValue) {
-      return this.zoomLevel.getZoomedSize(this.whiteboardProps.getSize());
+      return this.whiteboardProps.getSize().zoom(this.zoomLevel);
     }
     return this.whiteboardProps.getSize();
   }
@@ -90,6 +90,6 @@ export class AppState {
   }
 
   private getNewSvgRectanglePropsInitValue(): SvgRectangleProps {
-    return new SvgRectanglePropsBuilder().fill('#fff').strokeColor('#000').strokeWidth(1).build();
+    return new SvgRectanglePropsBuilder().fill('#fff').strokeColor('#707070').strokeWidth(1).build();
   }
 }

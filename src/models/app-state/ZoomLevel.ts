@@ -1,3 +1,5 @@
+import { BoundingRectangle } from '../BoundingRectangle';
+import { Position } from '../Position';
 import { Size } from '../Size';
 
 export const ZOOM_PERCENTAGE_STEP = 10;
@@ -12,8 +14,8 @@ export class ZoomLevel {
     return (initialValue * this.currentPercentageZoom) / 100;
   }
 
-  getZoomedSize(size: Size): Size {
-    return new Size((size.width * this.currentPercentageZoom) / 100, (size.height * this.currentPercentageZoom) / 100);
+  getInitialValue(zoomedValue: number): number {
+    return (zoomedValue * 100) / this.currentPercentageZoom;
   }
 
   getZoomedValueFromInitialValue(initialValue: number): number {

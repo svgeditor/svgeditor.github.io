@@ -2,6 +2,7 @@ import { AppState } from '../app-state/AppState';
 import { ISvgElement } from '../svg-elements/ISvgElement';
 import { Position } from '../Position';
 import { SvgRectangle } from './SvgRectangle';
+import { BoundingRectangle } from '../BoundingRectangle';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
@@ -12,7 +13,7 @@ export class SvgRootElement {
     return new SvgRootElement(svg);
   }
 
-  rect(position: Position): ISvgElement {
+  rect(position: Position): SvgRectangle {
     const element = document.createElementNS(SVG_NAMESPACE, 'rect');
     element.setAttribute('x', position.x + '');
     element.setAttribute('y', position.y + '');
@@ -21,5 +22,9 @@ export class SvgRootElement {
     element.setAttribute('stroke-width', this.appState.getNewSvgRectangleProps().strokeWidth + '');
     this.svg.appendChild(element);
     return SvgRectangle.from(element);
+  }
+
+  getBoundingRectangle(): BoundingRectangle {
+    return BoundingRectangle.fromSvgElement(this.svg);
   }
 }

@@ -27,7 +27,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   draw(event: MouseEvent): void {
     const _this = this;
     this.whiteboardDrawingService.unselectAllShapes();
-    const initialPosition = { x: event.offsetX, y: event.offsetY };
+    const initialPosition = new Position(event.offsetX, event.offsetY);
     const container = _this.createContainer();
     const rectangle = this.createRectangle(initialPosition);
     const shape = new SvgRectangle(container, rectangle);

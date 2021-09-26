@@ -1,3 +1,5 @@
+import { ZoomLevel } from './app-state/ZoomLevel';
+
 export class BoundingRectangle {
   constructor(public x: number, public y: number, public width: number, public height: number) {}
 
@@ -11,6 +13,22 @@ export class BoundingRectangle {
     const y = parseInt(svg.getAttribute('y'));
     const width = parseInt(svg.getAttribute('width'));
     const height = parseInt(svg.getAttribute('height'));
+    return new BoundingRectangle(x, y, width, height);
+  }
+
+  zoom(zoomLevel: ZoomLevel): BoundingRectangle {
+    const x = zoomLevel.getZoomedValue(this.x);
+    const y = zoomLevel.getZoomedValue(this.y);
+    const width = zoomLevel.getZoomedValue(this.width);
+    const height = zoomLevel.getZoomedValue(this.height);
+    return new BoundingRectangle(x, y, width, height);
+  }
+
+  unZoom(zoomLevel: ZoomLevel): BoundingRectangle {
+    const x = zoomLevel.getInitialValue(this.x);
+    const y = zoomLevel.getInitialValue(this.y);
+    const width = zoomLevel.getInitialValue(this.width);
+    const height = zoomLevel.getInitialValue(this.height);
     return new BoundingRectangle(x, y, width, height);
   }
 }

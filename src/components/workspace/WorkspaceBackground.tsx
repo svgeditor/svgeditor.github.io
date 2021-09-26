@@ -1,17 +1,24 @@
 import './workspace.scss';
 import * as React from 'react';
-import { Size } from '../../models/Size';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
+import { ISvgElementCreateServiceFactory } from '../../services/ISvgElementCreateServiceFactory';
+import { SvgElementCreateServiceFactory } from '../../services/impl/SvgElementCreateServiceFactory';
 
-export interface IWorkspaceBackgroundProps {}
+export interface IWorkspaceBackgroundProps {
+  svgElementCreateServiceFactory?: ISvgElementCreateServiceFactory;
+}
 
 export interface IWorkspaceBackgroundState {}
 
 export default class WorkspaceBackground extends React.Component<IWorkspaceBackgroundProps, IWorkspaceBackgroundState> {
   private container: HTMLElement;
+  private svgElementCreateServiceFactory: ISvgElementCreateServiceFactory;
 
   constructor(props: IWorkspaceBackgroundProps) {
     super(props);
+    this.svgElementCreateServiceFactory = props.svgElementCreateServiceFactory
+      ? props.svgElementCreateServiceFactory
+      : new SvgElementCreateServiceFactory();
   }
 
   public render() {
@@ -24,6 +31,10 @@ export default class WorkspaceBackground extends React.Component<IWorkspaceBackg
     );
   }
 
+  componentDidMount() {
+    this.container.addEventListener('mousedown', this.handleMouseDownEvent.bind(this));
+  }
+
   public size(width: number, height: number) {
     this.container.style.width = width + 'px';
     this.container.style.height = height + 'px';
@@ -31,5 +42,10 @@ export default class WorkspaceBackground extends React.Component<IWorkspaceBackg
 
   public getBoundingRectangle(): BoundingRectangle {
     return BoundingRectangle.fromHTMLElement(this.container);
+  }
+
+  private handleMouseDownEvent(event: MouseEvent) {
+    const svgElementCreateService = this.svgElementCreateServiceFactory.create();
+    svgElementCreateService.createOnMouseDown(event);
   }
 }

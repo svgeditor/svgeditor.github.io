@@ -38,9 +38,7 @@ export default class WorkspaceWhiteboard extends React.Component<IWorkspaceWhite
         height={this.state.height}
         viewBox={this.state.viewBox}
         xmlns='http://www.w3.org/2000/svg'
-      >
-        {this.props.children}
-      </svg>
+      ></svg>
     );
   }
 

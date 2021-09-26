@@ -28,7 +28,7 @@ export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> impl
   draw(event: MouseEvent): void {
     const _this = this;
     this.whiteboardDrawingService.unselectAllShapes();
-    const initialPosition = { x: event.offsetX, y: event.offsetY };
+    const initialPosition = new Position(event.offsetX, event.offsetY);
     const container = _this.createContainer();
     const line = _this.createLine(initialPosition);
     const shape = new SvgLine(container, line);

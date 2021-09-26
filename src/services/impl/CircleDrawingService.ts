@@ -27,7 +27,7 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
   draw(event: MouseEvent): void {
     const _this = this;
     this.whiteboardDrawingService.unselectAllShapes();
-    const initialPosition = { x: event.offsetX, y: event.offsetY };
+    const initialPosition = new Position(event.offsetX, event.offsetY);
     const container = _this.createContainer();
     const circle = _this.createCircle(initialPosition);
     const shape = new SvgCircle(container, circle);

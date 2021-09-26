@@ -28,7 +28,7 @@ export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse
   draw(event: MouseEvent): void {
     const _this = this;
     this.whiteboardDrawingService.unselectAllShapes();
-    const initialPosition = { x: event.offsetX, y: event.offsetY };
+    const initialPosition = new Position(event.offsetX, event.offsetY);
     const container = _this.createContainer();
     const ellipse = _this.createEllipse(initialPosition);
     const shape = new SvgEllipse(container, ellipse);
