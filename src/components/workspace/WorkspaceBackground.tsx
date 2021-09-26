@@ -46,6 +46,6 @@ export default class WorkspaceBackground extends React.Component<IWorkspaceBackg
 
   private handleMouseDownEvent(event: MouseEvent) {
     const createSvgElementService = this.createSvgElementServiceFactory.create();
-    createSvgElementService.createOnMouseDown(event);
+    createSvgElementService.onMouseDown(event);
   }
 }

@@ -1,44 +1,24 @@
 import { BoundingRectangle } from '../BoundingRectangle';
 import { Position } from '../Position';
+import { BaseSvgElement } from './BaseSvgElement';
 import { ISvgElement } from './ISvgElement';
 
-export class SvgRectangle implements ISvgElement {
-  private constructor(private element: SVGRectElement) {}
+export class SvgRectangle extends BaseSvgElement implements ISvgElement {
+  private constructor(private element: SVGRectElement) {
+    super();
+  }
 
   static from(rect: SVGRectElement) {
     return new SvgRectangle(rect);
   }
 
-  fill(color: string): SvgRectangle {
-    this.element.setAttribute('fill', color);
-    return this;
-  }
-  strokeColor(stroke: string): SvgRectangle {
-    this.element.setAttribute('stroke', stroke);
-    return this;
-  }
-  strokeWidth(width: number): SvgRectangle {
-    this.element.setAttribute('stroke-width', width + '');
-    return this;
-  }
-
-  addClass(className: string): SvgRectangle {
-    this.element.classList.add(className);
-    return this;
-  }
-
-  removeClass(className: string): SvgRectangle {
-    this.element.classList.remove(className);
-    return this;
-  }
-
   clone(): SvgRectangle {
-    const element = this.getSvgElement().cloneNode() as SVGRectElement;
+    const element = this.getElement().cloneNode() as SVGRectElement;
     element.removeAttribute('id');
     return new SvgRectangle(element);
   }
 
-  getSvgElement() {
+  getElement() {
     return this.element;
   }
 
@@ -54,5 +34,13 @@ export class SvgRectangle implements ISvgElement {
     this.element.setAttribute('width', boundingRectangle.width + '');
     this.element.setAttribute('height', boundingRectangle.height + '');
     return this;
+  }
+
+  getBoundingRectangle(): BoundingRectangle {
+    const x = parseInt(this.element.getAttribute('x'));
+    const y = parseInt(this.element.getAttribute('y'));
+    const width = parseInt(this.element.getAttribute('width'));
+    const height = parseInt(this.element.getAttribute('height'));
+    return new BoundingRectangle(x, y, width, height);
   }
 }

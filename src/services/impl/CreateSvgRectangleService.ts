@@ -2,28 +2,42 @@ import { AppState } from '../../models/app-state/AppState';
 import { ZoomLevel } from '../../models/app-state/ZoomLevel';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
 import { Position } from '../../models/Position';
+import { SvgRectangle } from '../../models/svg-elements/SvgRectangle';
 import { ICreateSvgElementService } from '../ICreateSvgElementService';
 
 export class CreateSvgRectangleService implements ICreateSvgElementService {
   constructor(private appState = AppState.getInstance()) {}
 
-  createOnMouseDown(event: MouseEvent): void {
+  onMouseDown(event: MouseEvent): void {
     const initialMousePosition = this.getMousePositonRelatedToWhiteboard(event);
     const rectangle = this.getSvgRootElement().rect(initialMousePosition);
 
     const onMouseMove = (event: MouseEvent) => {
-      event.preventDefault();
-      const newMousePosition = this.getMousePositonRelatedToWhiteboard(event);
-      const newBoundingRectangle = this.getNewBoundingRectangle(initialMousePosition, newMousePosition);
-      rectangle.boundingRectangle(newBoundingRectangle);
+      this.onMouseMove(event, initialMousePosition, rectangle);
     };
     const onMouseUp = () => {
+      this.onMouseUp(rectangle);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+  }
+
+  private onMouseMove(event: MouseEvent, initialMousePosition: Position, rectangle: SvgRectangle) {
+    event.preventDefault();
+    const newMousePosition = this.getMousePositonRelatedToWhiteboard(event);
+    const newBoundingRectangle = this.getNewBoundingRectangle(initialMousePosition, newMousePosition);
+    rectangle.boundingRectangle(newBoundingRectangle);
+  }
+
+  private onMouseUp(rectangle: SvgRectangle) {
+    if (rectangle.isEmpty()) {
+      this.getSvgRootElement().remove(rectangle);
+      return;
+    }
+    this.getSvgRootElement().add(rectangle.getHoverHelper());
   }
 
   private getMousePositonRelatedToWhiteboard(event: MouseEvent): Position {

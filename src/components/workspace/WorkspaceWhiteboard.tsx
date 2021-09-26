@@ -38,7 +38,9 @@ export default class WorkspaceWhiteboard extends React.Component<IWorkspaceWhite
         height={this.state.height}
         viewBox={this.state.viewBox}
         xmlns='http://www.w3.org/2000/svg'
-      ></svg>
+      >
+        <style>{this.getStyle()}</style>
+      </svg>
     );
   }
 
@@ -63,5 +65,23 @@ export default class WorkspaceWhiteboard extends React.Component<IWorkspaceWhite
 
   public getBoundingRectangle(): BoundingRectangle {
     return BoundingRectangle.fromSvgElement(this.svg);
+  }
+
+  private getStyle() {
+    return /* css */ `
+      .svg-element {
+        cursor: move;
+      }
+
+      .hover-helper-svg-element {
+        pointer-events: none;
+        transition: opacity 0.15s ease-in-out;
+        opacity: 0;
+      }
+
+      .svg-element:hover + .hover-helper-svg-element {
+        opacity: 1;
+      }
+    `;
   }
 }

@@ -3,12 +3,17 @@ import { Position } from '../Position';
 import { SvgRectangle } from './SvgRectangle';
 import { BoundingRectangle } from '../BoundingRectangle';
 import { ISvgElement } from './ISvgElement';
+import { SVG_ELEMENT_CSS_CLASS } from '../../constants/constants';
+import { RandomIdGenerator } from '../../services/impl/RandomIdGenerator';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
-const SVG_ELEMENT_CLASS_NAME = 'svg-element';
 
 export class SvgRootElement {
-  private constructor(private svg: SVGSVGElement, private appState = AppState.getInstance()) {}
+  private constructor(
+    private svg: SVGSVGElement,
+    private appState = AppState.getInstance(),
+    private randomIdGenerator = RandomIdGenerator.getInstance()
+  ) {}
 
   static from(svg: SVGSVGElement): SvgRootElement {
     return new SvgRootElement(svg);
@@ -25,19 +30,25 @@ export class SvgRootElement {
   }
 
   add(svgElement: ISvgElement): SvgRootElement {
-    this.svg.appendChild(svgElement.getSvgElement());
+    this.svg.appendChild(svgElement.getElement());
+    return this;
+  }
+
+  remove(svgElement: ISvgElement): SvgRootElement {
+    this.svg.removeChild(svgElement.getElement());
     return this;
   }
 
   rect(position: Position): SvgRectangle {
     const element = document.createElementNS(SVG_NAMESPACE, 'rect');
+    this.svg.appendChild(element);
     const res = SvgRectangle.from(element);
     res.move(position);
+    res.id(this.randomIdGenerator.generate());
     res.fill(this.appState.getNewSvgRectangleProps().fill);
     res.strokeColor(this.appState.getNewSvgRectangleProps().strokeColor);
     res.strokeWidth(this.appState.getNewSvgRectangleProps().strokeWidth);
-    res.addClass(SVG_ELEMENT_CLASS_NAME);
-    this.svg.appendChild(element);
+    res.addClass(SVG_ELEMENT_CSS_CLASS);
     return res;
   }
 
