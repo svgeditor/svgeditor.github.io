@@ -1,24 +1,24 @@
 import { ScrollInfo } from '../../models/ScrollInfo';
 import { ZOOM_PERCENTAGE_STEP } from '../../models/app-state/ZoomLevel';
 import { IWhiteboardWindowService } from '../IWhiteboardWindowService';
-import { AppStateService } from './AppStateService';
 import { WHITEBOARD_MARGIN } from '../../constants/constants';
+import { AppState } from '../../models/app-state/AppState';
 
 export class WhiteboardWindowService implements IWhiteboardWindowService {
   private static instance: IWhiteboardWindowService = new WhiteboardWindowService();
 
-  private constructor(private appStateService = AppStateService.getInstance()) {}
+  private constructor(private appState = AppState.getInstance()) {}
 
   static getInstance() {
     return WhiteboardWindowService.instance;
   }
 
   resize(): void {
-    const whiteboardWindow = this.appStateService.getWhiteboardWindow();
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const whiteboardWindow = null; // this.appState.getWhiteboardWindow();
+    const zoomLevel = this.appState.getZoomLevel();
     const whiteboardWindowBoundingRect = whiteboardWindow.whiteboardWindow.getBoundingClientRect();
-    const whiteboardWidth = zoomLevel.getZoomedValueFromInitialValue(this.appStateService.getInitialWhiteboardWidth());
-    const whiteboardHeight = zoomLevel.getZoomedValueFromInitialValue(this.appStateService.getInitialWhiteboardHeight());
+    const whiteboardWidth = zoomLevel.getZoomedValueFromInitialValue(this.appState.getWhiteboardSize().width);
+    const whiteboardHeight = zoomLevel.getZoomedValueFromInitialValue(this.appState.getWhiteboardSize().height);
     whiteboardWindow.whiteboard.style.width = `${whiteboardWidth}px`;
     whiteboardWindow.whiteboard.style.height = `${whiteboardHeight}px`;
     whiteboardWindow.whiteboard.style.left = `${whiteboardWindowBoundingRect.width - WHITEBOARD_MARGIN}px`;
@@ -28,10 +28,10 @@ export class WhiteboardWindowService implements IWhiteboardWindowService {
   }
 
   centerOnStartUp(): void {
-    const layers = this.appStateService.getWhiteboardWindow();
+    const layers = null; // this.appState.getWhiteboardWindow();
     const whiteboardWindowBoundingRect = layers.whiteboardWindow.getBoundingClientRect();
-    const whiteboardWidth = this.appStateService.getInitialWhiteboardWidth();
-    const whiteboardHeight = this.appStateService.getInitialWhiteboardHeight();
+    const whiteboardWidth = this.appState.getWhiteboardSize().width;
+    const whiteboardHeight = this.appState.getWhiteboardSize().height;
     const whiteboardBackgroundBoundingRect = layers.whiteboardBackground.getBoundingClientRect();
     const scrollX =
       whiteboardWidth < whiteboardWindowBoundingRect.width
@@ -45,7 +45,7 @@ export class WhiteboardWindowService implements IWhiteboardWindowService {
   }
 
   centerOnZoomIn(event?: MouseEvent): void {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const zoomLevel = this.appState.getZoomLevel();
     if (zoomLevel.currentPercentageZoom == zoomLevel.previousPercentageZoom) {
       return;
     }
@@ -53,7 +53,7 @@ export class WhiteboardWindowService implements IWhiteboardWindowService {
   }
 
   centerOnZoomOut(event?: MouseEvent): void {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const zoomLevel = this.appState.getZoomLevel();
     if (zoomLevel.currentPercentageZoom == zoomLevel.previousPercentageZoom) {
       return;
     }
@@ -61,7 +61,7 @@ export class WhiteboardWindowService implements IWhiteboardWindowService {
   }
 
   private continueScrollToNorthWest(scrollInfo: ScrollInfo): void {
-    const layers = this.appStateService.getWhiteboardWindow();
+    const layers = null; // this.appState.getWhiteboardWindow();
     if (scrollInfo.continueScroll) {
       layers.whiteboardWindow.scrollTo(
         layers.whiteboardWindow.scrollLeft - scrollInfo.scrollX,
@@ -73,7 +73,7 @@ export class WhiteboardWindowService implements IWhiteboardWindowService {
   }
 
   private continueScrollToSouthEast(scrollInfo: ScrollInfo): void {
-    const layers = this.appStateService.getWhiteboardWindow();
+    const layers = null; // this.appState.getWhiteboardWindow();
     if (scrollInfo.continueScroll) {
       layers.whiteboardWindow.scrollTo(
         layers.whiteboardWindow.scrollLeft + scrollInfo.scrollX,
@@ -85,7 +85,7 @@ export class WhiteboardWindowService implements IWhiteboardWindowService {
   }
 
   private getMousePositionRelatedToWhiteboardContainer(event?: MouseEvent) {
-    const layers = this.appStateService.getWhiteboardWindow();
+    const layers = null; // this.appState.getWhiteboardWindow();
     if (event) {
       const whiteboardWindowBoundingRect = layers.whiteboardWindow.getBoundingClientRect();
       const whiteboardBackgroundBoundingRect = layers.whiteboardBackground.getBoundingClientRect();
@@ -103,7 +103,7 @@ export class WhiteboardWindowService implements IWhiteboardWindowService {
   }
 
   private getWhiteboardZoomScroll(event?: MouseEvent): ScrollInfo {
-    const zoomPercentage = this.appStateService.getWhiteboardZoomLevel().previousPercentageZoom;
+    const zoomPercentage = this.appState.getZoomLevel().previousPercentageZoom;
     const mousePositionRelatedToWhiteboardContainer = this.getMousePositionRelatedToWhiteboardContainer(event);
     const scrollX = Math.floor((mousePositionRelatedToWhiteboardContainer.x * ZOOM_PERCENTAGE_STEP) / zoomPercentage);
     const scrollY = Math.floor((mousePositionRelatedToWhiteboardContainer.y * ZOOM_PERCENTAGE_STEP) / zoomPercentage);

@@ -1,20 +1,20 @@
 import * as constants from '../../constants/constants';
 import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
-import { AppStateService } from './AppStateService';
 import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { Position } from '../../models/Position';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { Rect, Shape } from '@svgdotjs/svg.js';
+import { Rect, Shape, Svg } from '@svgdotjs/svg.js';
 import { RandomIdGenerator } from './RandomIdGenerator';
 import { SvgRectangle } from '../../models/svg-elements/SvgShape';
+import { AppState } from '../../models/app-state/AppState';
 
 export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRectangle> implements ISvgShapeDrawingService<SvgRectangle> {
   private static instance: ISvgShapeDrawingService<SvgRectangle> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
-    super(AppStateService.getInstance(), whiteboardDrawingService, RandomIdGenerator.getInstance());
+    super(AppState.getInstance(), whiteboardDrawingService, RandomIdGenerator.getInstance());
   }
 
   static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgRectangle> {
@@ -67,7 +67,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   resize(rectangle: SvgRectangle): void {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const zoomLevel = this.appState.getZoomLevel();
     const newX = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().x());
     const newY = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().y());
     const newW = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().width());
@@ -79,7 +79,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   protected createResizeGuideNW(shape: SvgRectangle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y());
     const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -114,7 +114,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   protected createResizeGuideN(shape: SvgRectangle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width() / 2, shape.getContainer().y());
     const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -147,7 +147,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   protected createResizeGuideNE(shape: SvgRectangle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width(), shape.getContainer().y());
     const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -182,7 +182,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   protected createResizeGuideE(shape: SvgRectangle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width(),
       shape.getContainer().y() + shape.getContainer().height() / 2
@@ -218,7 +218,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   protected createResizeGuideSE(shape: SvgRectangle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width(),
       shape.getContainer().y() + shape.getContainer().height()
@@ -256,7 +256,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   protected createResizeGuideS(shape: SvgRectangle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width() / 2,
       shape.getContainer().y() + shape.getContainer().height()
@@ -292,7 +292,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   protected createResizeGuideSW(shape: SvgRectangle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height());
     const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -327,7 +327,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   protected createResizeGuideW(shape: SvgRectangle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height() / 2);
     const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
@@ -360,8 +360,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   private createRectangle(position: Position): Rect {
-    return this.appStateService
-      .getSvgRootElement()
+    return new Svg()
       .rect(0)
       .addClass(constants.SHAPE_CLASS_NAME)
       .move(position.x, position.y)
@@ -370,7 +369,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
   }
 
   private createBorderRadiusGuide(shape: SvgRectangle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const shapeRightBorder = shape.getContainer().x() + shape.getContainer().width();
     const shapeTopBorder = shape.getContainer().y();
     const borderRadiusGuideSize = 7;
@@ -378,8 +377,7 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     const radius = shape.getShape().attr('rx');
     const borderRadiusGuideX = shapeRightBorder - Math.max(margin, radius) - borderRadiusGuideSize / 2;
     const borderRadiusGuideY = shapeTopBorder + Math.max(margin, radius) - borderRadiusGuideSize / 2;
-    const borderRadiusGuide = this.appStateService
-      .getSvgRootElement()
+    const borderRadiusGuide = new Svg()
       .rect()
       .move(borderRadiusGuideX, borderRadiusGuideY)
       .size(borderRadiusGuideSize, borderRadiusGuideSize)

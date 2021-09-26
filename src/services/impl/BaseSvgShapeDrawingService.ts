@@ -1,17 +1,17 @@
 import * as constants from '../../constants/constants';
 import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
-import { IAppStateService } from '../IAppStateService';
-import { G, Shape } from '@svgdotjs/svg.js';
+import { G, Shape, Svg } from '@svgdotjs/svg.js';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { IRandomIdGenerator } from '../IRandomIdGenerator';
 import { SvgShape } from '../../models/svg-elements/SvgShape';
+import { AppState } from '../../models/app-state/AppState';
 
 export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> implements ISvgShapeDrawingService<T> {
   abstract draw(event: MouseEvent): void;
   abstract resize(shape: T): void;
 
   constructor(
-    protected appStateService: IAppStateService,
+    protected appState: AppState,
     protected whiteboardDrawingService: WhiteboardDrawingService,
     protected randomIdService: IRandomIdGenerator
   ) {}
@@ -37,12 +37,12 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   }
 
   getZoomedValue(initialValue = 1): number {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const zoomLevel = this.appState.getZoomLevel();
     return zoomLevel.getZoomedValueFromInitialValue(initialValue);
   }
 
   drawHoverGuide(shape: T): void {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const zoomLevel = this.appState.getZoomLevel();
     shape.getContainer().add(
       shape
         .getShape()
@@ -64,15 +64,14 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   // prettier-ignore
   protected createContainer(): G {
-    return this.appStateService.getSvgRootElement()
+    return new Svg()
       .group()
       .id(this.randomIdService.generate())
       .addClass(constants.SHAPE_GROUP_CLASS_NAME);
   }
 
   protected createBorder(shape: T): Shape {
-    return this.appStateService
-      .getSvgRootElement()
+    return new Svg()
       .rect()
       .addClass(constants.SELECTED_SHAPE_BORDER_CLASS_NAME)
       .move(shape.getContainer().x(), shape.getContainer().y())
@@ -82,7 +81,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   }
 
   protected createResizeGuideNW(shape: T): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
@@ -115,7 +114,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   }
 
   protected createResizeGuideN(shape: T): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width() / 2, shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
@@ -145,7 +144,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   }
 
   protected createResizeGuideNE(shape: T): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width(), shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
@@ -178,7 +177,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   }
 
   protected createResizeGuideE(shape: T): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width(),
       shape.getContainer().y() + shape.getContainer().height() / 2
@@ -211,7 +210,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   }
 
   protected createResizeGuideSE(shape: T): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width(),
       shape.getContainer().y() + shape.getContainer().height()
@@ -247,7 +246,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   }
 
   protected createResizeGuideS(shape: T): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width() / 2,
       shape.getContainer().y() + shape.getContainer().height()
@@ -280,7 +279,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   }
 
   protected createResizeGuideSW(shape: T): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
@@ -313,7 +312,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
   }
 
   protected createResizeGuideW(shape: T): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height() / 2);
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
@@ -344,7 +343,7 @@ export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> impl
 
   // prettier-ignore
   protected createResizeGuide(x: number, y: number): Shape {
-    return this.appStateService.getSvgRootElement()
+    return new Svg()
       .circle(Math.min(this.getZoomedValue(8), 14))
       .cx(x).cy(y)
       .fill('white')

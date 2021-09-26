@@ -7,11 +7,10 @@ import { RemoveWhiteboardGrid } from '../../../models/user-actions/RemoveWhitebo
 import { Switch } from '@mui/material';
 import ColorPicker from '../../color-picker/ColorPicker';
 import { Color } from '../../../models/Color';
-import { IAppStateService } from '../../../services/IAppStateService';
-import { AppStateService } from '../../../services/impl/AppStateService';
+import { AppState } from '../../../models/app-state/AppState';
 
 export interface IWhiteboardPropertiesProps {
-  appStateService?: IAppStateService;
+  appState?: AppState;
 }
 
 export interface IWhiteboardPropertiesState {
@@ -21,7 +20,7 @@ export interface IWhiteboardPropertiesState {
 }
 
 export default class WhiteboardProperties extends React.Component<IWhiteboardPropertiesProps, IWhiteboardPropertiesState> {
-  private appStateService: IAppStateService;
+  private appState: AppState;
 
   constructor(props: IWhiteboardPropertiesProps) {
     super(props);
@@ -30,7 +29,7 @@ export default class WhiteboardProperties extends React.Component<IWhiteboardPro
       whiteboardBackgroundColor: new Color(255, 255, 255),
       displayWhiteboardBackgroundColorPicker: false,
     };
-    this.appStateService = this.props.appStateService ? this.props.appStateService : AppStateService.getInstance();
+    this.appState = this.props.appState ? this.props.appState : AppState.getInstance();
   }
 
   public render() {
@@ -61,7 +60,6 @@ export default class WhiteboardProperties extends React.Component<IWhiteboardPro
   }
 
   private handleChangeWhiteboardBackgroundColor(color: Color) {
-    const whiteboard = this.appStateService.getWhiteboardWindow();
-    whiteboard.whiteboard.style.background = color.getRgba();
+    // todo - use the new whiteboard class
   }
 }

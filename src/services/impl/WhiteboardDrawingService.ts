@@ -1,16 +1,17 @@
 import * as constants from '../../constants/constants';
-import { Circle, Ellipse, G, Line, Rect, Shape } from '@svgdotjs/svg.js';
+import { Circle, Ellipse, G, Line, Rect, Shape, Svg } from '@svgdotjs/svg.js';
 import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
 import { IWhiteboardDrawingService } from '../IWhiteboardDrawingService';
 import { RectangleDrawingService } from './RectangleDrawingService';
-import { AppStateService } from './AppStateService';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { UserActions } from '../../models/user-actions/UserActions';
 import { CircleDrawingService } from './CircleDrawingService';
 import { EllipseDrawingService } from './EllipseDrawingService';
 import { LineDrawingService } from './LineDrawingService';
 import { SelectShapes } from '../../models/user-actions/SelectShapes';
-import { ESvgShape, SvgCircle, SvgEllipse, SvgLine, SvgRectangle, SvgShape } from '../../models/svg-elements/SvgShape';
+import { SvgCircle, SvgEllipse, SvgLine, SvgRectangle, SvgShape } from '../../models/svg-elements/SvgShape';
+import { AppState } from '../../models/app-state/AppState';
+import { ESvgElement } from '../../models/svg-elements/ESvgElement';
 
 export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private static instance: IWhiteboardDrawingService = new WhiteboardDrawingService();
@@ -21,7 +22,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private selectedShapeGroup: G = null;
 
   private constructor(
-    private appStateService = AppStateService.getInstance(),
+    private appState = AppState.getInstance(),
     rectangleDrawingService?: ISvgShapeDrawingService<SvgRectangle>,
     circleDrawingService?: ISvgShapeDrawingService<SvgCircle>,
     ellipseDrawingService?: ISvgShapeDrawingService<SvgEllipse>,
@@ -38,19 +39,19 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   }
 
   draw(shape: SvgShape<Shape>): void {
-    this.appStateService.getSvgRootElement().add(shape.getContainer());
+    new Svg().add(shape.getContainer());
   }
 
   drawOnMouseDown(event: MouseEvent): void {
-    const shapeToDraw = this.appStateService.getShapeToDraw();
+    const shapeToDraw = this.appState.getSelectedSvgElement();
     switch (shapeToDraw) {
-      case ESvgShape.RECTANGLE:
+      case ESvgElement.RECTANGLE:
         return this.rectangleDrawingService.draw(event);
-      case ESvgShape.CIRCLE:
+      case ESvgElement.CIRCLE:
         return this.circleDrawingService.draw(event);
-      case ESvgShape.ELLIPSE:
+      case ESvgElement.ELLIPSE:
         return this.ellipseDrawingService.draw(event);
-      case ESvgShape.LINE:
+      case ESvgElement.LINE:
         return this.lineDrawingService.draw(event);
       default:
       // no thing to do by default
@@ -82,7 +83,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   selectOnMouseDown(event: MouseEvent): void {
     const _this = this;
     const initialPosition = { x: event.offsetX, y: event.offsetY };
-    const rectangle = this.appStateService.getSvgRootElement().rect();
+    const rectangle = new Svg().rect();
     const allShapes = this.getAllShapes();
     rectangle
       .addClass(constants.SHAPE_CLASS_NAME)
@@ -115,7 +116,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     let mousePosition = { x: event.clientX, y: event.clientY };
 
     const onMouseMove = (event: MouseEvent) => {
-      if (!moveInProgressFlag) _this.appStateService.getSvgRootElement().addClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      if (!moveInProgressFlag) new Svg().addClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
       moveInProgressFlag = true;
       event.preventDefault();
       let previousMousePosition = { ...mousePosition };
@@ -128,7 +129,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
     };
 
     const onMouseUp = () => {
-      _this.appStateService.getSvgRootElement().removeClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
+      new Svg().removeClass(constants.MOVE_SHAPE_IN_PROGRESS_CLASS_NAME);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
       setTimeout(() => _this.select(shapes), 0);
@@ -139,7 +140,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   }
 
   resizeAllShapes(): void {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     this.unselectAllShapes();
     svg.find('rect').forEach((shape) => {
       this.rectangleDrawingService.resize(new SvgRectangle(shape.parent() as G, shape as Rect));
@@ -161,8 +162,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   }
 
   unselectAllShapesToSelectNewShape(): void {
-    this.appStateService
-      .getSvgRootElement()
+    new Svg()
       .find(`.${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`)
       .forEach((shape) => shape.removeClass(`${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`));
     this.getSelectedShapesGroup().each(function () {
@@ -177,15 +177,11 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   }
 
   getAllShapes(): SvgShape<Shape>[] {
-    return this.appStateService
-      .getSvgRootElement()
-      .find(`.${constants.SHAPE_CLASS_NAME}`)
-      .map((shape) => new SvgShape(shape.parent() as G, shape));
+    return new Svg().find(`.${constants.SHAPE_CLASS_NAME}`).map((shape) => new SvgShape(shape.parent() as G, shape));
   }
 
   getAllSelectedShapes(): SvgShape<Shape>[] {
-    return this.appStateService
-      .getSvgRootElement()
+    return new Svg()
       .find(`.${constants.SELECTED_SHAPE_GROUP_CLASS_NAME}`)
       .map((group) => new SvgShape(group as G, group.findOne(`.${constants.SHAPE_CLASS_NAME}`) as Shape));
   }
@@ -206,7 +202,7 @@ export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   getSelectedShapesGroup(): G {
     let selectedShapeGroup = this.selectedShapeGroup;
     if (selectedShapeGroup) return selectedShapeGroup;
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     selectedShapeGroup = svg.findOne(`g.${constants.SELECTED_SHAPES_GROUP_CLASS_NAME}`) as G;
     if (!selectedShapeGroup) selectedShapeGroup = svg.group().addClass(`${constants.SELECTED_SHAPES_GROUP_CLASS_NAME}`);
     this.selectedShapeGroup = selectedShapeGroup;

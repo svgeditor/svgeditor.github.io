@@ -1,20 +1,19 @@
-import { IAppStateService } from '../IAppStateService';
 import { IWhiteboardGridService } from '../IWhiteboardGridService';
-import { AppStateService } from './AppStateService';
 import { GRID_SIZE } from '../../constants/constants';
+import { AppState } from '../../models/app-state/AppState';
 
 export class WhiteboardGridService implements IWhiteboardGridService {
   private static instance: IWhiteboardGridService = new WhiteboardGridService();
 
-  private constructor(private appStateService: IAppStateService = AppStateService.getInstance()) {}
+  private constructor(private appState = AppState.getInstance()) {}
 
   static getInstance(): IWhiteboardGridService {
     return WhiteboardGridService.instance;
   }
 
   init(): void {
-    const whiteboardWindow = this.appStateService.getWhiteboardWindow();
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const whiteboardWindow = null; // this.appState.getWhiteboardWindow();
+    const zoomLevel = this.appState.getZoomLevel();
     const gridSize = zoomLevel.getZoomedValueFromInitialValue(GRID_SIZE);
     whiteboardWindow.whiteboardGrid.style.backgroundImage = `url(data:image/svg+xml;base64,${this.getGridBase64(gridSize)})`;
   }
@@ -28,7 +27,7 @@ export class WhiteboardGridService implements IWhiteboardGridService {
   }
 
   remove(): void {
-    const whiteboardWindow = this.appStateService.getWhiteboardWindow();
+    const whiteboardWindow = null; // this.appState.getWhiteboardWindow();
     whiteboardWindow.whiteboardGrid.style.backgroundImage = 'none';
   }
 

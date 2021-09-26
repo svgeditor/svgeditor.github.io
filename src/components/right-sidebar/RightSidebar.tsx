@@ -11,12 +11,12 @@ import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
 import { SelectShapes } from '../../models/user-actions/SelectShapes';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
-import { IAppStateService } from '../../services/IAppStateService';
-import { AppStateService } from '../../services/impl/AppStateService';
 import { ESvgShape, SvgShape } from '../../models/svg-elements/SvgShape';
+import { AppState } from '../../models/app-state/AppState';
+import { ESvgElement } from '../../models/svg-elements/ESvgElement';
 
 export interface IRightSidebarProps {
-  appStateService?: IAppStateService;
+  appState?: AppState;
 }
 
 export interface IRightSidebarState {
@@ -24,11 +24,11 @@ export interface IRightSidebarState {
 }
 
 export default class RightSidebar extends React.Component<IRightSidebarProps, IRightSidebarState> {
-  private appStateService: IAppStateService;
+  private appState: AppState;
 
   constructor(props: IRightSidebarProps) {
     super(props);
-    this.appStateService = this.props.appStateService ? this.props.appStateService : AppStateService.getInstance();
+    this.appState = this.props.appState ? this.props.appState : AppState.getInstance();
 
     this.state = {
       selectedShapes: [],
@@ -62,14 +62,14 @@ export default class RightSidebar extends React.Component<IRightSidebarProps, IR
 
   private getShapePropertiesComponent() {
     if (this.state.selectedShapes.length == 0) {
-      switch (this.appStateService.getShapeToDraw()) {
-        case ESvgShape.RECTANGLE:
+      switch (this.appState.getSelectedSvgElement()) {
+        case ESvgElement.RECTANGLE:
           return <RectangleProperties></RectangleProperties>;
-        case ESvgShape.CIRCLE:
+        case ESvgElement.CIRCLE:
           return <CircleProperties></CircleProperties>;
-        case ESvgShape.ELLIPSE:
+        case ESvgElement.ELLIPSE:
           return <EllipseProperties></EllipseProperties>;
-        case ESvgShape.LINE:
+        case ESvgElement.LINE:
           return <LineProperties></LineProperties>;
         default:
           return null;

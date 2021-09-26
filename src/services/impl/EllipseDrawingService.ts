@@ -1,7 +1,6 @@
-import { Ellipse } from '@svgdotjs/svg.js';
+import { Ellipse, Svg } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
 import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
-import { AppStateService } from './AppStateService';
 import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
 import { UserActions } from '../../models/user-actions/UserActions';
@@ -9,12 +8,13 @@ import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Position } from '../../models/Position';
 import { RandomIdGenerator } from './RandomIdGenerator';
 import { SvgEllipse } from '../../models/svg-elements/SvgShape';
+import { AppState } from '../../models/app-state/AppState';
 
 export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse> implements ISvgShapeDrawingService<SvgEllipse> {
   private static instance: ISvgShapeDrawingService<SvgEllipse> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
-    super(AppStateService.getInstance(), whiteboardDrawingService, RandomIdGenerator.getInstance());
+    super(AppState.getInstance(), whiteboardDrawingService, RandomIdGenerator.getInstance());
   }
 
   static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgEllipse> {
@@ -62,7 +62,7 @@ export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse
   }
 
   resize(ellipse: SvgEllipse): void {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const zoomLevel = this.appState.getZoomLevel();
     const newCx = zoomLevel.getZoomedValueFromPreviousValue(ellipse.getShape().cx());
     const newCy = zoomLevel.getZoomedValueFromPreviousValue(ellipse.getShape().cy());
     const newRx = zoomLevel.getZoomedValueFromPreviousValue(ellipse.getShape().attr('rx'));
@@ -72,8 +72,7 @@ export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse
   }
 
   private createEllipse(position: Position): Ellipse {
-    return this.appStateService
-      .getSvgRootElement()
+    return new Svg()
       .ellipse(0)
       .addClass(constants.SHAPE_CLASS_NAME)
       .move(position.x, position.y)

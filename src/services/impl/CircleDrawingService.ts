@@ -1,7 +1,6 @@
-import { Circle, Shape } from '@svgdotjs/svg.js';
+import { Circle, Shape, Svg } from '@svgdotjs/svg.js';
 import * as constants from '../../constants/constants';
 import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
-import { AppStateService } from './AppStateService';
 import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 import { AddShape } from '../../models/user-actions/AddShape';
 import { UserActions } from '../../models/user-actions/UserActions';
@@ -9,12 +8,13 @@ import { WhiteboardDrawingService } from './WhiteboardDrawingService';
 import { Position } from '../../models/Position';
 import { RandomIdGenerator } from './RandomIdGenerator';
 import { SvgCircle } from '../../models/svg-elements/SvgShape';
+import { AppState } from '../../models/app-state/AppState';
 
 export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> implements ISvgShapeDrawingService<SvgCircle> {
   private static instance: ISvgShapeDrawingService<SvgCircle> = null;
 
   private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
-    super(AppStateService.getInstance(), whiteboardDrawingService, RandomIdGenerator.getInstance());
+    super(AppState.getInstance(), whiteboardDrawingService, RandomIdGenerator.getInstance());
   }
 
   static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgCircle> {
@@ -61,7 +61,7 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
   }
 
   resize(circle: SvgCircle): void {
-    const zoomLevel = this.appStateService.getWhiteboardZoomLevel();
+    const zoomLevel = this.appState.getZoomLevel();
     const newCx = zoomLevel.getZoomedValueFromPreviousValue(circle.getShape().cx());
     const newCy = zoomLevel.getZoomedValueFromPreviousValue(circle.getShape().cy());
     const newRadius = zoomLevel.getZoomedValueFromPreviousValue(circle.getShape().attr('r'));
@@ -71,7 +71,7 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
 
   // prettier-ignore
   protected createResizeGuideNW(shape: SvgCircle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
@@ -105,7 +105,7 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
   }
 
   protected createResizeGuideNE(shape: SvgCircle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width(), shape.getContainer().y());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
@@ -139,7 +139,7 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
   }
 
   protected createResizeGuideSE(shape: SvgCircle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width(),
       shape.getContainer().y() + shape.getContainer().height()
@@ -176,7 +176,7 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
   }
 
   protected createResizeGuideSW(shape: SvgCircle): Shape {
-    const svg = this.appStateService.getSvgRootElement();
+    const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height());
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
@@ -210,8 +210,7 @@ export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> 
   }
 
   private createCircle(position: Position): Circle {
-    return this.appStateService
-      .getSvgRootElement()
+    return new Svg()
       .circle(0)
       .addClass(constants.SHAPE_CLASS_NAME)
       .move(position.x, position.y)
