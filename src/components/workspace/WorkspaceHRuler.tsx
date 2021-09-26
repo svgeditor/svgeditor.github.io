@@ -1,10 +1,10 @@
 import './workspace.scss';
 import * as React from 'react';
-import { ZoomLevel } from '../../models/ZoomLevel';
+import { ZoomLevel } from '../../models/app-state/ZoomLevel';
 import { Size } from '../../models/Size';
 import { IRandomIdGenerator } from '../../services/IRandomIdGenerator';
 import { RandomIdGenerator } from '../../services/impl/RandomIdGenerator';
-import { AppState } from '../../models/AppState';
+import { AppState } from '../../models/app-state/AppState';
 
 export interface IWorkspaceHRulerProps {
   appState?: AppState;

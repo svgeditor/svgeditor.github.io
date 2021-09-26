@@ -1,4 +1,4 @@
-import { Size } from './Size';
+import { Size } from '../Size';
 
 export const ZOOM_PERCENTAGE_STEP = 10;
 export const MAX_ZOOM_PERCENTAGE = 1000;

@@ -1,4 +1,4 @@
-import { AppState } from '../AppState';
+import { AppState } from '../app-state/AppState';
 import { ISvgElement } from '../svg-elements/ISvgElement';
 import { Position } from '../Position';
 import { SvgRectangle } from './SvgRectangle';

@@ -1,5 +1,5 @@
-import { Size } from './Size';
-import { SvgRootElement } from './svg-elements/SvgRootElement';
+import { Size } from '../Size';
+import { SvgRootElement } from '../svg-elements/SvgRootElement';
 
 export class WhiteboardProps {
   constructor(public width: number, public height: number, public svgRootElement: SvgRootElement) {}

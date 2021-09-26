@@ -3,10 +3,10 @@ import * as React from 'react';
 import { ScrollInfo } from '../../models/ScrollInfo';
 import WorkspaceWhiteboard from './WorkspaceWhiteboard';
 import { WORKSPACE_MARGIN } from '../../constants/constants';
-import { ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
+import { ZOOM_PERCENTAGE_STEP } from '../../models/app-state/ZoomLevel';
 import WorkspaceBackground from './WorkspaceBackground';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
-import { AppState } from '../../models/AppState';
+import { AppState } from '../../models/app-state/AppState';
 
 export interface IWorkspaceWindowProps {
   className?: string;

@@ -2,7 +2,7 @@ import './workspace.scss';
 import * as React from 'react';
 import { Size } from '../../models/Size';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
-import { AppState } from '../../models/AppState';
+import { AppState } from '../../models/app-state/AppState';
 import { SvgRootElement } from '../../models/svg-elements/SvgRootElement';
 
 export interface IWorkspaceWhiteboardProps {

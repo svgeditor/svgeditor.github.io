@@ -1,11 +1,11 @@
-import { ESvgElement } from './svg-elements/ESvgElement';
+import { ESvgElement } from '../svg-elements/ESvgElement';
 import { GridProps, GridPropsBuilder } from './GridProps';
 import { RulerProps, RulerPropsBuilder } from './RulerProps';
-import { Size } from './Size';
+import { Size } from '../Size';
 import { WhiteboardProps, WhiteboardPropsBuilder } from './WhiteboardProps';
 import { ZoomLevel } from './ZoomLevel';
-import { SvgRectangleProps, SvgRectanglePropsBuilder } from './svg-elements/SvgRectangleProps';
-import { SvgRootElement } from './svg-elements/SvgRootElement';
+import { SvgRectangleProps, SvgRectanglePropsBuilder } from '../svg-elements/SvgRectangleProps';
+import { SvgRootElement } from '../svg-elements/SvgRootElement';
 
 export class AppState {
   private zoomLevel: ZoomLevel = this.getZoomLevelInitValue();

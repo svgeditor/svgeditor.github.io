@@ -12,7 +12,7 @@ import WorkspaceHRuler from './WorkspaceHRuler';
 import WorkspaceVRuler from './WorkspaceVRuler';
 import WorkspaceRulerCorner from './WorkspaceRulerCorner';
 import { Size } from '../../models/Size';
-import { AppState } from '../../models/AppState';
+import { AppState } from '../../models/app-state/AppState';
 
 export interface IWorkspaceProps {
   appState?: AppState;

@@ -1,6 +1,6 @@
 import { Svg } from '@svgdotjs/svg.js';
 import { Size } from '../../models/Size';
-import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZoomLevel, ZOOM_PERCENTAGE_STEP } from '../../models/ZoomLevel';
+import { MAX_ZOOM_PERCENTAGE, MIN_ZOOM_PERCENTAGE, ZoomLevel, ZOOM_PERCENTAGE_STEP } from '../../models/app-state/ZoomLevel';
 import { IAppStateService } from '../IAppStateService';
 import { WhiteboardWindow } from '../../models/WhiteboardLayers';
 import { ESvgShape } from '../../models/svg-elements/SvgShape';

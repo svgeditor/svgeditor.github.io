@@ -14,7 +14,7 @@ import { SelectShapes } from '../../models/user-actions/SelectShapes';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
 import { Shape } from '@svgdotjs/svg.js';
 import { SelectAllShapes } from '../../models/user-actions/SelectAllShapes';
-import { AppState } from '../../models/AppState';
+import { AppState } from '../../models/app-state/AppState';
 import { ESvgElement } from '../../models/svg-elements/ESvgElement';
 import { SvgShape } from '../../models/svg-elements/SvgShape';
 

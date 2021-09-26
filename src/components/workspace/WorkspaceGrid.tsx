@@ -3,8 +3,8 @@ import * as React from 'react';
 import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
 import { Size } from '../../models/Size';
-import { ZoomLevel } from '../../models/ZoomLevel';
-import { AppState } from '../../models/AppState';
+import { ZoomLevel } from '../../models/app-state/ZoomLevel';
+import { AppState } from '../../models/app-state/AppState';
 
 export interface IWorkspaceGridProps {
   appState?: AppState;
