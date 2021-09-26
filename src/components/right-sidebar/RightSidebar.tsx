@@ -11,7 +11,7 @@ import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
 import { SelectShapes } from '../../models/user-actions/SelectShapes';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
-import { ESvgShape, SvgShape } from '../../models/svg-elements/SvgShape';
+import { ESvgShape, SvgShape } from '../../deprecated/SvgShape';
 import { AppState } from '../../models/app-state/AppState';
 import { ESvgElement } from '../../models/svg-elements/ESvgElement';
 

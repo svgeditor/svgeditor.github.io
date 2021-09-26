@@ -1,6 +1,6 @@
 import './app.scss';
 import * as React from 'react';
-import Whiteboard from '../whiteboard/Whiteboard';
+import Whiteboard from '../../deprecated/Whiteboard';
 import LeftSidebar from '../left-sidebar/LeftSidebar';
 import RightSidebar from '../right-sidebar/RightSidebar';
 import Navbar from '../navbar/Navbar';

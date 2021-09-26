@@ -1,8 +1,8 @@
-import { ScrollInfo } from '../../models/ScrollInfo';
-import { ZOOM_PERCENTAGE_STEP } from '../../models/app-state/ZoomLevel';
-import { IWhiteboardWindowService } from '../IWhiteboardWindowService';
-import { WHITEBOARD_MARGIN } from '../../constants/constants';
-import { AppState } from '../../models/app-state/AppState';
+import { WHITEBOARD_MARGIN } from '../constants/constants';
+import { AppState } from '../models/app-state/AppState';
+import { ZOOM_PERCENTAGE_STEP } from '../models/app-state/ZoomLevel';
+import { ScrollInfo } from '../models/ScrollInfo';
+import { IWhiteboardWindowService } from './IWhiteboardWindowService';
 
 export class WhiteboardWindowService implements IWhiteboardWindowService {
   private static instance: IWhiteboardWindowService = new WhiteboardWindowService();
@@ -14,7 +14,7 @@ export class WhiteboardWindowService implements IWhiteboardWindowService {
   }
 
   resize(): void {
-    const whiteboardWindow = null; // this.appStateService.getWhiteboardWindow();
+    const whiteboardWindow = null; // this.appState.getWhiteboardWindow();
     const zoomLevel = this.appState.getZoomLevel();
     const whiteboardWindowBoundingRect = whiteboardWindow.whiteboardWindow.getBoundingClientRect();
     const whiteboardWidth = zoomLevel.getZoomedValueFromInitialValue(this.appState.getWhiteboardSize().width);

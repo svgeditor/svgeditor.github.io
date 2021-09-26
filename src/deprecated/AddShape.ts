@@ -1,8 +1,8 @@
 import { Shape } from '@svgdotjs/svg.js';
-import { IWhiteboardDrawingService } from '../../services/IWhiteboardDrawingService';
-import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingService';
-import { UndoableUserAction } from './IUndoableUserAction';
-import { SvgShape } from '../svg-elements/SvgShape';
+import { WhiteboardDrawingService } from './WhiteboardDrawingService';
+import { UndoableUserAction } from '../models/user-actions/IUndoableUserAction';
+import { SvgShape } from './SvgShape';
+import { IWhiteboardDrawingService } from './IWhiteboardDrawingService';
 
 export class AddShape extends UndoableUserAction {
   constructor(public shape: SvgShape<Shape>, private whiteboardDrawingService: IWhiteboardDrawingService = WhiteboardDrawingService.getInstance()) {

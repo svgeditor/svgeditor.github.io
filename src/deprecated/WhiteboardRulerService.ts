@@ -1,6 +1,6 @@
-import { IWhiteboardRulerService } from '../IWhiteboardRulerService';
-import { GRID_SIZE, RULER_COLOR, RULER_WIDTH, WHITEBOARD_MARGIN } from '../../constants/constants';
-import { AppState } from '../../models/app-state/AppState';
+import { WHITEBOARD_MARGIN, GRID_SIZE, RULER_WIDTH, RULER_COLOR } from '../constants/constants';
+import { AppState } from '../models/app-state/AppState';
+import { IWhiteboardRulerService } from './IWhiteboardRulerService';
 
 export class WhiteboardRulerService implements IWhiteboardRulerService {
   private static instance: IWhiteboardRulerService = new WhiteboardRulerService();

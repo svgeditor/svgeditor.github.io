@@ -1,87 +1,88 @@
-import * as constants from '../../constants/constants';
-import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
-import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
-import { AddShape } from '../../models/user-actions/AddShape';
-import { UserActions } from '../../models/user-actions/UserActions';
-import { Position } from '../../models/Position';
+import * as constants from '../constants/constants';
+import { ISvgShapeDrawingService } from './ISvgShapeDrawingService';
+import { G, Shape, Svg } from '@svgdotjs/svg.js';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { Rect, Shape, Svg } from '@svgdotjs/svg.js';
-import { RandomIdGenerator } from './RandomIdGenerator';
-import { SvgRectangle } from '../../models/svg-elements/SvgShape';
-import { AppState } from '../../models/app-state/AppState';
+import { IRandomIdGenerator } from '../services/IRandomIdGenerator';
+import { SvgShape } from './SvgShape';
+import { AppState } from '../models/app-state/AppState';
 
-export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRectangle> implements ISvgShapeDrawingService<SvgRectangle> {
-  private static instance: ISvgShapeDrawingService<SvgRectangle> = null;
+export abstract class BaseSvgShapeDrawingService<T extends SvgShape<Shape>> implements ISvgShapeDrawingService<T> {
+  abstract draw(event: MouseEvent): void;
+  abstract resize(shape: T): void;
 
-  private constructor(whiteboardDrawingService: WhiteboardDrawingService) {
-    super(AppState.getInstance(), whiteboardDrawingService, RandomIdGenerator.getInstance());
-  }
+  constructor(
+    protected appState: AppState,
+    protected whiteboardDrawingService: WhiteboardDrawingService,
+    protected randomIdService: IRandomIdGenerator
+  ) {}
 
-  static getInstance(whiteboardDrawingService: WhiteboardDrawingService): ISvgShapeDrawingService<SvgRectangle> {
-    if (RectangleDrawingService.instance == null) {
-      RectangleDrawingService.instance = new RectangleDrawingService(whiteboardDrawingService);
-    }
-    return RectangleDrawingService.instance;
-  }
-
-  draw(event: MouseEvent): void {
-    const _this = this;
+  unselectAllShapes(): void {
     this.whiteboardDrawingService.unselectAllShapes();
-    const initialPosition = new Position(event.offsetX, event.offsetY);
-    const container = _this.createContainer();
-    const rectangle = this.createRectangle(initialPosition);
-    const shape = new SvgRectangle(container, rectangle);
-    container.add(rectangle);
-
-    const onMouseMove = (event: MouseEvent) => {
-      event.preventDefault();
-      const x = Math.min(event.offsetX, initialPosition.x);
-      const y = Math.min(event.offsetY, initialPosition.y);
-      const width = Math.abs(event.offsetX - initialPosition.x);
-      const height = Math.abs(event.offsetY - initialPosition.y);
-      rectangle.move(x, y).size(width, height);
-    };
-
-    const onMouseUp = () => {
-      if (rectangle.width() == 0 || rectangle.height() == 0) {
-        container.remove();
-      } else {
-        document.dispatchEvent(UserActions.createCustomEvent(new AddShape(shape)));
-        _this.drawHoverGuide(shape);
-        setTimeout(() => {
-          _this.whiteboardDrawingService.select([shape]);
-        }, 0);
-      }
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
   }
 
-  select(shape: SvgRectangle): void {
-    super.select(shape);
+  // prettier-ignore
+  select(shape: T): void {
+    shape.getContainer().addClass(constants.SELECTED_SHAPE_GROUP_CLASS_NAME);
     const group = this.whiteboardDrawingService.getSelectedShapesGroup();
-    group.add(this.createBorderRadiusGuide(shape));
+    group.add(this.createBorder(shape));
+    group.add(this.createResizeGuideNW(shape));
+    group.add(this.createResizeGuideN(shape));
+    group.add(this.createResizeGuideNE(shape));
+    group.add(this.createResizeGuideE(shape));
+    group.add(this.createResizeGuideSE(shape));
+    group.add(this.createResizeGuideS(shape));
+    group.add(this.createResizeGuideSW(shape));
+    group.add(this.createResizeGuideW(shape));
+    group.front();
   }
 
-  resize(rectangle: SvgRectangle): void {
+  getZoomedValue(initialValue = 1): number {
     const zoomLevel = this.appState.getZoomLevel();
-    const newX = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().x());
-    const newY = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().y());
-    const newW = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().width());
-    const newH = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().height());
-    const strokeWidth = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().attr('stroke-width'));
-    const rx = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().attr('rx'));
-    const ry = zoomLevel.getZoomedValueFromPreviousValue(rectangle.getShape().attr('ry'));
-    rectangle.getShape().move(newX, newY).size(newW, newH).attr('rx', rx).attr('ry', ry).attr('stroke-width', strokeWidth);
+    return zoomLevel.getZoomedValueFromInitialValue(initialValue);
   }
 
-  protected createResizeGuideNW(shape: SvgRectangle): Shape {
+  drawHoverGuide(shape: T): void {
+    const zoomLevel = this.appState.getZoomLevel();
+    shape.getContainer().add(
+      shape
+        .getShape()
+        .clone()
+        .removeClass(constants.SHAPE_CLASS_NAME)
+        .addClass(constants.HOVER_SHAPE_CLASS_NAME)
+        .fill('transparent')
+        .stroke({ color: constants.SELECTION_BORDER_COLOR, width: zoomLevel.getZoomedValueFromInitialValue(1) })
+    );
+  }
+
+  redrawHoverGuide(shape: T): void {
+    shape
+      .getContainer()
+      .find(`.${constants.HOVER_SHAPE_CLASS_NAME}`)
+      .forEach((shape) => shape.remove());
+    this.drawHoverGuide(shape);
+  }
+
+  // prettier-ignore
+  protected createContainer(): G {
+    return new Svg()
+      .group()
+      .id(this.randomIdService.generate())
+      .addClass(constants.SHAPE_GROUP_CLASS_NAME);
+  }
+
+  protected createBorder(shape: T): Shape {
+    return new Svg()
+      .rect()
+      .addClass(constants.SELECTED_SHAPE_BORDER_CLASS_NAME)
+      .move(shape.getContainer().x(), shape.getContainer().y())
+      .size(shape.getContainer().width(), shape.getContainer().height())
+      .fill('transparent')
+      .stroke({ color: constants.SELECTION_BORDER_COLOR, width: 1, dasharray: constants.STROKE_DASH_ARRAY });
+  }
+
+  protected createResizeGuideNW(shape: T): Shape {
     const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y());
-    const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
     circle.on('mousedown', () => {
@@ -95,9 +96,8 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        const newRadius = Math.min(initialRadius, Math.min(width / 2, height / 2));
         shape.getContainer().each(function () {
-          this.move(x, y).size(width, height).attr('rx', newRadius).attr('ry', newRadius);
+          this.move(x, y).size(width, height);
         });
       };
       const handleMouseUp = () => {
@@ -113,10 +113,9 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     return circle;
   }
 
-  protected createResizeGuideN(shape: SvgRectangle): Shape {
+  protected createResizeGuideN(shape: T): Shape {
     const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width() / 2, shape.getContainer().y());
-    const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
     circle.on('mousedown', () => {
@@ -126,11 +125,9 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
       const handleMouseMove = (event) => {
         event.preventDefault();
         const y = Math.min(event.offsetY, shapeInitialY);
-        const width = shape.getShape().width();
         const height = Math.abs(event.offsetY - shapeInitialY);
-        const newRadius = Math.min(initialRadius, Math.min(width / 2, height / 2));
         shape.getContainer().each(function () {
-          this.y(y).height(height).attr('rx', newRadius).attr('ry', newRadius);
+          this.y(y).height(height);
         });
       };
       const handleMouseUp = () => {
@@ -146,10 +143,9 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     return circle;
   }
 
-  protected createResizeGuideNE(shape: SvgRectangle): Shape {
+  protected createResizeGuideNE(shape: T): Shape {
     const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x() + shape.getContainer().width(), shape.getContainer().y());
-    const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
     circle.on('mousedown', () => {
@@ -163,9 +159,8 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        const newRadius = Math.min(initialRadius, Math.min(width / 2, height / 2));
         shape.getContainer().each(function () {
-          this.move(x, y).size(width, height).attr('rx', newRadius).attr('ry', newRadius);
+          this.move(x, y).size(width, height);
         });
       };
       const handleMouseUp = () => {
@@ -181,13 +176,12 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     return circle;
   }
 
-  protected createResizeGuideE(shape: SvgRectangle): Shape {
+  protected createResizeGuideE(shape: T): Shape {
     const svg = new Svg();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width(),
       shape.getContainer().y() + shape.getContainer().height() / 2
     );
-    const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
     circle.on('mousedown', () => {
@@ -198,10 +192,8 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const width = Math.abs(event.offsetX - shapeInitialX);
-        const height = shape.getShape().height();
-        const newRadius = Math.min(initialRadius, Math.min(width / 2, height / 2));
         shape.getContainer().each(function () {
-          this.x(x).width(width).attr('rx', newRadius).attr('ry', newRadius);
+          this.x(x).width(width);
         });
       };
       const handleMouseUp = () => {
@@ -217,13 +209,12 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     return circle;
   }
 
-  protected createResizeGuideSE(shape: SvgRectangle): Shape {
+  protected createResizeGuideSE(shape: T): Shape {
     const svg = new Svg();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width(),
       shape.getContainer().y() + shape.getContainer().height()
     );
-    const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nwse-resize');
     circle.on('mousedown', () => {
@@ -237,9 +228,8 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        const newRadius = Math.min(initialRadius, Math.min(width / 2, height / 2));
         shape.getContainer().each(function () {
-          this.move(x, y).size(width, height).attr('rx', newRadius).attr('ry', newRadius);
+          this.move(x, y).size(width, height);
         });
       };
       const handleMouseUp = () => {
@@ -255,13 +245,12 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     return circle;
   }
 
-  protected createResizeGuideS(shape: SvgRectangle): Shape {
+  protected createResizeGuideS(shape: T): Shape {
     const svg = new Svg();
     const circle = this.createResizeGuide(
       shape.getContainer().x() + shape.getContainer().width() / 2,
       shape.getContainer().y() + shape.getContainer().height()
     );
-    const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ns-resize');
     circle.on('mousedown', () => {
@@ -271,11 +260,9 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
       const handleMouseMove = (event) => {
         event.preventDefault();
         const y = Math.min(event.offsetY, shapeInitialY);
-        const width = shape.getShape().width();
         const height = Math.abs(event.offsetY - shapeInitialY);
-        const newRadius = Math.min(initialRadius, Math.min(width / 2, height / 2));
         shape.getContainer().each(function () {
-          this.y(y).height(height).attr('rx', newRadius).attr('ry', newRadius);
+          this.y(y).height(height);
         });
       };
       const handleMouseUp = () => {
@@ -291,10 +278,9 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     return circle;
   }
 
-  protected createResizeGuideSW(shape: SvgRectangle): Shape {
+  protected createResizeGuideSW(shape: T): Shape {
     const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height());
-    const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'nesw-resize');
     circle.on('mousedown', () => {
@@ -308,9 +294,8 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
         const y = Math.min(event.offsetY, shapeInitialY);
         const width = Math.abs(event.offsetX - shapeInitialX);
         const height = Math.abs(event.offsetY - shapeInitialY);
-        const newRadius = Math.min(initialRadius, Math.min(width / 2, height / 2));
         shape.getContainer().each(function () {
-          this.move(x, y).size(width, height).attr('rx', newRadius).attr('ry', newRadius);
+          this.move(x, y).size(width, height);
         });
       };
       const handleMouseUp = () => {
@@ -326,10 +311,9 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     return circle;
   }
 
-  protected createResizeGuideW(shape: SvgRectangle): Shape {
+  protected createResizeGuideW(shape: T): Shape {
     const svg = new Svg();
     const circle = this.createResizeGuide(shape.getContainer().x(), shape.getContainer().y() + shape.getContainer().height() / 2);
-    const initialRadius = shape.getShape().attr('rx');
     circle.addClass(constants.RESIZE_SHAPE_GUIDE_CLASS_NAME);
     circle.css('cursor', 'ew-resize');
     circle.on('mousedown', () => {
@@ -340,10 +324,8 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
         event.preventDefault();
         const x = Math.min(event.offsetX, shapeInitialX);
         const width = Math.abs(event.offsetX - shapeInitialX);
-        const height = shape.getShape().height();
-        const newRadius = Math.min(initialRadius, Math.min(width / 2, height / 2));
         shape.getContainer().each(function () {
-          this.x(x).width(width).attr('rx', newRadius).attr('ry', newRadius);
+          this.x(x).width(width);
         });
       };
       const handleMouseUp = () => {
@@ -359,68 +341,12 @@ export class RectangleDrawingService extends BaseSvgShapeDrawingService<SvgRecta
     return circle;
   }
 
-  private createRectangle(position: Position): Rect {
+  // prettier-ignore
+  protected createResizeGuide(x: number, y: number): Shape {
     return new Svg()
-      .rect(0)
-      .addClass(constants.SHAPE_CLASS_NAME)
-      .move(position.x, position.y)
+      .circle(Math.min(this.getZoomedValue(8), 14))
+      .cx(x).cy(y)
       .fill('white')
-      .stroke({ color: '#707070', width: this.getZoomedValue() });
-  }
-
-  private createBorderRadiusGuide(shape: SvgRectangle): Shape {
-    const svg = new Svg();
-    const shapeRightBorder = shape.getContainer().x() + shape.getContainer().width();
-    const shapeTopBorder = shape.getContainer().y();
-    const borderRadiusGuideSize = 7;
-    const margin = 15;
-    const radius = shape.getShape().attr('rx');
-    const borderRadiusGuideX = shapeRightBorder - Math.max(margin, radius) - borderRadiusGuideSize / 2;
-    const borderRadiusGuideY = shapeTopBorder + Math.max(margin, radius) - borderRadiusGuideSize / 2;
-    const borderRadiusGuide = new Svg()
-      .rect()
-      .move(borderRadiusGuideX, borderRadiusGuideY)
-      .size(borderRadiusGuideSize, borderRadiusGuideSize)
-      .fill('#F2931E')
-      .radius(1)
-      .addClass(constants.RESIZE_SHAPE_BORDER_RADIUS_GUIDE_CLASS_NAME)
-      .on('mousedown', () => {
-        const _this = this;
-        svg.addClass(constants.RESIZE_SHAPE_BORDER_RADIUS_IN_PROGRESS_CLASS_NAME);
-        const maxRadius = Math.min(shape.getContainer().width() / 2, shape.getContainer().height() / 2);
-        const mousePositionXMax = shape.getContainer().x() + shape.getContainer().width();
-        const mousePositionXMin = mousePositionXMax - maxRadius;
-        const mousePositionYMin = shape.getContainer().y();
-        const mousePositionYMax = mousePositionYMin + maxRadius;
-        const handleMouseMove = (event) => {
-          event.preventDefault();
-          let radius = 0;
-          if (
-            event.offsetX >= mousePositionXMin &&
-            event.offsetX <= mousePositionXMax &&
-            event.offsetY >= mousePositionYMin &&
-            event.offsetY <= mousePositionYMax
-          ) {
-            radius = Math.max(mousePositionXMax - event.offsetX, event.offsetY - mousePositionYMin);
-          }
-          if (event.offsetX < mousePositionXMin || event.offsetY > mousePositionYMax) {
-            radius = maxRadius;
-          }
-          borderRadiusGuide.move(shapeRightBorder - borderRadiusGuideSize / 2 - radius, shapeTopBorder - borderRadiusGuideSize / 2 + radius);
-          shape.getContainer().each(function () {
-            this.attr('rx', radius).attr('ry', radius);
-          });
-        };
-        const handleMouseUp = () => {
-          _this.whiteboardDrawingService.unselectAllShapesToSelectNewShape();
-          _this.whiteboardDrawingService.select([shape]);
-          svg.removeClass(constants.RESIZE_SHAPE_IN_PROGRESS_CLASS_NAME);
-          document.removeEventListener('mousemove', handleMouseMove);
-          document.removeEventListener('mouseup', handleMouseUp);
-        };
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-      });
-    return borderRadiusGuide;
+      .stroke({ color: constants.SELECTION_BORDER_COLOR, width: Math.min(this.getZoomedValue(), 3) });
   }
 }

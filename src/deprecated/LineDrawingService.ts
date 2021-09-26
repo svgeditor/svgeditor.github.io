@@ -1,14 +1,14 @@
 import { Line, Shape, Svg } from '@svgdotjs/svg.js';
-import * as constants from '../../constants/constants';
-import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
-import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
-import { AddShape } from '../../models/user-actions/AddShape';
-import { UserActions } from '../../models/user-actions/UserActions';
-import { Position } from '../../models/Position';
+import * as constants from '../constants/constants';
+import { AppState } from '../models/app-state/AppState';
+import { Position } from '../models/Position';
+import { SvgLine } from './SvgShape';
+import { AddShape } from './AddShape';
+import { UserActions } from '../models/user-actions/UserActions';
+import { RandomIdGenerator } from '../services/impl/RandomIdGenerator';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { RandomIdGenerator } from './RandomIdGenerator';
-import { SvgLine } from '../../models/svg-elements/SvgShape';
-import { AppState } from '../../models/app-state/AppState';
+import { ISvgShapeDrawingService } from './ISvgShapeDrawingService';
+import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 
 export class LineDrawingService extends BaseSvgShapeDrawingService<SvgLine> implements ISvgShapeDrawingService<SvgLine> {
   private static instance: ISvgShapeDrawingService<SvgLine> = null;

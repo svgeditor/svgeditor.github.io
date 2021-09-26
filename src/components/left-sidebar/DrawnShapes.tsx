@@ -3,14 +3,14 @@ import * as React from 'react';
 import { Shape } from '@svgdotjs/svg.js';
 import { USER_ACTION_EVENT_NAME } from '../../constants/constants';
 import { IUserAction } from '../../models/user-actions/IUserAction';
-import { AddShape } from '../../models/user-actions/AddShape';
-import { DeleteShapes } from '../../models/user-actions/DeleteShapes';
+import { AddShape } from '../../deprecated/AddShape';
+import { DeleteShapes } from '../../deprecated/DeleteShapes';
 import { SelectShapes } from '../../models/user-actions/SelectShapes';
 import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
-import { IWhiteboardDrawingService } from '../../services/IWhiteboardDrawingService';
-import { WhiteboardDrawingService } from '../../services/impl/WhiteboardDrawingService';
+import { WhiteboardDrawingService } from '../../deprecated/WhiteboardDrawingService';
 import SidebarSection from '../sidebar-section/SidebarSection';
-import { SvgShape } from '../../models/svg-elements/SvgShape';
+import { SvgShape } from '../../deprecated/SvgShape';
+import { IWhiteboardDrawingService } from '../../deprecated/IWhiteboardDrawingService';
 
 export interface IDrawnShapesProps {
   whiteboardDrawingService?: IWhiteboardDrawingService;

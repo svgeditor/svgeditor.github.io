@@ -1,14 +1,14 @@
 import { Ellipse, Svg } from '@svgdotjs/svg.js';
-import * as constants from '../../constants/constants';
-import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
-import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
-import { AddShape } from '../../models/user-actions/AddShape';
-import { UserActions } from '../../models/user-actions/UserActions';
+import * as constants from '../constants/constants';
+import { AppState } from '../models/app-state/AppState';
+import { Position } from '../models/Position';
+import { SvgEllipse } from './SvgShape';
+import { AddShape } from './AddShape';
+import { UserActions } from '../models/user-actions/UserActions';
+import { RandomIdGenerator } from '../services/impl/RandomIdGenerator';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { Position } from '../../models/Position';
-import { RandomIdGenerator } from './RandomIdGenerator';
-import { SvgEllipse } from '../../models/svg-elements/SvgShape';
-import { AppState } from '../../models/app-state/AppState';
+import { ISvgShapeDrawingService } from './ISvgShapeDrawingService';
+import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
 
 export class EllipseDrawingService extends BaseSvgShapeDrawingService<SvgEllipse> implements ISvgShapeDrawingService<SvgEllipse> {
   private static instance: ISvgShapeDrawingService<SvgEllipse> = null;

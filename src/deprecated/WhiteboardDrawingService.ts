@@ -1,17 +1,17 @@
-import * as constants from '../../constants/constants';
+import * as constants from '../constants/constants';
 import { Circle, Ellipse, G, Line, Rect, Shape, Svg } from '@svgdotjs/svg.js';
-import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
-import { IWhiteboardDrawingService } from '../IWhiteboardDrawingService';
-import { RectangleDrawingService } from './RectangleDrawingService';
-import { UnselectAllShapes } from '../../models/user-actions/UnselectAllShapes';
-import { UserActions } from '../../models/user-actions/UserActions';
+import { ISvgShapeDrawingService } from './ISvgShapeDrawingService';
+import { UnselectAllShapes } from '../models/user-actions/UnselectAllShapes';
+import { UserActions } from '../models/user-actions/UserActions';
 import { CircleDrawingService } from './CircleDrawingService';
+import { SelectShapes } from '../models/user-actions/SelectShapes';
+import { SvgCircle, SvgEllipse, SvgLine, SvgRectangle, SvgShape } from './SvgShape';
+import { AppState } from '../models/app-state/AppState';
+import { ESvgElement } from '../models/svg-elements/ESvgElement';
 import { EllipseDrawingService } from './EllipseDrawingService';
 import { LineDrawingService } from './LineDrawingService';
-import { SelectShapes } from '../../models/user-actions/SelectShapes';
-import { SvgCircle, SvgEllipse, SvgLine, SvgRectangle, SvgShape } from '../../models/svg-elements/SvgShape';
-import { AppState } from '../../models/app-state/AppState';
-import { ESvgElement } from '../../models/svg-elements/ESvgElement';
+import { RectangleDrawingService } from './RectangleDrawingService';
+import { IWhiteboardDrawingService } from './IWhiteboardDrawingService';
 
 export class WhiteboardDrawingService implements IWhiteboardDrawingService {
   private static instance: IWhiteboardDrawingService = new WhiteboardDrawingService();

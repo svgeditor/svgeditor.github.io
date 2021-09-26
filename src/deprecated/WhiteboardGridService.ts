@@ -1,6 +1,6 @@
-import { IWhiteboardGridService } from '../IWhiteboardGridService';
-import { GRID_SIZE } from '../../constants/constants';
-import { AppState } from '../../models/app-state/AppState';
+import { IWhiteboardGridService } from './IWhiteboardGridService';
+import { GRID_SIZE } from '../constants/constants';
+import { AppState } from '../models/app-state/AppState';
 
 export class WhiteboardGridService implements IWhiteboardGridService {
   private static instance: IWhiteboardGridService = new WhiteboardGridService();

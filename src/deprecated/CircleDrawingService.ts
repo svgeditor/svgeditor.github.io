@@ -1,14 +1,14 @@
 import { Circle, Shape, Svg } from '@svgdotjs/svg.js';
-import * as constants from '../../constants/constants';
-import { ISvgShapeDrawingService } from '../ISvgShapeDrawingService';
+import * as constants from '../constants/constants';
+import { ISvgShapeDrawingService } from './ISvgShapeDrawingService';
 import { BaseSvgShapeDrawingService } from './BaseSvgShapeDrawingService';
-import { AddShape } from '../../models/user-actions/AddShape';
-import { UserActions } from '../../models/user-actions/UserActions';
+import { AddShape } from './AddShape';
+import { UserActions } from '../models/user-actions/UserActions';
 import { WhiteboardDrawingService } from './WhiteboardDrawingService';
-import { Position } from '../../models/Position';
-import { RandomIdGenerator } from './RandomIdGenerator';
-import { SvgCircle } from '../../models/svg-elements/SvgShape';
-import { AppState } from '../../models/app-state/AppState';
+import { Position } from '../models/Position';
+import { RandomIdGenerator } from '../services/impl/RandomIdGenerator';
+import { SvgCircle } from './SvgShape';
+import { AppState } from '../models/app-state/AppState';
 
 export class CircleDrawingService extends BaseSvgShapeDrawingService<SvgCircle> implements ISvgShapeDrawingService<SvgCircle> {
   private static instance: ISvgShapeDrawingService<SvgCircle> = null;
