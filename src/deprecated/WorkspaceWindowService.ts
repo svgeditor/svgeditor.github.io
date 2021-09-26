@@ -1,7 +1,7 @@
 import { WHITEBOARD_MARGIN } from '../constants/constants';
 import { AppState } from '../models/app-state/AppState';
 import { ZOOM_PERCENTAGE_STEP } from '../models/app-state/ZoomLevel';
-import { ScrollInfo } from '../models/ScrollInfo';
+import { ScrollInfo } from './ScrollInfo';
 import { IWhiteboardWindowService } from './IWhiteboardWindowService';
 
 export class WhiteboardWindowService implements IWhiteboardWindowService {

@@ -1,3 +1,3 @@
-export interface ISvgElementCreateService {
+export interface ICreateSvgElementService {
   createOnMouseDown(event: MouseEvent): void;
 }

@@ -1,24 +1,24 @@
 import './workspace.scss';
 import * as React from 'react';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
-import { ISvgElementCreateServiceFactory } from '../../services/ISvgElementCreateServiceFactory';
-import { SvgElementCreateServiceFactory } from '../../services/impl/SvgElementCreateServiceFactory';
+import { ICreateSvgElementServiceFactory } from '../../services/ICreateSvgElementServiceFactory';
+import { CreateSvgElementServiceFactory } from '../../services/impl/CreateSvgElementServiceFactory';
 
 export interface IWorkspaceBackgroundProps {
-  svgElementCreateServiceFactory?: ISvgElementCreateServiceFactory;
+  createSvgElementServiceFactory?: ICreateSvgElementServiceFactory;
 }
 
 export interface IWorkspaceBackgroundState {}
 
 export default class WorkspaceBackground extends React.Component<IWorkspaceBackgroundProps, IWorkspaceBackgroundState> {
   private container: HTMLElement;
-  private svgElementCreateServiceFactory: ISvgElementCreateServiceFactory;
+  private createSvgElementServiceFactory: ICreateSvgElementServiceFactory;
 
   constructor(props: IWorkspaceBackgroundProps) {
     super(props);
-    this.svgElementCreateServiceFactory = props.svgElementCreateServiceFactory
-      ? props.svgElementCreateServiceFactory
-      : new SvgElementCreateServiceFactory();
+    this.createSvgElementServiceFactory = props.createSvgElementServiceFactory
+      ? props.createSvgElementServiceFactory
+      : new CreateSvgElementServiceFactory();
   }
 
   public render() {
@@ -45,7 +45,7 @@ export default class WorkspaceBackground extends React.Component<IWorkspaceBackg
   }
 
   private handleMouseDownEvent(event: MouseEvent) {
-    const svgElementCreateService = this.svgElementCreateServiceFactory.create();
-    svgElementCreateService.createOnMouseDown(event);
+    const createSvgElementService = this.createSvgElementServiceFactory.create();
+    createSvgElementService.createOnMouseDown(event);
   }
 }

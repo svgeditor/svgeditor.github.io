@@ -2,9 +2,9 @@ import { AppState } from '../../models/app-state/AppState';
 import { ZoomLevel } from '../../models/app-state/ZoomLevel';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
 import { Position } from '../../models/Position';
-import { ISvgElementCreateService } from '../ISvgElementCreateService';
+import { ICreateSvgElementService } from '../ICreateSvgElementService';
 
-export class SvgRectangleCreateService implements ISvgElementCreateService {
+export class CreateSvgRectangleService implements ICreateSvgElementService {
   constructor(private appState = AppState.getInstance()) {}
 
   createOnMouseDown(event: MouseEvent): void {

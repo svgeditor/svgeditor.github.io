@@ -1,12 +1,12 @@
 import './workspace.scss';
 import * as React from 'react';
-import { ScrollInfo } from '../../models/ScrollInfo';
 import WorkspaceWhiteboard from './WorkspaceWhiteboard';
 import { WORKSPACE_MARGIN } from '../../constants/constants';
 import { ZOOM_PERCENTAGE_STEP } from '../../models/app-state/ZoomLevel';
 import WorkspaceBackground from './WorkspaceBackground';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
 import { AppState } from '../../models/app-state/AppState';
+import { ScrollBy } from '../../models/ScrollBy';
 
 export interface IWorkspaceWindowProps {
   className?: string;
@@ -38,16 +38,12 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
     return BoundingRectangle.fromHTMLElement(this.container);
   }
 
-  public getScrollInfo(): ScrollInfo {
-    return ScrollInfo.form(this.container);
-  }
-
   public scrollTo(x: number, y: number): void {
     this.container.scrollTo(x, y);
   }
 
-  public scrollBy(x: number, y: number): void {
-    this.container.scrollBy(x, y);
+  public scrollBy(scrollBy: ScrollBy): void {
+    this.container.scrollBy(scrollBy.x, scrollBy.y);
   }
 
   public getScrollTop(): number {
@@ -102,23 +98,20 @@ export default class WorkspaceWindow extends React.Component<IWorkspaceWindowPro
     this.continueScrollToNorthWest(this.getScrollInfoOnZoom(event));
   }
 
-  private continueScrollToSouthEast(scrollInfo: ScrollInfo): void {
-    this.scrollBy(scrollInfo.scrollX, scrollInfo.scrollY);
+  private continueScrollToSouthEast(scrollBy: ScrollBy): void {
+    this.scrollBy(scrollBy);
   }
 
-  private continueScrollToNorthWest(scrollInfo: ScrollInfo): void {
-    this.scrollBy(-scrollInfo.scrollX, -scrollInfo.scrollY);
+  private continueScrollToNorthWest(scrollBy: ScrollBy): void {
+    this.scrollBy(scrollBy.negate());
   }
 
-  private getScrollInfoOnZoom(event?: MouseEvent): ScrollInfo {
+  private getScrollInfoOnZoom(event?: MouseEvent): ScrollBy {
     const zoomPercentage = this.appState.getZoomLevel().previousPercentageZoom;
     const mousePositionRelatedToWhiteboard = this.getMousePositionRelatedToWhiteboard(event);
-    const scrollX = (mousePositionRelatedToWhiteboard.x * ZOOM_PERCENTAGE_STEP) / zoomPercentage;
-    const scrollY = (mousePositionRelatedToWhiteboard.y * ZOOM_PERCENTAGE_STEP) / zoomPercentage;
-    return {
-      scrollX,
-      scrollY,
-    };
+    const x = (mousePositionRelatedToWhiteboard.x * ZOOM_PERCENTAGE_STEP) / zoomPercentage;
+    const y = (mousePositionRelatedToWhiteboard.y * ZOOM_PERCENTAGE_STEP) / zoomPercentage;
+    return new ScrollBy(x, y);
   }
 
   private getMousePositionRelatedToWhiteboard(event?: MouseEvent) {
