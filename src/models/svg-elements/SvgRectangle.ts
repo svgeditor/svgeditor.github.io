@@ -1,43 +1,58 @@
 import { BoundingRectangle } from '../BoundingRectangle';
+import { Position } from '../Position';
 import { ISvgElement } from './ISvgElement';
 
 export class SvgRectangle implements ISvgElement {
-  private constructor(private rect: SVGRectElement) {}
+  private constructor(private element: SVGRectElement) {}
 
   static from(rect: SVGRectElement) {
     return new SvgRectangle(rect);
   }
 
   fill(color: string): SvgRectangle {
-    this.rect.setAttribute('fill', color);
+    this.element.setAttribute('fill', color);
     return this;
   }
   strokeColor(stroke: string): SvgRectangle {
-    this.rect.setAttribute('stroke', stroke);
+    this.element.setAttribute('stroke', stroke);
     return this;
   }
   strokeWidth(width: number): SvgRectangle {
-    this.rect.setAttribute('stroke-width', width + '');
+    this.element.setAttribute('stroke-width', width + '');
     return this;
   }
 
-  move(x: number, y: number): SvgRectangle {
-    this.rect.setAttribute('x', x + '');
-    this.rect.setAttribute('y', y + '');
+  addClass(className: string): SvgRectangle {
+    this.element.classList.add(className);
     return this;
   }
 
-  size(width: number, height: number): SvgRectangle {
-    this.rect.setAttribute('width', width + '');
-    this.rect.setAttribute('height', height + '');
+  removeClass(className: string): SvgRectangle {
+    this.element.classList.remove(className);
+    return this;
+  }
+
+  clone(): SvgRectangle {
+    const element = this.getSvgElement().cloneNode() as SVGRectElement;
+    element.removeAttribute('id');
+    return new SvgRectangle(element);
+  }
+
+  getSvgElement() {
+    return this.element;
+  }
+
+  move(position: Position): SvgRectangle {
+    this.element.setAttribute('x', position.x + '');
+    this.element.setAttribute('y', position.y + '');
     return this;
   }
 
   boundingRectangle(boundingRectangle: BoundingRectangle): SvgRectangle {
-    this.rect.setAttribute('x', boundingRectangle.x + '');
-    this.rect.setAttribute('y', boundingRectangle.y + '');
-    this.rect.setAttribute('width', boundingRectangle.width + '');
-    this.rect.setAttribute('height', boundingRectangle.height + '');
+    this.element.setAttribute('x', boundingRectangle.x + '');
+    this.element.setAttribute('y', boundingRectangle.y + '');
+    this.element.setAttribute('width', boundingRectangle.width + '');
+    this.element.setAttribute('height', boundingRectangle.height + '');
     return this;
   }
 }
