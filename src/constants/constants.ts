@@ -19,4 +19,6 @@ export const USER_ACTION_EVENT_NAME = 'USER_ACTION_EVENT_NAME';
 export const STROKE_DASH_ARRAY = '3,3';
 export const WORKSPACE_MARGIN = 100;
 export const SVG_ELEMENT_CSS_CLASS = 'svg-element';
-export const HOVER_HELPER_SVG_ELEMENT_CSS_CLASS = 'hover-helper-svg-element';
+export const SVG_ELEMENT_GROUP_CSS_CLASS = 'svg-element-group';
+export const SVG_ELEMENT_HOVER_HELPER_CSS_CLASS = 'svg-element-hover-helper';
+export const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';

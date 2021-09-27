@@ -2,27 +2,31 @@ import { AppState } from '../../models/app-state/AppState';
 import { ZoomLevel } from '../../models/app-state/ZoomLevel';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
 import { Position } from '../../models/Position';
+import { SvgGroup } from '../../models/svg-elements/SvgGroup';
 import { SvgRectangle } from '../../models/svg-elements/SvgRectangle';
 import { ICreateSvgElementService } from '../ICreateSvgElementService';
 
 export class CreateSvgRectangleService implements ICreateSvgElementService {
   constructor(private appState = AppState.getInstance()) {}
 
-  onMouseDown(event: MouseEvent): void {
+  createOnMouseDown(event: MouseEvent): void {
     const initialMousePosition = this.getMousePositonRelatedToWhiteboard(event);
-    const rectangle = this.getSvgRootElement().rect(initialMousePosition);
-
-    const onMouseMove = (event: MouseEvent) => {
-      this.onMouseMove(event, initialMousePosition, rectangle);
-    };
-    const onMouseUp = () => {
-      this.onMouseUp(rectangle);
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-
+    const group = this.getSvgRootElement().group();
+    const rectangle = group.rect(initialMousePosition);
+    const onMouseMove = (event: MouseEvent) => this.onMouseMove(event, initialMousePosition, rectangle);
+    const onMouseUp = () => this.createOnMouseUp(group, rectangle, onMouseMove, onMouseUp);
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+  }
+
+  private createOnMouseUp(group: SvgGroup, rectangle: SvgRectangle, onMouseMove: (event: MouseEvent) => void, onMouseUp: () => void) {
+    if (rectangle.isNone()) {
+      this.getSvgRootElement().remove(group);
+    } else {
+      group.add(rectangle.getHoverHelper());
+    }
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
   }
 
   private onMouseMove(event: MouseEvent, initialMousePosition: Position, rectangle: SvgRectangle) {
@@ -30,14 +34,6 @@ export class CreateSvgRectangleService implements ICreateSvgElementService {
     const newMousePosition = this.getMousePositonRelatedToWhiteboard(event);
     const newBoundingRectangle = this.getNewBoundingRectangle(initialMousePosition, newMousePosition);
     rectangle.boundingRectangle(newBoundingRectangle);
-  }
-
-  private onMouseUp(rectangle: SvgRectangle) {
-    if (rectangle.isEmpty()) {
-      this.getSvgRootElement().remove(rectangle);
-      return;
-    }
-    this.getSvgRootElement().add(rectangle.getHoverHelper());
   }
 
   private getMousePositonRelatedToWhiteboard(event: MouseEvent): Position {

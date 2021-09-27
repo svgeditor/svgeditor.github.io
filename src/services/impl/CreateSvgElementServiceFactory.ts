@@ -3,9 +3,9 @@ import { ICreateSvgElementServiceFactory } from '../ICreateSvgElementServiceFact
 import { CreateSvgRectangleService } from './CreateSvgRectangleService';
 
 export class CreateSvgElementServiceFactory implements ICreateSvgElementServiceFactory {
-  private svgRectangleCreateService = new CreateSvgRectangleService();
+  private createSvgRectangleService = new CreateSvgRectangleService();
 
   create(): ICreateSvgElementService {
-    return this.svgRectangleCreateService;
+    return this.createSvgRectangleService;
   }
 }

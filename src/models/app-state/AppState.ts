@@ -4,7 +4,7 @@ import { RulerProps, RulerPropsBuilder } from './RulerProps';
 import { Size } from '../Size';
 import { WhiteboardProps, WhiteboardPropsBuilder } from './WhiteboardProps';
 import { ZoomLevel } from './ZoomLevel';
-import { SvgRectangleProps, SvgRectanglePropsBuilder } from '../svg-elements/SvgRectangleProps';
+import { SvgRectangleProps, SvgRectanglePropsBuilder } from './SvgRectangleProps';
 import { SvgRootElement } from '../svg-elements/SvgRootElement';
 
 export class AppState {
@@ -90,6 +90,6 @@ export class AppState {
   }
 
   private getNewSvgRectanglePropsInitValue(): SvgRectangleProps {
-    return new SvgRectanglePropsBuilder().fill('#fff').strokeColor('#707070').strokeWidth(1).build();
+    return new SvgRectanglePropsBuilder().backgroundColor('#fff').borderColor('#707070').borderWidth(1).build();
   }
 }

@@ -3,15 +3,16 @@ import { BoundingRectangle } from '../BoundingRectangle';
 export interface ISvgElement {
   id(id: string): ISvgElement;
   getId(): string;
-  addClass(className: string): ISvgElement;
-  removeClass(className: string): ISvgElement;
-  fill(color: string): ISvgElement;
-  strokeColor(stroke: string): ISvgElement;
-  strokeWidth(width: number): ISvgElement;
+  addCssClass(className: string): ISvgElement;
+  removeCssClass(className: string): ISvgElement;
+  removeAllCssClasses(): ISvgElement;
+  backgroundColor(color: string): ISvgElement;
+  borderColor(stroke: string): ISvgElement;
+  borderWidth(width: number): ISvgElement;
   getElement(): SVGElement;
   clone(): ISvgElement;
-  isEmpty(): boolean;
-  removeAllClasses(): ISvgElement;
+  isNone(): boolean;
   getHoverHelper(): ISvgElement;
   getBoundingRectangle(): BoundingRectangle;
+  add<T extends ISvgElement>(svgElement: T): T;
 }

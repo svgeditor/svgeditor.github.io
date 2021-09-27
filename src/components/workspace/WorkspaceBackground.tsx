@@ -3,9 +3,13 @@ import * as React from 'react';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
 import { ICreateSvgElementServiceFactory } from '../../services/ICreateSvgElementServiceFactory';
 import { CreateSvgElementServiceFactory } from '../../services/impl/CreateSvgElementServiceFactory';
+import { SvgGroup } from '../../models/svg-elements/SvgGroup';
+import { IMoveSvgElementService } from '../../services/IMoveSvgElementService';
+import { MoveSvgElementService } from '../../services/impl/MoveSvgElementService';
 
 export interface IWorkspaceBackgroundProps {
   createSvgElementServiceFactory?: ICreateSvgElementServiceFactory;
+  moveSvgElementService?: IMoveSvgElementService;
 }
 
 export interface IWorkspaceBackgroundState {}
@@ -13,12 +17,14 @@ export interface IWorkspaceBackgroundState {}
 export default class WorkspaceBackground extends React.Component<IWorkspaceBackgroundProps, IWorkspaceBackgroundState> {
   private container: HTMLElement;
   private createSvgElementServiceFactory: ICreateSvgElementServiceFactory;
+  private moveSvgElementService: IMoveSvgElementService;
 
   constructor(props: IWorkspaceBackgroundProps) {
     super(props);
     this.createSvgElementServiceFactory = props.createSvgElementServiceFactory
       ? props.createSvgElementServiceFactory
       : new CreateSvgElementServiceFactory();
+    this.moveSvgElementService = props.moveSvgElementService ? props.moveSvgElementService : new MoveSvgElementService();
   }
 
   public render() {
@@ -45,7 +51,17 @@ export default class WorkspaceBackground extends React.Component<IWorkspaceBackg
   }
 
   private handleMouseDownEvent(event: MouseEvent) {
-    const createSvgElementService = this.createSvgElementServiceFactory.create();
-    createSvgElementService.onMouseDown(event);
+    const svgElement = this.getSvgGroup(event);
+    console.log(this.getSvgGroup(event));
+    if (this.getSvgGroup(event)) {
+      this.moveSvgElementService.moveOnMouseDown(event, svgElement);
+    } else {
+      const createSvgElementService = this.createSvgElementServiceFactory.create();
+      createSvgElementService.createOnMouseDown(event);
+    }
+  }
+
+  private getSvgGroup(event: MouseEvent): SvgGroup {
+    return event.target instanceof SVGElement && event.target.closest('g') != null ? SvgGroup.from(event.target.closest('g')) : null;
   }
 }

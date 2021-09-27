@@ -1,10 +1,10 @@
-import { HOVER_HELPER_SVG_ELEMENT_CSS_CLASS } from '../../constants/constants';
+import { SVG_ELEMENT_HOVER_HELPER_CSS_CLASS } from '../../constants/constants';
 import { RandomIdGenerator } from '../../services/impl/RandomIdGenerator';
 import { BoundingRectangle } from '../BoundingRectangle';
 import { ISvgElement } from './ISvgElement';
 
 export abstract class BaseSvgElement implements ISvgElement {
-  constructor(private randomIdGenerator = RandomIdGenerator.getInstance()) {}
+  constructor(protected randomIdGenerator = RandomIdGenerator.getInstance()) {}
 
   id(id: string): ISvgElement {
     this.getElement().id = id;
@@ -15,32 +15,32 @@ export abstract class BaseSvgElement implements ISvgElement {
     return this.getElement().id;
   }
 
-  addClass(className: string): ISvgElement {
+  addCssClass(className: string): ISvgElement {
     this.getElement().classList.add(className);
     return this;
   }
 
-  removeClass(className: string): ISvgElement {
+  removeCssClass(className: string): ISvgElement {
     this.getElement().classList.remove(className);
     return this;
   }
 
-  fill(color: string): ISvgElement {
+  backgroundColor(color: string): ISvgElement {
     this.getElement().setAttribute('fill', color);
     return this;
   }
 
-  strokeColor(stroke: string): ISvgElement {
+  borderColor(stroke: string): ISvgElement {
     this.getElement().setAttribute('stroke', stroke);
     return this;
   }
 
-  strokeWidth(width: number): ISvgElement {
+  borderWidth(width: number): ISvgElement {
     this.getElement().setAttribute('stroke-width', width + '');
     return this;
   }
 
-  removeAllClasses(): ISvgElement {
+  removeAllCssClasses(): ISvgElement {
     this.getElement().removeAttribute('class');
     return this;
   }
@@ -48,14 +48,19 @@ export abstract class BaseSvgElement implements ISvgElement {
   getHoverHelper(): ISvgElement {
     return this.clone()
       .id(this.randomIdGenerator.generate())
-      .removeAllClasses()
-      .addClass(HOVER_HELPER_SVG_ELEMENT_CSS_CLASS)
-      .strokeColor('#348CF7')
-      .fill('transparent');
+      .removeAllCssClasses()
+      .addCssClass(SVG_ELEMENT_HOVER_HELPER_CSS_CLASS)
+      .borderColor('#348CF7')
+      .backgroundColor('transparent');
   }
 
-  isEmpty(): boolean {
+  isNone(): boolean {
     return !this.getElement().getAttribute('width') || !this.getElement().getAttribute('height');
+  }
+
+  add<T extends ISvgElement>(svgElement: T): T {
+    this.getElement().appendChild(svgElement.getElement());
+    return svgElement;
   }
 
   abstract getElement(): SVGElement;

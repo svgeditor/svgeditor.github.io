@@ -73,13 +73,13 @@ export default class WorkspaceWhiteboard extends React.Component<IWorkspaceWhite
         cursor: move;
       }
 
-      .hover-helper-svg-element {
+      .svg-element-hover-helper {
         pointer-events: none;
         transition: opacity 0.15s ease-in-out;
         opacity: 0;
       }
 
-      .svg-element:hover + .hover-helper-svg-element {
+      .svg-element-group:hover .svg-element-hover-helper {
         opacity: 1;
       }
     `;
