@@ -1,20 +1,7 @@
-import { SVG_ELEMENT_HOVER_HELPER_CSS_CLASS } from '../../constants/constants';
-import { RandomIdGenerator } from '../../services/impl/RandomIdGenerator';
 import { BoundingRectangle } from '../BoundingRectangle';
 import { ISvgElement } from './ISvgElement';
 
 export abstract class BaseSvgElement implements ISvgElement {
-  constructor(protected randomIdGenerator = RandomIdGenerator.getInstance()) {}
-
-  id(id: string): ISvgElement {
-    this.getElement().id = id;
-    return this;
-  }
-
-  getId(): string {
-    return this.getElement().id;
-  }
-
   addCssClass(className: string): ISvgElement {
     this.getElement().classList.add(className);
     return this;
@@ -45,13 +32,9 @@ export abstract class BaseSvgElement implements ISvgElement {
     return this;
   }
 
-  getHoverHelper(): ISvgElement {
-    return this.clone()
-      .id(this.randomIdGenerator.generate())
-      .removeAllCssClasses()
-      .addCssClass(SVG_ELEMENT_HOVER_HELPER_CSS_CLASS)
-      .borderColor('#348CF7')
-      .backgroundColor('transparent');
+  setAttribute(name: string, value: string): ISvgElement {
+    this.getElement().setAttribute(name, value);
+    return this;
   }
 
   isNone(): boolean {

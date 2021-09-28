@@ -3,6 +3,7 @@ import { ZoomLevel } from '../../models/app-state/ZoomLevel';
 import { BoundingRectangle } from '../../models/BoundingRectangle';
 import { Position } from '../../models/Position';
 import { SvgGroup } from '../../models/svg-elements/SvgGroup';
+import { SvgHoverHelperElement } from '../../models/svg-elements/SvgHoverHelperElement';
 import { SvgRectangle } from '../../models/svg-elements/SvgRectangle';
 import { ICreateSvgElementService } from '../ICreateSvgElementService';
 
@@ -23,7 +24,7 @@ export class CreateSvgRectangleService implements ICreateSvgElementService {
     if (rectangle.isNone()) {
       this.getSvgRootElement().remove(group);
     } else {
-      group.add(rectangle.getHoverHelper());
+      group.add(new SvgHoverHelperElement(rectangle.getBoundingRectangle()));
     }
     document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseup', onMouseUp);

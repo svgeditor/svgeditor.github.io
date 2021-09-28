@@ -52,7 +52,6 @@ export default class WorkspaceBackground extends React.Component<IWorkspaceBackg
 
   private handleMouseDownEvent(event: MouseEvent) {
     const svgElement = this.getSvgGroup(event);
-    console.log(this.getSvgGroup(event));
     if (this.getSvgGroup(event)) {
       this.moveSvgElementService.moveOnMouseDown(event, svgElement);
     } else {

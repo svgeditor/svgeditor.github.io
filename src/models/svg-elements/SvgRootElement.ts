@@ -5,7 +5,7 @@ import { SvgGroup } from './SvgGroup';
 import { SVG_NAMESPACE, SVG_ELEMENT_GROUP_CSS_CLASS } from '../../constants/constants';
 
 export class SvgRootElement {
-  private constructor(private svg: SVGSVGElement, private randomIdGenerator = RandomIdGenerator.getInstance()) {}
+  private constructor(private svg: SVGSVGElement) {}
 
   static from(svg: SVGSVGElement): SvgRootElement {
     return new SvgRootElement(svg);
@@ -35,7 +35,6 @@ export class SvgRootElement {
     const element = document.createElementNS(SVG_NAMESPACE, 'g');
     this.svg.appendChild(element);
     const res = SvgGroup.from(element);
-    res.id(this.randomIdGenerator.generate());
     res.addCssClass(SVG_ELEMENT_GROUP_CSS_CLASS);
     return res;
   }
